@@ -1,11 +1,8 @@
+import React from "react";
+import RouterCustom from "./router.jsx";
+
 function App() {
-  return (
-    <div className="flex justify-center items-center h-screen bg-gray-100">
-      <h1 className="text-4xl font-bold text-blue-600">
-        Tailwind đã lên sóng! Website ToiYeuPC sẵn sàng!
-      </h1>
-    </div>
-  )
+  return <RouterCustom />;
 }
 
-export default App
+export default App;

@@ -1,0 +1,8 @@
+// style.scss — Entry point: gom tất cả SCSS
+@use "sass:color";
+@use './clients/theme'  as *;
+@use './clients/footer' as *;
+@use './clients/styles' as *;
+@use './admin/admin'    as *;
+
+
