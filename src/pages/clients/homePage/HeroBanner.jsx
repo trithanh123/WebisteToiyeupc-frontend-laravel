@@ -10,8 +10,8 @@ const banners = [banner1, banner2, banner3];
 
 const HeroBanner = () => {
   const [current, setCurrent] = useState(0);
-const totalSlides = 4; // Tổng cộng có 4 slide (1 slide Figma + 3 slide ảnh)
-  // Auto-slide mỗi 4 giây
+const totalSlides = 4; 
+
   useEffect(() => {
     const timer = setInterval(() => {
       setCurrent((c) => (c + 1) % totalSlides);
@@ -22,22 +22,22 @@ const totalSlides = 4; // Tổng cộng có 4 slide (1 slide Figma + 3 slide ả
   const prev = () => setCurrent((c) => (c - 1 + totalSlides) % totalSlides);
   return (
     <section className="bg-white py-6">
-      {/* Khung chính bọc toàn bộ Slider */}
+      {}
       <div className="max-w-[1280px] mx-auto relative group overflow-hidden rounded-[24px] shadow-sm">
-        
-        {/* Đường ray trượt (Bắt buộc phải bọc CẢ 4 SLIDE ở trong này) */}
+
+        {}
         <div 
           className="flex transition-transform duration-700 ease-in-out h-[560px]"
           style={{ transform: `translateX(-${current * 100}%)` }}
         >
-          
-          {/* ================= SLIDE 0: GIAO DIỆN FIGMA CHÍNH ================= */}
+
+          {}
           <div className="w-full shrink-0 h-full bg-gradient-to-br from-[#e1e3e6] to-[#d1d5db] relative flex px-8 py-10 select-none">
             <span className="absolute top-[68%] -translate-y-1/2 left-0 text-[140px] lg:text-[170px] font-black text-white/70 tracking-tight whitespace-nowrap z-0 pointer-events-none leading-none">
               BUILD PC
             </span>
 
-            {/* Cột Trái */}
+            {}
             <div className="relative z-10 w-[42%] flex flex-col justify-between h-full">
               <div className="mb-auto">
                 <p className="font-extrabold text-[16px] uppercase text-black mb-1.5 tracking-wide">TÔIYEUPC</p>
@@ -53,10 +53,10 @@ const totalSlides = 4; // Tổng cộng có 4 slide (1 slide Figma + 3 slide ả
               </Link>
             </div>
 
-            {/* Ở Giữa */}
+            {}
             <img src={laptopImg} alt="Laptop" className="absolute left-[48%] top-[45%] -translate-x-1/2 -translate-y-1/2 w-[400px] lg:w-[480px] -rotate-[15deg] z-20 drop-shadow-2xl object-contain pointer-events-none" />
 
-            {/* Cột Phải */}
+            {}
             <div className="relative z-10 w-[35%] ml-auto flex flex-col justify-between h-full items-end">
               <img src={pcImg} alt="PC Case" className="h-[220px] lg:h-[270px] object-contain drop-shadow-xl mr-4" />
               <div className="flex flex-col gap-1.5 max-w-[260px] text-left relative z-20">
@@ -64,7 +64,7 @@ const totalSlides = 4; // Tổng cộng có 4 slide (1 slide Figma + 3 slide ả
                 <p className="text-[11px] lg:text-[12px] font-bold text-gray-500 uppercase leading-[1.6]">
                   Chúng tôi có 5 chi nhánh khác nhau trên mỗi thành phố chi nhánh chính gần nhất ở Cao Lỗ Quận 8
                 </p>
-                {/* Nút mũi tên chuyển Slide */}
+                {}
                 <button
                   onClick={next}
                   className="w-[42px] h-[42px] mt-2 rounded-full bg-white border border-gray-300 flex items-center justify-center text-black hover:bg-gray-100 transition-colors shadow-sm"
@@ -77,9 +77,9 @@ const totalSlides = 4; // Tổng cộng có 4 slide (1 slide Figma + 3 slide ả
               </div>
             </div>
           </div>
-          {/* =========== KẾT THÚC SLIDE 0 =========== */}
+          {}
 
-          {/* ================= SLIDE 1, 2, 3 ================= */}
+          {}
           <div className="w-full shrink-0 h-full">
             <img src={banner1} alt="Khuyến mãi 1" className="w-full h-full object-cover" />
           </div>
@@ -91,9 +91,9 @@ const totalSlides = 4; // Tổng cộng có 4 slide (1 slide Figma + 3 slide ả
           </div>
 
         </div> 
-        {/* === ĐÓNG ĐƯỜNG RAY TRƯỢT Ở ĐÂY === */}
+        {}
 
-        {/* Nút bấm lướt thủ công qua TRÁI (Hiện khi rê chuột vào) */}
+        {}
         <button 
           onClick={prev}
           className="absolute top-1/2 left-4 -translate-y-1/2 w-12 h-12 rounded-full bg-black/30 hover:bg-black/60 text-white flex items-center justify-center shadow-md transition-all opacity-0 group-hover:opacity-100 z-30"
@@ -102,7 +102,7 @@ const totalSlides = 4; // Tổng cộng có 4 slide (1 slide Figma + 3 slide ả
             <polyline points="15 18 9 12 15 6"></polyline>
           </svg>
         </button>
-        {/* Dấu chấm điều hướng (Dots) ở dưới đáy */}
+        {}
         <div className="absolute bottom-5 left-1/2 -translate-x-1/2 flex gap-2 z-30">
           {[0, 1, 2, 3].map((index) => (
             <button 

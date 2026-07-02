@@ -132,7 +132,7 @@ const Homepage = () => {
           </a>
         </div>
       </header>
-      {/* ===== HERO BANNER ===== */}
+      {}
       <section className="bg-gray-100 py-8">
         <div className="max-w-7xl mx-auto px-4">
           <div className="bg-white rounded-2xl overflow-hidden flex flex-col md:flex-row items-center px-8 py-8 gap-6 shadow-sm">
@@ -162,10 +162,10 @@ const Homepage = () => {
           </div>
         </div>
       </section>
-      {/* ===== CATEGORY CARDS ===== */}
+      {}
       <section className="bg-gray-900 py-6">
         <div className="max-w-7xl mx-auto px-4 grid grid-cols-3 gap-4">
-          {/* Card 1 - Máy Tính */}
+          {}
           <div className="relative rounded-xl overflow-hidden h-36 bg-gray-800 flex items-center justify-between px-5 cursor-pointer hover:opacity-90">
             <div>
               <p className="text-gray-400 text-xs">Tại đây</p>
@@ -175,7 +175,7 @@ const Homepage = () => {
             </div>
             <img src={pcHero} alt="Máy Tính" className="h-28 object-contain" />
           </div>
-          {/* Card 2 - Laptop */}
+          {}
           <div className="relative rounded-xl overflow-hidden h-36 bg-gray-800 flex items-center justify-between px-5 cursor-pointer hover:opacity-90">
             <div>
               <p className="text-gray-400 text-xs">Tại đây</p>
@@ -185,7 +185,7 @@ const Homepage = () => {
             </div>
             <img src={laptopHero} alt="Laptop" className="h-28 object-contain" />
           </div>
-          {/* Card 3 - Laptop Gaming */}
+          {}
           <div className="relative rounded-xl overflow-hidden h-36 bg-gray-800 flex items-center justify-between px-5 cursor-pointer hover:opacity-90">
             <div>
               <p className="text-gray-400 text-xs">Tại đây</p>
@@ -195,7 +195,7 @@ const Homepage = () => {
             </div>
             <img src={laptopGaming} alt="Laptop Gaming" className="h-28 object-contain" />
           </div>
-          {/* Card 4 - Màn Hình */}
+          {}
           <div className="relative rounded-xl overflow-hidden h-36 bg-gradient-to-r from-pink-600 to-purple-700 flex items-center justify-between px-5 cursor-pointer hover:opacity-90">
             <div>
               <p className="text-pink-200 text-xs">Tại đây</p>
@@ -205,7 +205,7 @@ const Homepage = () => {
             </div>
             <img src={manhinh} alt="Màn Hình" className="h-28 object-contain" />
           </div>
-          {/* Card 5 - Bàn Phím */}
+          {}
           <div className="relative rounded-xl overflow-hidden h-36 bg-gray-800 flex items-center justify-between px-5 cursor-pointer hover:opacity-90">
             <div>
               <p className="text-gray-400 text-xs">Tại đây</p>
@@ -215,7 +215,7 @@ const Homepage = () => {
             </div>
             <img src={banphim} alt="Bàn Phím" className="h-28 object-contain" />
           </div>
-          {/* Card 6 - Chuột */}
+          {}
           <div className="relative rounded-xl overflow-hidden h-36 bg-white flex items-center justify-between px-5 cursor-pointer hover:opacity-90 shadow">
             <div>
               <p className="text-gray-400 text-xs">Tại đây</p>
@@ -227,7 +227,7 @@ const Homepage = () => {
           </div>
         </div>
       </section>
-      {/* ===== SERVICE BAR ===== */}
+      {}
       <section className="bg-white border-y border-gray-200 py-4">
         <div className="max-w-7xl mx-auto px-4 grid grid-cols-4 divide-x divide-gray-200">
           {[
@@ -247,7 +247,7 @@ const Homepage = () => {
         </div>
       </section>
 
-      {/* ===== PROMO BANNER ===== */}
+      {}
       <section className="bg-gray-100 py-6">
         <div className="max-w-7xl mx-auto px-4">
           <div className="bg-red-600 rounded-2xl overflow-hidden flex items-center justify-between px-8 py-6">
@@ -272,7 +272,7 @@ const Homepage = () => {
           </div>
         </div>
       </section>
-      {/* ===== TOP PC BÁN CHẠY ===== */}
+      {}
       <section className="bg-white py-10">
         <div className="max-w-7xl mx-auto px-4">
           <div className="text-center mb-6">
@@ -293,7 +293,7 @@ const Homepage = () => {
         </div>
       </section>
 
-      {/* ===== CATEGORY ICONS BAR ===== */}
+      {}
       <section className="bg-white border-t border-b border-blue-200 py-4">
         <div className="max-w-7xl mx-auto px-4">
           <div className="flex items-center justify-around flex-wrap gap-2">
@@ -308,7 +308,7 @@ const Homepage = () => {
           </div>
         </div>
       </section>
-      {/* ===== TIN TỨC CÔNG NGHỆ ===== */}
+      {}
       <section className="bg-white py-10">
         <div className="max-w-7xl mx-auto px-4">
           <div className="text-center mb-6">
@@ -335,7 +335,7 @@ const Homepage = () => {
         </div>
       </section>
 
-      {/* ===== BRAND LOGOS ===== */}
+      {}
       <section className="bg-white border-t border-gray-100 py-6">
         <div className="max-w-7xl mx-auto px-4">
           <div className="flex items-center justify-around flex-wrap gap-6">
@@ -352,7 +352,7 @@ const Homepage = () => {
           </div>
         </div>
       </section>
-      {/* ===== FOOTER ===== */}
+      {}
       <footer className="bg-gray-900 text-gray-300 pt-10 pb-4">
         <div className="max-w-7xl mx-auto px-4">
           <div className="grid grid-cols-5 gap-6 mb-8">

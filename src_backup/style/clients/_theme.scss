@@ -1,0 +1,270 @@
+// ============================================================
+// _theme.scss — Header & MasterLayout styles
+// ============================================================
+
+$red:    #e53e3e;
+$dark:   #1a202c;
+$white:  #ffffff;
+
+// ---------- Header ----------
+.header {
+  background: $white;
+  box-shadow: 0 1px 6px rgba(0,0,0,0.1);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+
+  &__inner {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 8px 16px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  // Logo
+  &__logo img {
+    height: 40px;
+    object-fit: contain;
+    display: block;
+  }
+
+  // ── Danh Mục button ──
+  &__menu {
+    position: relative;
+    flex-shrink: 0;
+
+    &-btn {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      background: $red;
+      color: $white;
+      border: none;
+      padding: 8px 14px;
+      border-radius: 6px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: background 0.2s;
+
+      &:hover { background: #c53030; }
+    }
+  }
+
+  &__dropdown {
+    position: absolute;
+    top: calc(100% + 6px);
+    left: 0;
+    background: $white;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.12);
+    min-width: 190px;
+    list-style: none;
+    padding: 6px 0;
+    margin: 0;
+    z-index: 200;
+
+    li a {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 16px;
+      font-size: 13px;
+      color: $dark;
+      text-decoration: none;
+      transition: background 0.15s, color 0.15s;
+
+      &:hover {
+        background: #fff5f5;
+        color: $red;
+      }
+    }
+  }
+
+  // ── Chi Nhánh dropdown ──
+  &__branch {
+    position: relative;
+    flex-shrink: 0;
+
+    &-btn {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: #f7f8fa;
+      border: 1.5px solid #e2e8f0;
+      color: $dark;
+      padding: 7px 12px;
+      border-radius: 6px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: border-color 0.2s, background 0.2s;
+
+      &:hover {
+        border-color: $red;
+        background: #fff5f5;
+        color: $red;
+      }
+
+      svg { flex-shrink: 0; }
+    }
+
+    &-dropdown {
+      position: absolute;
+      top: calc(100% + 6px);
+      left: 0;
+      background: $white;
+      border: 1px solid #e2e8f0;
+      border-radius: 10px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.12);
+      min-width: 260px;
+      list-style: none;
+      padding: 6px 0;
+      margin: 0;
+      z-index: 200;
+    }
+
+    &-item {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 2px;
+      width: 100%;
+      padding: 10px 16px;
+      background: none;
+      border: none;
+      cursor: pointer;
+      text-align: left;
+      transition: background 0.15s;
+
+      &:hover { background: #f7f8fa; }
+
+      &--active {
+        background: #fff5f5;
+        .header__branch-name { color: $red; }
+      }
+    }
+
+    &-name {
+      font-size: 13px;
+      font-weight: 600;
+      color: $dark;
+    }
+
+    &-addr {
+      font-size: 11px;
+      color: #718096;
+    }
+  }
+
+  // ── Search ──
+  &__search {
+    flex: 1;
+    display: flex;
+    border: 1.5px solid #e2e8f0;
+    border-radius: 6px;
+    overflow: hidden;
+    transition: border-color 0.2s;
+    min-width: 0;
+
+    &:focus-within { border-color: $red; }
+
+    input {
+      flex: 1;
+      padding: 8px 12px;
+      font-size: 13px;
+      border: none;
+      outline: none;
+      color: $dark;
+      min-width: 0;
+
+      &::placeholder { color: #a0aec0; }
+    }
+
+    button {
+      background: $red;
+      color: $white;
+      border: none;
+      padding: 8px 14px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.2s;
+      flex-shrink: 0;
+
+      &:hover { background: #c53030; }
+    }
+  }
+
+  // ── Auth ──
+  &__auth {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0;
+  }
+
+  &__cart {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    text-decoration: none;
+    color: $dark;
+    font-size: 13px;
+    font-weight: 500;
+    padding: 7px 10px;
+    border-radius: 6px;
+    transition: background 0.2s, color 0.2s;
+
+    &:hover { background: #f7f8fa; color: $red; }
+
+    &-label { white-space: nowrap; }
+
+    &-count {
+      background: $red;
+      color: $white;
+      font-size: 10px;
+      font-weight: 700;
+      min-width: 18px;
+      height: 18px;
+      border-radius: 9px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0 4px;
+    }
+  }
+
+  &__login-btn {
+    background: $dark;
+    color: $white;
+    padding: 8px 16px;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 600;
+    text-decoration: none;
+    white-space: nowrap;
+    transition: background 0.2s;
+
+    &:hover { background: #2d3748; }
+  }
+}
+
+// ---------- MasterLayout ----------
+.master-layout {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+
+  &__content {
+    flex: 1;
+    background: #f7f8fa;
+  }
+}

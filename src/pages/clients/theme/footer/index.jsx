@@ -8,11 +8,11 @@ import codLogo from "../../../../assets/images/cod.png";
 const Footer = () => {
   return (
     <footer>
-      {/* Main content — white background */}
+      {}
       <div className="bg-white border-t border-gray-200 py-10">
         <div className="max-w-[1280px] mx-auto px-4 grid grid-cols-5 gap-8">
 
-          {/* Col 1 — Về chúng tôi */}
+          {}
           <div>
             <h4 className="text-[12px] font-bold text-gray-900 uppercase tracking-wide mb-4">VỀ CHÚNG TÔI</h4>
             <ul className="flex flex-col gap-2">
@@ -22,7 +22,7 @@ const Footer = () => {
             </ul>
           </div>
 
-          {/* Col 2 — Chính sách */}
+          {}
           <div>
             <h4 className="text-[12px] font-bold text-gray-900 uppercase tracking-wide mb-4">CHÍNH SÁCH</h4>
             <ul className="flex flex-col gap-2">
@@ -32,7 +32,7 @@ const Footer = () => {
             </ul>
           </div>
 
-          {/* Col 3 — Hướng dẫn */}
+          {}
           <div>
             <h4 className="text-[12px] font-bold text-gray-900 uppercase tracking-wide mb-4">HƯỚNG DẪN</h4>
             <ul className="flex flex-col gap-2">
@@ -42,7 +42,7 @@ const Footer = () => {
             </ul>
           </div>
 
-          {/* Col 4 — Tổng đài */}
+          {}
           <div>
             <h4 className="text-[12px] font-bold text-gray-900 uppercase tracking-wide mb-4">TỔNG ĐÀI HỖ TRỢ: 8:00 – 21:00</h4>
             <ul className="flex flex-col gap-3">
@@ -59,7 +59,7 @@ const Footer = () => {
             </ul>
           </div>
 
-          {/* Col 5 — Vận chuyển + Thanh toán + BCT */}
+          {}
           <div>
             <h4 className="text-[12px] font-bold text-gray-900 uppercase tracking-wide mb-3">ĐƠN VỊ VẬN CHUYỂN</h4>
             <div className="flex gap-2 mb-4 items-center">
@@ -76,7 +76,7 @@ const Footer = () => {
         </div>
       </div>
 
-      {/* Bottom bar — dark */}
+      {}
       <div className="bg-[#1a202c] py-4">
         <div className="max-w-[1280px] mx-auto px-4 flex items-center justify-between">
           <p className="text-[12px] text-gray-400 m-0">

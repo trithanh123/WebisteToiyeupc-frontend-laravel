@@ -1,0 +1,303 @@
+// _admin.scss — Admin & Staff layout styles
+$sidebar-width:   260px;
+$topbar-h:        60px;
+$sidebar-active:  #e53e3e;
+
+// ── Shared layout ────────────────────────────────────────────
+.admin-layout,
+.staff-layout {
+  display: flex;
+  min-height: 100vh;
+  background: #f1f5f9;
+
+  &__main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    min-width: 0;
+  }
+
+  &__topbar {
+    height: $topbar-h;
+    background: #fff;
+    border-bottom: 1px solid #e2e8f0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 24px;
+    flex-shrink: 0;
+  }
+
+  &__topbar-right {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: #374151;
+  }
+
+  &__bell {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #374151;
+    display: flex;
+    align-items: center;
+    padding: 4px;
+    border-radius: 6px;
+    transition: background 0.15s;
+
+    &:hover { background: #f1f5f9; }
+  }
+
+  &__username {
+    font-size: 14px;
+    font-weight: 600;
+    color: #374151;
+    white-space: nowrap;
+  }
+
+  &__content {
+    flex: 1;
+    padding: 24px;
+    overflow-y: auto;
+  }
+}
+
+// ── Sidebar shared ────────────────────────────────────────────
+.admin-sidebar,
+.staff-sidebar {
+  width: $sidebar-width;
+  background: #fff;
+  border-right: 1px solid #e2e8f0;
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+
+  // Logo area
+  &__logo {
+    height: $topbar-h;
+    display: flex;
+    align-items: center;
+    padding: 0 20px;
+    border-bottom: 1px solid #e2e8f0;
+    flex-shrink: 0;
+  }
+
+  &__logo-link {
+    display: flex;
+    align-items: center;
+    text-decoration: none;
+  }
+
+  &__logo-img {
+    height: 36px;
+    width: auto;
+    object-fit: contain;
+  }
+
+  // Nav
+  &__nav {
+    flex: 1;
+    padding: 12px 0;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    overflow-y: auto;
+  }
+
+  &__item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 11px 20px;
+    color: #374151;
+    text-decoration: none;
+    font-size: 13.5px;
+    font-weight: 500;
+    border-radius: 0;
+    transition: background 0.15s, color 0.15s;
+    white-space: nowrap;
+
+    &:hover {
+      background: #f8fafc;
+      color: #111827;
+    }
+
+    &--active {
+      background: #fef2f2;
+      color: $sidebar-active;
+      font-weight: 600;
+    }
+  }
+
+  &__icon-wrap {
+    color: #9ca3af;
+    display: flex;
+    align-items: center;
+    flex-shrink: 0;
+    transition: color 0.15s;
+
+    &--active { color: $sidebar-active; }
+  }
+
+  &__item:hover &__icon-wrap {
+    color: #374151;
+  }
+
+  &__label {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+}
+
+// ── Dashboard skeleton ────────────────────────────────────────
+.skeleton-block {
+  background: #9ca3af;
+  border-radius: 8px;
+  opacity: 0.7;
+}
+
+.dash-stats-row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.dash-stat-card {
+  height: 130px;
+}
+
+.dash-main-grid {
+  display: grid;
+  grid-template-columns: 1fr 340px;
+  gap: 16px;
+
+  &__left {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  &__right {
+    display: flex;
+    flex-direction: column;
+  }
+}
+
+.dash-chart-large {
+  height: 310px;
+}
+
+.dash-chart-small {
+  height: 200px;
+}
+
+.dash-panel-tall {
+  height: 526px;
+}
+
+// ── Admin Table (kept for StaffOrders page) ───────────────────
+.admin-table-wrap {
+  background: #fff;
+  border-radius: 10px;
+  padding: 20px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+
+  &__title {
+    font-size: 16px;
+    font-weight: 700;
+    color: #1a202c;
+    margin: 0 0 16px;
+  }
+}
+
+.admin-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+
+  th {
+    text-align: left;
+    padding: 10px 12px;
+    background: #f7f8fa;
+    color: #4a5568;
+    font-weight: 600;
+    border-bottom: 1px solid #e2e8f0;
+    white-space: nowrap;
+  }
+
+  td {
+    padding: 12px;
+    border-bottom: 1px solid #f0f0f0;
+    color: #2d3748;
+  }
+
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: #fafafa; }
+
+  &__badge {
+    display: inline-block;
+    color: #fff;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 3px 10px;
+    border-radius: 20px;
+    white-space: nowrap;
+  }
+
+  &__action-btn {
+    background: #3182ce;
+    color: #fff;
+    border: none;
+    padding: 5px 12px;
+    border-radius: 4px;
+    font-size: 12px;
+    cursor: pointer;
+    transition: background 0.2s;
+
+    &:hover { background: #2b6cb0; }
+  }
+
+  &__empty {
+    text-align: center;
+    color: #a0aec0;
+    padding: 24px;
+    font-size: 14px;
+  }
+}
+
+// ── Staff Filter ──────────────────────────────────────────────
+.staff-filter {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 20px;
+
+  &__input {
+    flex: 1;
+    padding: 9px 14px;
+    border: 1.5px solid #e2e8f0;
+    border-radius: 6px;
+    font-size: 14px;
+    outline: none;
+    background: #fff;
+    transition: border-color 0.2s;
+
+    &:focus { border-color: #3182ce; }
+  }
+
+  &__select {
+    padding: 9px 14px;
+    border: 1.5px solid #e2e8f0;
+    border-radius: 6px;
+    font-size: 14px;
+    outline: none;
+    background: #fff;
+    cursor: pointer;
+    transition: border-color 0.2s;
+
+    &:focus { border-color: #3182ce; }
+  }
+}

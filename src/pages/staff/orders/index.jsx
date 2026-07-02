@@ -29,7 +29,7 @@ const StaffOrders = () => {
 
   return (
     <StaffMasterLayout title="Quản Lý Đơn Hàng">
-      {/* Filter bar */}
+      {}
       <div className="staff-filter">
         <input
           type="text"
@@ -49,7 +49,7 @@ const StaffOrders = () => {
         </select>
       </div>
 
-      {/* Orders table */}
+      {}
       <div className="admin-table-wrap">
         <table className="admin-table">
           <thead>

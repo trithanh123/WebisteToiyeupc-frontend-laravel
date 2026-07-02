@@ -1,0 +1,7 @@
+@import "tailwindcss";
+
+/* Global font — đảm bảo toàn trang dùng font sans-serif hiện đại */
+*, *::before, *::after {
+  font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
+  box-sizing: border-box;
+}

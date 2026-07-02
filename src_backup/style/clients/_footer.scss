@@ -1,0 +1,180 @@
+// ============================================================
+// _footer.scss — Footer styles (nền trắng cho nội dung, đen cho bottom bar)
+// ============================================================
+
+.footer {
+  // Phần nội dung chính: nền TRẮNG
+  background: #ffffff;
+  color: #4a5568;
+  font-family: 'Inter', 'Segoe UI', system-ui, sans-serif;
+
+  &__inner {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 40px 24px 36px;
+    display: grid;
+    grid-template-columns: 1.2fr 1fr 1.2fr 1.3fr 1.2fr;
+    gap: 32px;
+    border-top: 1px solid #e2e8f0;
+  }
+
+  &__col {
+    h4 {
+      color: #1a202c;           // chữ đen đậm
+      font-size: 12px;
+      font-weight: 700;
+      margin: 0 0 14px;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+    }
+
+    ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 9px;
+    }
+
+    a {
+      color: #4a5568;           // chữ xám tối trên nền trắng
+      text-decoration: none;
+      font-size: 13px;
+      transition: color 0.2s;
+
+      &:hover { color: #e53e3e; }
+    }
+
+    p {
+      font-size: 13px;
+      color: #4a5568;
+      margin: 4px 0;
+    }
+  }
+
+  // Hotlines
+  &__hotlines {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+
+    li {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 13px;
+      color: #4a5568;
+    }
+  }
+
+  &__hotline-num {
+    color: #e53e3e;             // đỏ nổi bật trên nền trắng
+    font-weight: 700;
+    font-size: 14px;
+    text-decoration: none;
+    transition: color 0.2s;
+
+    &:hover { color: #c53030; }
+  }
+
+  // Shipping badges
+  &__shipping {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 20px;
+  }
+
+  &__shipping-badge {
+    padding: 5px 12px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: 0.5px;
+
+    &--ghn  { background: #e53e3e; color: #fff; }
+    &--ghtk { background: #f6ad55; color: #1a202c; }
+  }
+
+  &__payment-title {
+    color: #1a202c;
+    font-size: 12px;
+    font-weight: 700;
+    margin: 0 0 10px !important;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+  }
+
+  &__payment {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 16px;
+  }
+
+  &__payment-badge {
+    padding: 5px 12px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: 800;
+    background: #3182ce;
+    color: #fff;
+
+    &--cod { background: #38a169; }
+  }
+
+  &__bocongthuong {
+    height: 52px;
+    object-fit: contain;
+    margin-top: 4px;
+    display: block;
+  }
+
+  // ── Bottom bar: CHỈ phần này có nền đen ──
+  &__bottom {
+    background: #1a202c;        // nền đen chỉ ở dải băng dưới cùng
+    border-top: none;
+  }
+
+  &__bottom-inner {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 12px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+
+    p {
+      font-size: 12px;
+      color: #a0aec0;           // chữ xám nhạt trên nền đen
+      margin: 0;
+    }
+  }
+
+  &__social {
+    display: flex;
+    gap: 10px;
+    flex-shrink: 0;
+  }
+
+  &__social-link {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background: #2d3748;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #a0aec0;
+    text-decoration: none;
+    transition: background 0.2s, color 0.2s;
+
+    &:hover {
+      background: #e53e3e;
+      color: #fff;
+    }
+  }
+}

@@ -165,40 +165,161 @@ $white:  #ffffff;
   // ── Search ──
   &__search {
     flex: 1;
-    display: flex;
-    border: 1.5px solid #e2e8f0;
-    border-radius: 6px;
-    overflow: hidden;
-    transition: border-color 0.2s;
+    position: relative;
     min-width: 0;
 
-    &:focus-within { border-color: $red; }
+    form {
+      display: flex;
+      align-items: stretch;   // ← cả input lẫn button tự giãn đệu
+      width: 100%;
+      height: 40px;
+      border: 1.5px solid #e2e8f0;
+      border-radius: 6px;
+      overflow: hidden;
+      transition: border-color 0.2s;
+
+      &:focus-within { border-color: $red; }
+    }
 
     input {
       flex: 1;
-      padding: 8px 12px;
+      padding: 0 12px;
       font-size: 13px;
       border: none;
       outline: none;
       color: $dark;
       min-width: 0;
+      background: transparent;
 
       &::placeholder { color: #a0aec0; }
     }
 
-    button {
-      background: $red;
-      color: $white;
+    button[type="submit"] {
+      flex-shrink: 0;
+      width: 44px;
+      background: #f7f8fa;
       border: none;
-      padding: 8px 14px;
+      border-left: 1.5px solid #e2e8f0;
+      color: #666;
       cursor: pointer;
       display: flex;
       align-items: center;
       justify-content: center;
-      transition: background 0.2s;
-      flex-shrink: 0;
+      transition: color 0.2s, background 0.2s;
 
-      &:hover { background: #c53030; }
+      &:hover { color: $red; background: #fff5f5; }
+    }
+
+    /* ── Dropdown AI Search ── */
+    &-dropdown {
+      position: absolute;
+      top: 45px;
+      left: 0;
+      width: 450px;
+      background: #fff;
+      border-radius: 8px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+      border: 1px solid #eee;
+      z-index: 1000;
+      padding: 16px;
+    }
+
+    &-popular-title {
+      font-size: 13px;
+      font-weight: 700;
+      color: #6b7280;
+      margin-bottom: 12px;
+      text-transform: uppercase;
+    }
+
+    &-popular-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    &-pill {
+      background: #f3f4f6;
+      padding: 6px 12px;
+      border-radius: 999px;
+      font-size: 13px;
+      cursor: pointer;
+      color: #374151;
+      transition: background 0.2s;
+
+      &:hover { background: #e5e7eb; }
+    }
+
+    &-loading {
+      padding: 16px 0;
+      text-align: center;
+      color: #2563eb;
+      font-weight: 500;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+
+      svg {
+        width: 20px;
+        height: 20px;
+        animation: spin 1s linear infinite;
+      }
+
+      @keyframes spin {
+        from { transform: rotate(0deg); }
+        to { transform: rotate(360deg); }
+      }
+    }
+
+    &-ai-title {
+      font-size: 13px;
+      font-weight: 700;
+      color: #2563eb;
+      margin-bottom: 12px;
+      border-bottom: 1px solid #eee;
+      padding-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    &-item {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      padding: 8px;
+      border-radius: 6px;
+      text-decoration: none;
+      transition: background 0.2s;
+
+      &:hover { background: #f9fafb; }
+    }
+
+    &-item-img {
+      width: 48px;
+      height: 48px;
+      object-fit: contain;
+      background: #fff;
+      border: 1px solid #eee;
+      border-radius: 4px;
+    }
+
+    &-item-name {
+      font-size: 13px;
+      font-weight: 600;
+      color: #1f2937;
+      margin-bottom: 2px;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    &-item-price {
+      font-size: 14px;
+      font-weight: 700;
+      color: #ef4444;
     }
   }
 
@@ -268,3 +389,344 @@ $white:  #ffffff;
     background: #f7f8fa;
   }
 }
+
+// ---------- Mega Menu ----------
+.mgear-mega-wrap {
+  position: fixed;
+  left: 0;
+  right: 0;
+  z-index: 9999;
+  display: flex;
+  justify-content: center;
+}
+.mgear-mega-inner {
+  width: 100%;
+  max-width: 1280px;
+  display: flex;
+  background: #fff;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.16);
+  border: 1px solid #e5e7eb;
+  border-top: none;
+  border-radius: 0 0 10px 10px;
+  overflow: hidden;
+}
+.mgear-side-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 14px;
+  font-size: 13.5px;
+  color: #1e293b;
+  font-weight: 500;
+  border-left: 3px solid transparent;
+  cursor: pointer;
+  white-space: nowrap;
+  text-decoration: none;
+  transition: background 0.12s, color 0.12s, border-color 0.12s;
+}
+.mgear-side-item:hover,
+.mgear-side-item.active {
+  background: #fff1f2;
+  color: #dc2626;
+  border-left-color: #dc2626;
+  font-weight: 700;
+}
+.mgear-side-item .mgear-arrow {
+  margin-left: auto;
+  font-size: 14px;
+  color: #9ca3af;
+}
+.mgear-l2-title {
+  font-size: 12.5px;
+  font-weight: 800;
+  color: #dc2626;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  margin-bottom: 7px;
+  padding-bottom: 5px;
+  border-bottom: 1.5px solid #fee2e2;
+  text-decoration: none;
+  display: block;
+  cursor: pointer;
+}
+.mgear-l2-title:hover { color: #b91c1c; }
+.mgear-l3-link {
+  display: block;
+  font-size: 13px;
+  color: #374151;
+  padding: 3px 0;
+  text-decoration: none;
+  cursor: pointer;
+  line-height: 1.55;
+}
+.mgear-l3-link:hover { color: #dc2626; }
+
+.mgear-mega-col-left {
+  width: 220px;
+  background: #f9fafb;
+  border-right: 1px solid #e5e7eb;
+  overflow-y: auto;
+  flex-shrink: 0;
+  max-height: 480px;
+  padding-top: 6px;
+  padding-bottom: 6px;
+}
+
+.mgear-mega-col-right {
+  flex: 1;
+  min-width: 0;
+  max-height: 480px;
+  overflow-y: auto;
+  padding: 18px 28px;
+  background: #fff;
+}
+
+.mgear-mega-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 20px 28px;
+  align-items: start;
+}
+
+// ============================================================
+// pv-search — Thanh tìm kiếm style Phong Vũ
+// ============================================================
+.pv-search {
+  flex: 1;
+  position: relative;
+  min-width: 0;
+
+  // ── Form wrapper ──
+  &__form {
+    display: flex;
+    align-items: center;
+    height: 42px;
+    background: #fff;
+    border: 1.5px solid #d1d5db;
+    border-radius: 6px;
+    overflow: hidden;
+    transition: border-color 0.2s, box-shadow 0.2s;
+
+    &:focus-within {
+      border-color: #2563eb;
+      box-shadow: 0 0 0 3px rgba(37,99,235,0.10);
+    }
+  }
+
+  // ── Icon kính lúp bên trái ──
+  &__icon {
+    flex-shrink: 0;
+    margin: 0 10px 0 12px;
+    color: #9ca3af;
+    pointer-events: none;
+  }
+
+  // ── Input ──
+  &__input {
+    flex: 1;
+    height: 100%;
+    border: none;
+    outline: none;
+    background: transparent;
+    font-size: 13.5px;
+    color: #1f2937;
+    min-width: 0;
+    padding: 0;
+
+    &::placeholder { color: #9ca3af; }
+  }
+
+  // ── Nút xóa (×) ──
+  &__clear {
+    flex-shrink: 0;
+    width: 28px;
+    height: 28px;
+    margin: 0 4px;
+    border: none;
+    background: #f3f4f6;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #6b7280;
+    transition: background 0.15s;
+
+    &:hover { background: #e5e7eb; }
+  }
+
+  // ── Nút "Tìm kiếm" đỏ bên phải ──
+  &__btn {
+    flex-shrink: 0;
+    height: 100%;
+    padding: 0 18px;
+    background: #da251d;
+    border: none;
+    color: #fff;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: background 0.2s;
+
+    &:hover { background: #b91c1c; }
+  }
+
+  // ── Dropdown ──
+  &__dropdown {
+    position: absolute;
+    top: calc(100% + 4px);
+    left: 0;
+    width: 100%;
+    min-width: 400px;
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 8px 30px rgba(0,0,0,0.12);
+    border: 1px solid #e5e7eb;
+    z-index: 1000;
+    padding: 8px 0;
+  }
+
+  // ── Section (lịch sử / từ khóa) ──
+  &__section {
+    padding: 10px 16px 6px;
+
+    & + & { border-top: 1px solid #f3f4f6; }
+  }
+
+  &__section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 10px;
+  }
+
+  &__section-title {
+    font-size: 11.5px;
+    font-weight: 700;
+    color: #6b7280;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+  }
+
+  // ── Nút Xóa lịch sử ──
+  &__clear-history {
+    font-size: 12px;
+    color: #2563eb;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+
+    &:hover { text-decoration: underline; }
+  }
+
+  // ── Danh sách lịch sử ──
+  &__history-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  &__history-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 7px 8px;
+    font-size: 13px;
+    color: #374151;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background 0.15s;
+
+    &:hover { background: #f9fafb; color: #111827; }
+  }
+
+  // ── Từ khóa pills ──
+  &__pills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    padding-bottom: 6px;
+  }
+
+  &__pill {
+    display: inline-flex;
+    align-items: center;
+    padding: 5px 12px;
+    border-radius: 999px;
+    border: 1px solid #e5e7eb;
+    background: #fff;
+    font-size: 12.5px;
+    color: #374151;
+    cursor: pointer;
+    transition: border-color 0.15s, background 0.15s, color 0.15s;
+
+    &:hover {
+      border-color: #2563eb;
+      background: #eff6ff;
+      color: #1d4ed8;
+    }
+  }
+
+  // ── AI Results ──
+  &__loading {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 14px 16px;
+    font-size: 13px;
+    color: #2563eb;
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+  }
+
+  &__ai-list {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding-bottom: 6px;
+  }
+
+  &__ai-item {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    padding: 8px;
+    border-radius: 6px;
+    text-decoration: none;
+    transition: background 0.15s;
+
+    &:hover { background: #f9fafb; }
+  }
+
+  &__ai-img {
+    width: 48px;
+    height: 48px;
+    object-fit: contain;
+    border: 1px solid #f3f4f6;
+    border-radius: 4px;
+    flex-shrink: 0;
+  }
+
+  &__ai-name {
+    font-size: 13px;
+    font-weight: 500;
+    color: #1f2937;
+    margin-bottom: 3px;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  &__ai-price {
+    font-size: 13px;
+    font-weight: 700;
+    color: #da251d;
+  }
+}
+

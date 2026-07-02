@@ -1,0 +1,609 @@
+// ================================================================
+// TRANG DANH MỤC SẢN PHẨM – Style GearVN
+// ================================================================
+
+$primary:    #dc2626;
+$primary-dk: #b91c1c;
+$bg-page:    #f3f4f6;
+$text-main:  #1a1a2e;
+$text-muted: #6b7280;
+$border:     #e5e7eb;
+$radius:     10px;
+$transition: all 0.18s ease;
+
+// ── Layout ───────────────────────────────────────────────────
+.product-page {
+  background: $bg-page;
+  min-height: 100vh;
+
+  &__inner {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 20px 16px 48px;
+    display: flex;
+    gap: 20px;
+    align-items: flex-start;
+  }
+}
+
+// ── Breadcrumb ───────────────────────────────────────────────
+.product-page__breadcrumb {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 10px 16px 0;
+  font-size: 13px;
+  color: $text-muted;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+
+  a { color: $text-muted; text-decoration: none; &:hover { color: $primary; } }
+  span.sep   { color: #d1d5db; }
+  span.current { color: $text-main; font-weight: 600; }
+}
+
+// ── Sidebar ──────────────────────────────────────────────────
+.product-sidebar {
+  width: 224px;
+  flex-shrink: 0;
+  position: sticky;
+  top: 80px;
+
+  &__box {
+    background: #fff;
+    border-radius: $radius;
+    border: 1px solid $border;
+    padding: 16px 15px;
+    margin-bottom: 12px;
+    box-shadow: 0 1px 6px rgba(0,0,0,0.05);
+  }
+
+  &__title {
+    font-size: 13px;
+    font-weight: 800;
+    color: $text-main;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    margin: 0 0 12px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid $primary;
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    svg { color: $primary; }
+  }
+
+  &__price-display {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 8px;
+    font-size: 12.5px;
+    font-weight: 700;
+    color: $primary;
+  }
+
+  &__range-wrap {
+    padding: 4px 0;
+    input[type='range'] {
+      width: 100%;
+      accent-color: $primary;
+      cursor: pointer;
+      height: 4px;
+    }
+  }
+
+  &__apply-btn {
+    margin-top: 10px;
+    width: 100%;
+    background: $primary;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    padding: 8px;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: $transition;
+    &:hover { background: $primary-dk; }
+  }
+
+  &__check-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+
+    li {
+      font-size: 13px;
+      color: $text-main;
+      cursor: pointer;
+      border-radius: 6px;
+      padding: 4px 6px;
+      transition: $transition;
+
+      &:hover { background: #fff1f2; color: $primary; }
+    }
+  }
+
+  // PhongVu style Accordion Filter
+  &__filter-group {
+    border-top: 1px solid #f1f5f9;
+    padding: 12px 0;
+    &:first-child { border-top: none; padding-top: 0; }
+  }
+
+  &__filter-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 700;
+    color: $text-main;
+    margin-bottom: 8px;
+    user-select: none;
+    
+    svg {
+      transition: transform 0.2s ease;
+      color: #9ca3af;
+    }
+    
+    &.is-open svg {
+      transform: rotate(180deg);
+    }
+  }
+
+  &__filter-body {
+    overflow: hidden;
+  }
+
+  &__filter-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+
+  &__checkbox-label {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12.5px;
+    color: #4b5563;
+    cursor: pointer;
+    user-select: none;
+
+    input[type="checkbox"] {
+      width: 14px;
+      height: 14px;
+      cursor: pointer;
+      accent-color: $primary;
+    }
+    
+    &:hover { color: $primary; }
+  }
+
+  &__applied-filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-bottom: 12px;
+  }
+
+  &__applied-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 14px;
+    padding: 3px 8px;
+    font-size: 11.5px;
+    color: $text-main;
+    
+    button {
+      background: none;
+      border: none;
+      color: #94a3b8;
+      cursor: pointer;
+      padding: 0;
+      display: flex;
+      align-items: center;
+      
+      &:hover { color: $primary; }
+    }
+  }
+}
+
+// ── Main ─────────────────────────────────────────────────────
+.product-main {
+  flex: 1;
+  min-width: 0;
+
+  &__header {
+    background: #fff;
+    border-radius: $radius;
+    border: 1px solid $border;
+    padding: 12px 16px;
+    margin-bottom: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 10px;
+    box-shadow: 0 1px 6px rgba(0,0,0,0.05);
+  }
+
+  &__title-wrap {
+    h1 { font-size: 18px; font-weight: 900; color: $text-main; margin: 0 0 2px; line-height: 1.2; }
+    span { font-size: 12.5px; color: $text-muted; }
+  }
+}
+
+// ── Sort Bar ─────────────────────────────────────────────────
+.sort-bar {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  flex-wrap: wrap;
+
+  &__label { font-size: 13px; color: $text-muted; font-weight: 600; margin-right: 2px; white-space: nowrap; }
+
+  &__btn {
+    background: #f9fafb;
+    border: 1.5px solid $border;
+    border-radius: 6px;
+    padding: 5px 12px;
+    font-size: 12.5px;
+    font-weight: 600;
+    color: $text-main;
+    cursor: pointer;
+    transition: $transition;
+    white-space: nowrap;
+    &:hover { border-color: $primary; color: $primary; }
+    &--active { background: $primary; border-color: $primary; color: #fff; &:hover { background: $primary-dk; } }
+  }
+}
+
+// ── Product Grid ─────────────────────────────────────────────
+.product-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  margin-bottom: 24px;
+
+  @media (max-width: 1100px) { grid-template-columns: repeat(3, 1fr); }
+  @media (max-width: 768px)  { grid-template-columns: repeat(2, 1fr); }
+}
+
+// ══════════════════════════════════════════════════════════════
+// GearVN PRODUCT CARD
+// ══════════════════════════════════════════════════════════════
+.gvn-card {
+  background: #fff;
+  border: 1px solid #f1f5f9;
+  border-radius: 12px;
+  overflow: hidden;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+
+  &:hover {
+    border-color: #e2e8f0;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+    transform: translateY(-2px);
+  }
+
+  // ── Image ────────────────────────────────────────────────
+  &__img-wrap {
+    background: #f4f6fb;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 220px;
+    overflow: hidden;
+    padding: 16px;
+    position: relative;
+  }
+
+  &__img {
+    max-height: 190px;
+    max-width: 100%;
+    object-fit: contain;
+    transition: transform 0.4s ease;
+
+    .gvn-card:hover & {
+      transform: scale(1.05);
+    }
+  }
+
+  &__img-placeholder {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    opacity: 0.5;
+  }
+
+  // ── Discount badge (góc trên phải) ──
+  &__discount-badge {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    background: #e30019;
+    color: #fff;
+    font-size: 13px;
+    font-weight: 800;
+    padding: 3px 8px;
+    border-radius: 20px;
+    z-index: 3;
+    letter-spacing: 0.3px;
+    box-shadow: 0 2px 6px rgba(227, 0, 25, 0.3);
+  }
+
+  // ── Body ─────────────────────────────────────────────────
+  &__body {
+    padding: 14px 12px 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    flex: 1;
+    background: #fff;
+  }
+
+  // Tên sản phẩm
+  &__name {
+    font-size: 14px;
+    font-weight: 600;
+    color: #0055a6; // GearVN Blue
+    line-height: 1.45;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    min-height: 40px;
+    margin: 0 0 10px;
+
+    .gvn-card:hover & { color: #004080; }
+  }
+
+  // ── Spec inline – Compact style ─────────────────────────────
+  &__specs {
+    background: #f1f5f9;
+    border-radius: 6px;
+    padding: 6px 8px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px 10px;
+    margin-bottom: 12px;
+  }
+
+  &__spec {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    color: #475569;
+  }
+
+  &__spec-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    color: #64748b;
+  }
+
+  &__spec-val {
+    font-size: 11.5px;
+    font-weight: 500;
+    color: #334155;
+    white-space: nowrap;
+  }
+
+  // ── Price ────────────────────────────────────────────────
+  &__price-block {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    margin-bottom: 8px;
+  }
+  
+  &__price-old-wrap {
+    min-height: 18px;
+  }
+
+  &__price-old {
+    font-size: 12.5px;
+    color: #9ca3af;
+    text-decoration: line-through;
+    font-weight: 500;
+    line-height: 1.3;
+  }
+
+  &__price-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  &__price {
+    font-size: 17px;
+    font-weight: 800;
+    color: #e30019;
+    line-height: 1.2;
+  }
+
+  &__pct-badge {
+    background: #fee2e2;
+    color: #e30019;
+    font-size: 11.5px;
+    font-weight: 800;
+    padding: 2px 6px;
+    border-radius: 4px;
+    white-space: nowrap;
+  }
+
+  // ── Rating ───────────────────────────────────────────────
+  &__rating {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: auto;
+    padding-top: 4px;
+    margin-bottom: 12px;
+  }
+
+  &__stars {
+    display: flex;
+    gap: 2px;
+    align-items: center;
+  }
+
+  &__review-count {
+    font-size: 11.5px;
+    color: #6b7280;
+  }
+
+  // ── Add to cart button ───────────────────────────────────
+  &__add-btn {
+    width: 100%;
+    background: #fff;
+    color: #e30019;
+    border: 1px solid #e30019;
+    border-radius: 8px;
+    padding: 9px 12px;
+    font-size: 13.5px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+
+    &:hover {
+      background: #e30019;
+      color: #fff;
+      box-shadow: 0 2px 8px rgba(227, 0, 25, 0.2);
+    }
+  }
+}
+
+// ── GearVN Skeleton ───────────────────────────────────────────
+.gvn-skeleton {
+  background: #fff;
+  border: 1.5px solid $border;
+  border-radius: 12px;
+  overflow: hidden;
+
+  &__img {
+    height: 190px;
+    background: #f1f5f9;
+    position: relative;
+    overflow: hidden;
+    &::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.7) 50%, transparent 100%);
+      animation: gvn-shimmer 1.4s infinite;
+    }
+  }
+
+  &__body {
+    padding: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  &__line {
+    border-radius: 5px;
+    background: #e2e8f0;
+    position: relative;
+    overflow: hidden;
+    height: 13px;
+    &--title { height: 14px; width: 90%; }
+    &--price { height: 18px; width: 55%; background: #fee2e2; }
+    &--sub   { width: 40%; }
+    &::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.7) 50%, transparent 100%);
+      animation: gvn-shimmer 1.4s infinite;
+    }
+  }
+
+  &__specs {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 4px;
+  }
+
+  &__chip {
+    height: 26px;
+    border-radius: 6px;
+    background: #f1f5f9;
+    position: relative;
+    overflow: hidden;
+    &::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.7) 50%, transparent 100%);
+      animation: gvn-shimmer 1.4s infinite;
+    }
+  }
+}
+
+@keyframes gvn-shimmer {
+  0%   { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+// ── Empty state ───────────────────────────────────────────────
+.product-empty {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 60px 20px;
+  color: $text-muted;
+
+  &__icon  { font-size: 56px; margin-bottom: 14px; opacity: 0.35; }
+  &__title { font-size: 18px; font-weight: 700; color: $text-main; margin: 0 0 6px; }
+  &__desc  { font-size: 13.5px; margin: 0; }
+}
+
+// ── Pagination ────────────────────────────────────────────────
+.product-pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 5px;
+  margin-top: 10px;
+  flex-wrap: wrap;
+
+  &__btn {
+    min-width: 36px;
+    height: 36px;
+    border: 1.5px solid $border;
+    border-radius: 7px;
+    background: #fff;
+    color: $text-main;
+    font-size: 13.5px;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 10px;
+    transition: $transition;
+    &:hover:not(:disabled) { border-color: $primary; color: $primary; }
+    &--active { background: $primary; border-color: $primary; color: #fff; }
+    &:disabled { opacity: 0.4; cursor: not-allowed; }
+  }
+}

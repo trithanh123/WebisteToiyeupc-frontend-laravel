@@ -29,10 +29,9 @@ const services = [
 
 const ServiceStrip = () => {
   return (
-  /* Lớp nền trắng phủ full màn hình để che 2 bên mép */
-    <div className="w-full bg-gray-100">
+      <div className="w-full bg-gray-100">
       <section className="max-w-[1280px] mx-auto bg-[#1a202c] border-y border-[#2d3748] py-[18px]">
-        {/* Lưới chia 4 cột bên trong */}
+        {}
         <div className="px-4 grid grid-cols-4">
           {services.map((s, i) => (
             <div
@@ -48,7 +47,7 @@ const ServiceStrip = () => {
           ))}
         </div>
       </section>
-      
+
     </div>
   );
 };

@@ -8,7 +8,7 @@ const SkeletonBlock = ({ className = "" }) => (
 const StaffDashboard = () => {
   return (
     <StaffMasterLayout title="Nhân Viên – ToiYeuPC">
-      {/* Stats row */}
+      {}
       <div className="dash-stats-row">
         <SkeletonBlock className="dash-stat-card" />
         <SkeletonBlock className="dash-stat-card" />
@@ -16,7 +16,7 @@ const StaffDashboard = () => {
         <SkeletonBlock className="dash-stat-card" />
       </div>
 
-      {/* Main content grid */}
+      {}
       <div className="dash-main-grid">
         <div className="dash-main-grid__left">
           <SkeletonBlock className="dash-chart-large" />
