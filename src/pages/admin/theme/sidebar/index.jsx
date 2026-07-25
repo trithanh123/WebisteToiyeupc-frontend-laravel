@@ -23,6 +23,8 @@ const navItems = [
   { label: "Quản lý kho tổng",    path: ROUTERS.ADMIN.WAREHOUSE, icon: iconWarehouse },
   { label: "Quản lý thống kê",    path: ROUTERS.ADMIN.STATISTICS, icon: iconStats },
   { label: "Quản lý giám sát đơn hàng", path: ROUTERS.ADMIN.ORDERS, icon: iconMonitor },
+  { label: "Hỗ Trợ & Bảo Hành",         path: ROUTERS.ADMIN.WARRANTY, icon: iconWarehouse },
+  { label: "Phiếu Điều Chuyển",         path: ROUTERS.ADMIN.TRANSFER, icon: iconWarehouse },
 ];
 
 const AdminSidebar = () => {

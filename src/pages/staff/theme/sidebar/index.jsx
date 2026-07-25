@@ -13,16 +13,23 @@ const GridIcon = () => (
 );
 
 const navItems = [
-  { label: "BẢNG ĐIỀU KHIỂN",    path: ROUTERS.STAFF.HOME },
-  { label: "QL Đơn hàng",         path: ROUTERS.STAFF.ORDERS },
-  { label: "QL Kho cục bộ",       path: ROUTERS.STAFF.WAREHOUSE },
-  { label: "QL Luân Chuyển",      path: ROUTERS.STAFF.TRANSFER },
-  { label: "Hỗ trợ Va Bảo hành", path: ROUTERS.STAFF.WARRANTY },
-  { label: "Thống Kê Cục Bộ",    path: ROUTERS.STAFF.STATISTICS },
+  { label: "Bảng Điều Khiển",                  path: ROUTERS.STAFF.HOME },
+  { label: "Xử Lý Đơn Hàng",                  path: ROUTERS.STAFF.ORDERS },
+  { label: "Kiểm kê Cập nhật Tồn kho",        path: ROUTERS.STAFF.WAREHOUSE },
+  { label: "Tạo xử lý Phiếu Điều Chuyển",    path: ROUTERS.STAFF.TRANSFER },
+  { label: "Hỗ Trợ Và Bảo Hành",             path: ROUTERS.STAFF.WARRANTY },
+  { label: "Xem tồn kho hệ thống",            path: ROUTERS.STAFF.STATISTICS },
 ];
 
 const StaffSidebar = () => {
   const location = useLocation();
+  const storedUser = localStorage.getItem("staff_user");
+  const user = storedUser ? JSON.parse(storedUser) : null;
+  
+  const currentNavItems = [...navItems];
+  if (user && user.chucvu === "Quản lý Cửa hàng") {
+      currentNavItems.push({ label: "QL Nhân Sự", path: "/staff/nhan-su" });
+  }
 
   return (
     <aside className="staff-sidebar">
@@ -33,7 +40,7 @@ const StaffSidebar = () => {
       </div>
 
       <nav className="staff-sidebar__nav">
-        {navItems.map((item, i) => {
+        {currentNavItems.map((item, i) => {
           const isActive = location.pathname === item.path;
           return (
             <Link

@@ -51,27 +51,28 @@ const AuthModal = ({ isOpen, onClose }) => {
         headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
         body: JSON.stringify({ email: formData.email, password: formData.password })
       })
-      .then(res => res.json())
-      .then(data => {
-        if (data.status === 'success') {
-          alert('Đăng nhập thành công!');
-          localStorage.setItem('access_token', data.token);
+        .then(res => res.json())
+        .then(data => {
+          if (data.status === 'success') {
+            alert('Đăng nhập thành công!');
+            localStorage.setItem('access_token', data.token);
 
-          const role = data.data ? Number(data.data.phanquyen) : 3;
+            const role = data.data ? Number(data.data.phanquyen) : 3;
 
-          if (role === 1) {
-            window.location.href = '/admin';
-          } else if (role === 2) {
-            window.location.href = '/staff';
+            if (role === 1) {
+              window.location.href = '/admin';
+            } else if (role === 2) {
+              window.location.href = '/staff';
+            } else {
+              window.location.reload();
+            }
           } else {
-            window.location.reload();
+            alert(data.message || 'Email hoặc mật khẩu không chính xác!');
           }
-        } else {
-          alert(data.message || 'Email hoặc mật khẩu không chính xác!');
-        }
-      })
-      .catch(err => console.log('Lỗi:', err));
+        })
+        .catch(err => console.log('Lỗi:', err));
     } else {
+      //gọm lại thành payload
       const payload = {
         ho: formData.ho,
         ten: formData.ten,
@@ -85,17 +86,17 @@ const AuthModal = ({ isOpen, onClose }) => {
         headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
         body: JSON.stringify(payload)
       })
-      .then(res => res.json())
-      .then(data => {
-        if (data.status === 'success') {
-          alert('Đăng ký thành công!');
-          localStorage.setItem('access_token', data.token);
-          window.location.reload();
-        } else {
-          alert(data.message || 'Có lỗi xảy ra, vui lòng kiểm tra lại!');
-        }
-      })
-      .catch(err => console.log('Lỗi:', err));
+        .then(res => res.json())
+        .then(data => {
+          if (data.status === 'success') {
+            alert('Đăng ký thành công!');
+            localStorage.setItem('access_token', data.token);
+            window.location.reload();
+          } else {
+            alert(data.message || 'Có lỗi xảy ra, vui lòng kiểm tra lại!');
+          }
+        })
+        .catch(err => console.log('Lỗi:', err));
     }
   };
 
@@ -192,9 +193,9 @@ const AuthModal = ({ isOpen, onClose }) => {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
         body: JSON.stringify({
-          identifier:            fpIdentifier,
-          otp:                   fpOtp.join(''),
-          password:              fpPassword,
+          identifier: fpIdentifier,
+          otp: fpOtp.join(''),
+          password: fpPassword,
           password_confirmation: fpPasswordConfirm,
         })
       });
@@ -219,11 +220,10 @@ const AuthModal = ({ isOpen, onClose }) => {
     <div className="flex items-center justify-center gap-2 mb-6">
       {[1, 2, 3].map(step => (
         <React.Fragment key={step}>
-          <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold transition-all ${
-            step < current ? 'bg-green-500 text-white' :
-            step === current ? 'bg-[#e30019] text-white' :
-            'bg-gray-200 text-gray-400'
-          }`}>
+          <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold transition-all ${step < current ? 'bg-green-500 text-white' :
+              step === current ? 'bg-[#e30019] text-white' :
+                'bg-gray-200 text-gray-400'
+            }`}>
             {step < current ? '✓' : step}
           </div>
           {step < 3 && (
@@ -236,7 +236,7 @@ const AuthModal = ({ isOpen, onClose }) => {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-[2px]"
-         onClick={(e) => e.target === e.currentTarget && onClose()}>
+      onClick={(e) => e.target === e.currentTarget && onClose()}>
       <div className="relative w-full max-w-[480px] bg-white rounded-xl shadow-2xl p-6 mx-4 max-h-[90vh] overflow-y-auto">
 
         <button
@@ -448,11 +448,10 @@ const AuthModal = ({ isOpen, onClose }) => {
                     value={digit}
                     onChange={e => handleOtpInput(index, e.target.value)}
                     onKeyDown={e => handleOtpKeyDown(index, e)}
-                    className={`w-12 h-14 text-center text-2xl font-bold border-2 rounded-xl focus:outline-none transition-all ${
-                      digit
+                    className={`w-12 h-14 text-center text-2xl font-bold border-2 rounded-xl focus:outline-none transition-all ${digit
                         ? 'border-[#e30019] bg-red-50 text-[#e30019]'
                         : 'border-gray-300 focus:border-red-400'
-                    }`}
+                      }`}
                   />
                 ))}
               </div>

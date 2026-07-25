@@ -14,12 +14,13 @@ import iconDelete from '../../../assets/icons/icons8-remove-24.png';
 
 const API = 'http://127.0.0.1:8000/api';
 
-// ── Badge phân quyền có màu ────────────────────────────────────
+
 const RoleBadge = ({ role }) => {
   const map = {
     1: { label: 'Admin', classes: 'bg-red-100 text-red-700 border-red-300', dot: 'bg-red-600' },
     2: { label: 'Nhân viên', classes: 'bg-blue-100 text-blue-700 border-blue-300', dot: 'bg-blue-600' },
     3: { label: 'Khách hàng', classes: 'bg-green-100 text-green-700 border-green-300', dot: 'bg-green-600' },
+    4: { label: 'Khách VIP', classes: 'bg-gray-100 text-gray-700 border-gray-300', dot: 'bg-gray-600' },
   };
   const style = map[role] ?? { label: 'Không rõ', classes: 'bg-gray-100 text-gray-500 border-gray-300', dot: 'bg-gray-500' };
 
@@ -31,7 +32,6 @@ const RoleBadge = ({ role }) => {
   );
 };
 
-// ── Skeleton row ───────────────────────────────────────────────
 const SkeletonRow = () => (
   <tr>
     {[40, 130, 180, 100, 120, 90].map((w, i) => (
@@ -51,7 +51,7 @@ const SkeletonRow = () => (
   </tr>
 );
 
-// ── Modal Thêm / Cập Nhật ─────────────────────────────────────
+
 const UserModal = ({ isOpen, onClose, user, onSaveSuccess }) => {
   const [formData, setFormData] = useState({
     Ten: '',
@@ -68,7 +68,7 @@ const UserModal = ({ isOpen, onClose, user, onSaveSuccess }) => {
         Ten: user.Ten || '',
         email: user.email || '',
         SDT: user.SDT || '',
-        matkhau: '', // Không tải mật khẩu lên
+        matkhau: '',
         Phanquyen: user.Phanquyen || 3,
       });
     } else {
@@ -92,7 +92,7 @@ const UserModal = ({ isOpen, onClose, user, onSaveSuccess }) => {
       const token = localStorage.getItem('access_token');
 
       if (user) {
-        // Gọi API Cập nhật (PUT) - backend cho phép cập nhật Ten, SDT và Phanquyen
+
         const res = await axios.put(`${API}/admin/users/${user.id_NguoiDung}`, {
           Ten: formData.Ten,
           SDT: formData.SDT,
@@ -113,7 +113,7 @@ const UserModal = ({ isOpen, onClose, user, onSaveSuccess }) => {
           onClose();
         }
       } else {
-        // Gọi API Thêm mới (POST)
+
         const res = await axios.post(`${API}/admin/users`, formData, {
           headers: { Authorization: `Bearer ${token}` }
         });
@@ -203,6 +203,7 @@ const UserModal = ({ isOpen, onClose, user, onSaveSuccess }) => {
               <option value={1}>Admin</option>
               <option value={2}>Nhân viên</option>
               <option value={3}>Khách hàng</option>
+              <option value={4}>Khách VIP</option>
             </select>
           </div>
 

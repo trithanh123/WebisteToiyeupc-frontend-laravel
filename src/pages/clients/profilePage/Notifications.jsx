@@ -1,23 +1,35 @@
 import React, { useState } from 'react';
 import ProfileLayout from './ProfileLayout';
+import useNotifications from '../../../hooks/useNotifications';
+import { useNavigate } from 'react-router-dom';
 
 const NOTIF_TABS = [
-  { id: 'updates', label: 'Ưu đãi & Cập nhật' },
-  { id: 'orders',  label: 'Đơn hàng'           },
+  { id: 'don_hang',  label: 'Đơn hàng' },
+  { id: 'bao_hanh',  label: 'Bảo hành & Hỗ trợ' },
 ];
 
-const mockNotifs = [];
-
 const Notifications = () => {
-  const [activeTab, setActiveTab] = useState('updates');
-  const filtered = mockNotifs.filter(n => n.type === activeTab);
+  const [activeTab, setActiveTab] = useState('don_hang');
+  const { notifications, unreadCount, markAsRead, markAllAsRead } = useNotifications();
+  const navigate = useNavigate();
+
+  const filtered = notifications.filter(n => n.loai_thong_bao === activeTab);
+
+  const handleNotificationClick = (n) => {
+    if (!n.da_doc) {
+      markAsRead(n.id_thongbao);
+    }
+    if (n.link) {
+      navigate(n.link);
+    }
+  };
 
   return (
     <ProfileLayout>
       <div className="flex items-center justify-between mb-5">
         <h2 className="text-xl font-semibold text-gray-800">Thông báo của bạn</h2>
-        {mockNotifs.length > 0 && (
-          <button className="text-xs text-blue-600 hover:underline font-medium">
+        {unreadCount > 0 && (
+          <button onClick={markAllAsRead} className="text-xs text-blue-600 hover:underline font-medium">
             Đánh dấu tất cả là đã đọc
           </button>
         )}
@@ -46,21 +58,22 @@ const Notifications = () => {
             <circle cx="42" cy="42" r="10" stroke="#e5e7eb" strokeWidth="3"/>
           </svg>
           <p className="text-base font-medium text-gray-400">
-            Bạn chưa có {activeTab === 'orders' ? 'thông báo đơn hàng' : 'thông báo ưu đãi'} nào
+            Bạn chưa có {activeTab === 'don_hang' ? 'thông báo đơn hàng' : 'thông báo bảo hành'} nào
           </p>
         </div>
       ) : (
         <div className="flex flex-col gap-2">
           {filtered.map(n => (
-            <div key={n.id}
+            <div key={n.id_thongbao}
+              onClick={() => handleNotificationClick(n)}
               className={`p-4 rounded-xl border cursor-pointer hover:bg-gray-50 transition-colors
-                ${!n.read ? 'border-blue-100 bg-blue-50/30' : 'border-gray-100 bg-white'}`}>
+                ${!n.da_doc ? 'border-blue-100 bg-blue-50/30' : 'border-gray-100 bg-white'}`}>
               <div className="flex items-start gap-3">
-                <div className={`w-2 h-2 rounded-full mt-1.5 flex-shrink-0 ${!n.read ? 'bg-blue-500' : 'bg-transparent'}`} />
+                <div className={`w-2 h-2 rounded-full mt-1.5 flex-shrink-0 ${!n.da_doc ? 'bg-blue-500' : 'bg-transparent'}`} />
                 <div>
-                  <p className="font-medium text-sm text-gray-800">{n.title}</p>
-                  <p className="text-xs text-gray-500 mt-0.5">{n.body}</p>
-                  <p className="text-xs text-gray-400 mt-1">{n.time}</p>
+                  <p className={`font-medium text-sm ${!n.da_doc ? 'text-gray-900' : 'text-gray-700'}`}>{n.tieu_de}</p>
+                  <p className="text-xs text-gray-500 mt-0.5">{n.noi_dung}</p>
+                  <p className="text-xs text-gray-400 mt-1">{new Date(n.created_at).toLocaleString('vi-VN')}</p>
                 </div>
               </div>
             </div>

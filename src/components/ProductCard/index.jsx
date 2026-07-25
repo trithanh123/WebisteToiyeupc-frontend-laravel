@@ -5,10 +5,12 @@ import { formatCurrency } from "../../utils/formatter";
 import { getImageUrl } from "../../utils/getImageUrl";
 import { parseSpecs, SpecIcon } from "../../utils/specHelper";
 import { CartContext } from "../../context/CartContext";
+import useWishlist from "../../hooks/useWishlist";
 
 const ProductCard = ({ product }) => {
   const navigate = useNavigate();
   const { addToCart } = React.useContext(CartContext);
+  const { toggleWishlist, isInWishlist } = useWishlist();
 
   const id = product.id || product.id_sanpham;
   const img = product.img || product.thumbail;
@@ -38,6 +40,16 @@ const ProductCard = ({ product }) => {
             -{discount}%
           </span>
         )}
+
+        {/* Nút Thả tim (Wishlist) */}
+        <button 
+          onClick={(e) => { e.stopPropagation(); toggleWishlist(id); }}
+          className="absolute top-2 left-2 p-1.5 bg-white/80 rounded-full shadow-sm hover:scale-110 transition z-10">
+          <svg className={`w-5 h-5 ${isInWishlist(id) ? 'text-red-500 fill-current' : 'text-gray-400 fill-none'} transition-colors`} viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+            <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+          </svg>
+        </button>
+
         {img ? (
           <img
             className="gvn-card__img"

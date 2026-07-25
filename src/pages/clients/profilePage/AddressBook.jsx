@@ -1,25 +1,75 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 import ProfileLayout from './ProfileLayout';
 import { useAddressBook, PROVINCES } from '../../../hooks/useAddressBook';
 
 const AddressBook = () => {
   const { addresses, addAddress, updateAddress, deleteAddress, setDefaultAddress } = useAddressBook();
-  const [showForm, setShowForm]   = useState(false);
+  const [showForm, setShowForm] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
   const [editingId, setEditingId] = useState(null);
   const [form, setForm] = useState({
-    name:'', phone:'', province:'', district:'', ward:'', detail:'', isDefault: false
+    name: '', phone: '', province: '', district: '', ward: '', detail: '', isDefault: false
   });
 
-  const handleSave = () => {
-    if (!form.name || !form.phone || !form.province) return;
-    if (editingId) {
-      updateAddress(editingId, form);
-    } else {
-      addAddress(form);
+  // State chứa danh sách từ API
+  const [provinces, setProvinces] = useState([]);
+  const [districts, setDistricts] = useState([]);
+  const [wards, setWards] = useState([]);
+
+  // Tự động tải danh sách Tỉnh/Thành phố
+  useEffect(() => {
+    axios.get('https://provinces.open-api.vn/api/p/')
+      .then(res => setProvinces(res.data))
+      .catch(err => console.log(err));
+  }, []);
+
+  // Xử lý đổi Tỉnh
+  const handleProvinceChange = (e) => {
+    const provinceCode = e.target.value;
+    setForm({ ...form, province: provinceCode, district: '', ward: '' });
+    setDistricts([]);
+    setWards([]);
+    if (provinceCode) {
+      axios.get(`https://provinces.open-api.vn/api/p/${provinceCode}?depth=2`)
+        .then(res => setDistricts(res.data.districts))
+        .catch(err => console.log(err));
     }
-    setForm({ name:'', phone:'', province:'', district:'', ward:'', detail:'', isDefault: false });
-    setEditingId(null);
-    setShowForm(false);
+  };
+
+  // Xử lý đổi Quận
+  const handleDistrictChange = (e) => {
+    const districtCode = e.target.value;
+    setForm({ ...form, district: districtCode, ward: '' });
+    setWards([]);
+    if (districtCode) {
+      axios.get(`https://provinces.open-api.vn/api/d/${districtCode}?depth=2`)
+        .then(res => setWards(res.data.wards))
+        .catch(err => console.log(err));
+    }
+  };
+
+  const handleSave = async () => {
+    setErrorMessage('');
+    if (!form.name || !form.phone || !form.province || !form.district || !form.ward) {
+      setErrorMessage("Vui lòng điền đầy đủ các trường bắt buộc (*)");
+      return;
+    }
+    
+    let result = null;
+    if (editingId) {
+      result = await updateAddress(editingId, form);
+    } else {
+      result = await addAddress(form);
+    }
+    
+    if (result.success) {
+      setForm({ name: '', phone: '', province: '', district: '', ward: '', detail: '', isDefault: false });
+      setEditingId(null);
+      setShowForm(false);
+    } else {
+      setErrorMessage(result.message);
+    }
   };
 
   const handleEdit = (addr) => {
@@ -38,13 +88,15 @@ const AddressBook = () => {
 
   const handleAddNew = () => {
     setEditingId(null);
-    setForm({ name:'', phone:'', province:'', district:'', ward:'', detail:'', isDefault: false });
+    setErrorMessage('');
+    setForm({ name: '', phone: '', province: '', district: '', ward: '', detail: '', isDefault: false });
     setShowForm(true);
   };
 
   const handleCancel = () => {
     setEditingId(null);
-    setForm({ name:'', phone:'', province:'', district:'', ward:'', detail:'', isDefault: false });
+    setErrorMessage('');
+    setForm({ name: '', phone: '', province: '', district: '', ward: '', detail: '', isDefault: false });
     setShowForm(false);
   };
 
@@ -65,51 +117,64 @@ const AddressBook = () => {
       {/* Form thêm địa chỉ */}
       {showForm && (
         <div className="border border-blue-200 bg-blue-50/30 rounded-xl p-6 mb-6">
-          <h3 className="font-semibold text-gray-800 mb-4 text-sm">{editingId ? 'Cập nhật địa chỉ' : 'Địa chỉ mới'}</h3>
+          <div className="flex items-center gap-3 mb-4">
+            <h3 className="font-semibold text-gray-800 text-sm">{editingId ? 'Cập nhật địa chỉ' : 'Địa chỉ mới'}</h3>
+            {errorMessage && (
+              <span className="text-red-500 text-sm font-medium bg-red-50 px-2 py-0.5 rounded border border-red-100">
+                Lỗi: {errorMessage}
+              </span>
+            )}
+          </div>
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Họ và tên *</label>
               <input type="text" value={form.name}
-                onChange={e => setForm({...form, name: e.target.value})}
+                onChange={e => setForm({ ...form, name: e.target.value })}
                 className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-500" />
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Số điện thoại *</label>
               <input type="tel" value={form.phone}
-                onChange={e => setForm({...form, phone: e.target.value})}
+                onChange={e => setForm({ ...form, phone: e.target.value })}
                 className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-500" />
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Tỉnh / Thành phố *</label>
               <select value={form.province}
-                onChange={e => setForm({...form, province: e.target.value})}
+                onChange={handleProvinceChange}
                 className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-500 bg-white">
                 <option value="">Chọn tỉnh / thành</option>
-                {PROVINCES.map(p => <option key={p} value={p}>{p}</option>)}
+                {provinces.map(p => <option key={p.code} value={p.code}>{p.name}</option>)}
               </select>
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Quận / Huyện</label>
-              <input type="text" value={form.district}
-                onChange={e => setForm({...form, district: e.target.value})}
-                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-500" />
+              <label className="block text-sm font-medium text-gray-700 mb-1">Quận / Huyện *</label>
+              <select value={form.district}
+                onChange={handleDistrictChange} disabled={!form.province}
+                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-500 bg-white disabled:bg-gray-100">
+                <option value="">Chọn quận / huyện</option>
+                {districts.map(d => <option key={d.code} value={d.code}>{d.name}</option>)}
+              </select>
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Phường / Xã</label>
-              <input type="text" value={form.ward}
-                onChange={e => setForm({...form, ward: e.target.value})}
-                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-500" />
+              <label className="block text-sm font-medium text-gray-700 mb-1">Phường / Xã *</label>
+              <select value={form.ward}
+                onChange={e => setForm({ ...form, ward: e.target.value })} disabled={!form.district}
+                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-500 bg-white disabled:bg-gray-100">
+                <option value="">Chọn phường / xã</option>
+                {wards.map(w => <option key={w.code} value={w.code}>{w.name}</option>)}
+              </select>
             </div>
             <div className="col-span-2">
               <label className="block text-sm font-medium text-gray-700 mb-1">Địa chỉ cụ thể (số nhà, tên đường...)</label>
               <input type="text" value={form.detail}
-                onChange={e => setForm({...form, detail: e.target.value})}
+                onChange={e => setForm({ ...form, detail: e.target.value })}
                 className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-500" />
             </div>
             <div className="col-span-2">
               <label className="flex items-center gap-2 cursor-pointer text-sm text-gray-600 select-none">
                 <input type="checkbox" checked={form.isDefault}
-                  onChange={e => setForm({...form, isDefault: e.target.checked})}
+                  onChange={e => setForm({ ...form, isDefault: e.target.checked })}
                   className="w-4 h-4 accent-blue-600 rounded" />
                 Đặt làm địa chỉ mặc định
               </label>
@@ -128,7 +193,7 @@ const AddressBook = () => {
         </div>
       )}
 
-      {}
+      { }
       {addresses.length === 0 && !showForm ? (
         <div>
           <button onClick={handleAddNew}

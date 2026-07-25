@@ -27,12 +27,12 @@ const SkeletonRow = () => (
 
 const ProductModal = ({ isOpen, onClose, product, onSaveSuccess }) => {
   const [formData, setFormData] = useState({
-    Ma_DanhMuc: '',
-    MaSP: '',
-    TenSP: '',
-    Gia: '',
-    Thumbail: '',
-    Motasanpham: '',
+    ma_danhmuc: '',
+    masp: '',
+    tensp: '',
+    gia: '',
+    thumbail: '',
+    motasanpham: '',
     specifications: {},
   });
   const [loading, setLoading] = useState(false);
@@ -86,12 +86,12 @@ const ProductModal = ({ isOpen, onClose, product, onSaveSuccess }) => {
       fetchCategories();
       if (product) {
         setFormData({
-          Ma_DanhMuc: product.ma_danhmuc || '',
-          MaSP: product.masp || '',
-          TenSP: product.tensp || '',
-          Gia: product.gia || '',
-          Thumbail: product.Thumbail || '',
-          Motasanpham: product.Motasanpham || '',
+          ma_danhmuc: product.ma_danhmuc || '',
+          masp: product.masp || '',
+          tensp: product.tensp || '',
+          gia: product.gia || '',
+          thumbail: product.thumbail || '',
+          motasanpham: product.Motasanpham || product.motasanpham || '',
           specifications: product.specifications || {},
         });
 
@@ -101,12 +101,12 @@ const ProductModal = ({ isOpen, onClose, product, onSaveSuccess }) => {
         setSpecList(specsArray);
       } else {
         setFormData({
-          Ma_DanhMuc: '',
-          MaSP: '',
-          TenSP: '',
-          Gia: '',
-          Thumbail: '',
-          Motasanpham: '',
+          ma_danhmuc: '',
+          masp: '',
+          tensp: '',
+          gia: '',
+          thumbail: '',
+          motasanpham: '',
           specifications: {},
         });
         setSpecList([]);
@@ -151,9 +151,16 @@ const ProductModal = ({ isOpen, onClose, product, onSaveSuccess }) => {
     try {
       const token = localStorage.getItem("access_token") || localStorage.getItem("admin_access_token");
 
+      // Ép kiểu số nguyên cho các field Laravel yêu cầu integer
+      const payload = {
+        ...formData,
+        ma_danhmuc: parseInt(formData.ma_danhmuc) || '',
+        gia: parseInt(formData.gia) || '',
+      };
+
       if (product) {
         // Cập nhật (PUT)
-        const res = await axios.put(`${API}/admin/products/${product.id_sanpham}`, formData, {
+        const res = await axios.put(`${API}/admin/products/${product.id_sanpham}`, payload, {
           headers: { Authorization: `Bearer ${token}` }
         });
         if (res.data.status === 'success') {
@@ -166,7 +173,7 @@ const ProductModal = ({ isOpen, onClose, product, onSaveSuccess }) => {
         }
       } else {
 
-        const res = await axios.post(`${API}/admin/products`, formData, {
+        const res = await axios.post(`${API}/admin/products`, payload, {
           headers: { Authorization: `Bearer ${token}` }
         });
         if (res.data.status === 'success') {
@@ -179,10 +186,14 @@ const ProductModal = ({ isOpen, onClose, product, onSaveSuccess }) => {
         }
       }
     } catch (error) {
+      const errors = error.response?.data?.errors;
       const msg = error.response?.data?.message || 'Có lỗi xảy ra, vui lòng kiểm tra lại!';
+      // Hiển thị chi tiết lỗi validation nếu có
+      const detail = errors ? Object.values(errors).flat().join('\n') : '';
       Swal.fire({
-        icon: 'error', title: 'Lỗi!', text: msg,
-        toast: true, position: 'top-end', showConfirmButton: false, timer: 3000
+        icon: 'error', title: 'Lỗi!',
+        text: detail || msg,
+        toast: !detail, position: 'top-end', showConfirmButton: !!detail, timer: detail ? undefined : 3000
       });
     } finally {
       setLoading(false);
@@ -212,7 +223,7 @@ const ProductModal = ({ isOpen, onClose, product, onSaveSuccess }) => {
                 <label className="block text-sm font-semibold text-gray-700 mb-1">
                   Mã SP <span className="text-red-500">*</span>
                 </label>
-                <input type="text" required value={formData.masp} onChange={e => setFormData({ ...formData, MaSP: e.target.value })}
+                <input type="text" required value={formData.masp} onChange={e => setFormData({ ...formData, masp: e.target.value })}
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 outline-none transition-all"
                   placeholder="SP001..." disabled={!!product} />
               </div>
@@ -222,7 +233,7 @@ const ProductModal = ({ isOpen, onClose, product, onSaveSuccess }) => {
                   Danh mục <span className="text-red-500">*</span>
                 </label>
                 <div className="flex gap-2">
-                  <select required value={formData.ma_danhmuc} onChange={e => setFormData({ ...formData, Ma_DanhMuc: e.target.value })}
+                  <select required value={formData.ma_danhmuc} onChange={e => setFormData({ ...formData, ma_danhmuc: e.target.value })}
                     className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 outline-none cursor-pointer">
                     <option value="">-- Chọn danh mục --</option>
                     {buildCategoryTree(categoriesList).map(cat => (
@@ -252,7 +263,7 @@ const ProductModal = ({ isOpen, onClose, product, onSaveSuccess }) => {
               <label className="block text-sm font-semibold text-gray-700 mb-1">
                 Tên Sản Phẩm <span className="text-red-500">*</span>
               </label>
-              <input type="text" required value={formData.tensp} onChange={e => setFormData({ ...formData, TenSP: e.target.value })}
+              <input type="text" required value={formData.tensp} onChange={e => setFormData({ ...formData, tensp: e.target.value })}
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 outline-none transition-all"
                 placeholder="Nhập tên sản phẩm..." />
             </div>
@@ -261,21 +272,21 @@ const ProductModal = ({ isOpen, onClose, product, onSaveSuccess }) => {
               <label className="block text-sm font-semibold text-gray-700 mb-1">
                 Giá (VNĐ) <span className="text-red-500">*</span>
               </label>
-              <input type="number" required min="0" value={formData.gia} onChange={e => setFormData({ ...formData, Gia: e.target.value })}
+              <input type="number" required min="0" value={formData.gia} onChange={e => setFormData({ ...formData, gia: e.target.value })}
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 outline-none transition-all"
                 placeholder="1500000..." />
             </div>
 
             <div>
               <label className="block text-sm font-semibold text-gray-700 mb-1">URL Hình ảnh (Thumbnail)</label>
-              <input type="text" value={formData.Thumbail} onChange={e => setFormData({ ...formData, Thumbail: e.target.value })}
+              <input type="text" value={formData.thumbail} onChange={e => setFormData({ ...formData, thumbail: e.target.value })}
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 outline-none transition-all"
                 placeholder="https://..." />
             </div>
 
             <div>
               <label className="block text-sm font-semibold text-gray-700 mb-1">Mô tả sản phẩm</label>
-              <textarea value={formData.Motasanpham} onChange={e => setFormData({ ...formData, Motasanpham: e.target.value })}
+              <textarea value={formData.motasanpham} onChange={e => setFormData({ ...formData, motasanpham: e.target.value })}
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 outline-none transition-all h-24"
                 placeholder="Nhập mô tả..." />
             </div>

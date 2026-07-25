@@ -7,21 +7,21 @@ const API = "http://127.0.0.1:8000/api";
 const BellIcon = () => (
   <svg width="20" height="20" viewBox="0 0 24 24" fill="none"
     stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/>
-    <path d="M13.73 21a2 2 0 01-3.46 0"/>
+    <path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9" />
+    <path d="M13.73 21a2 2 0 01-3.46 0" />
   </svg>
 );
 const ChevronIcon = () => (
   <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
     stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
-    <polyline points="6 9 12 15 18 9"/>
+    <polyline points="6 9 12 15 18 9" />
   </svg>
 );
 const LockIcon = () => (
   <svg width="40" height="40" viewBox="0 0 24 24" fill="none"
     stroke="#e30019" strokeWidth="1.5" strokeLinecap="round">
-    <rect x="3" y="11" width="18" height="11" rx="2"/>
-    <path d="M7 11V7a5 5 0 0110 0v4"/>
+    <rect x="3" y="11" width="18" height="11" rx="2" />
+    <path d="M7 11V7a5 5 0 0110 0v4" />
   </svg>
 );
 const EyeIcon = ({ open }) => (
@@ -29,23 +29,23 @@ const EyeIcon = ({ open }) => (
     stroke="currentColor" strokeWidth="2" strokeLinecap="round">
     {open ? (
       <>
-        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
-        <circle cx="12" cy="12" r="3"/>
+        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+        <circle cx="12" cy="12" r="3" />
       </>
     ) : (
       <>
-        <path d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94"/>
-        <path d="M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19"/>
-        <line x1="1" y1="1" x2="23" y2="23"/>
+        <path d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94" />
+        <path d="M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19" />
+        <line x1="1" y1="1" x2="23" y2="23" />
       </>
     )}
   </svg>
 );
 
 const AdminLoginForm = ({ onLoginSuccess }) => {
-  const [form,     setForm]     = useState({ email: "", password: "" });
-  const [loading,  setLoading]  = useState(false);
-  const [error,    setError]    = useState("");
+  const [form, setForm] = useState({ email: "", password: "" });
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
   const [showPass, setShowPass] = useState(false);
 
   const handleSubmit = async (e) => {
@@ -88,8 +88,7 @@ const AdminLoginForm = ({ onLoginSuccess }) => {
 
       if (Number(user.phanquyen) !== 1) {
         setError(
-          `Tài khoản "${user.ten}" có vai trò ${
-            user.phanquyen === 2 ? "Nhân viên" : "Khách hàng"
+          `Tài khoản "${user.ten}" có vai trò ${user.phanquyen === 2 ? "Nhân viên" : "Khách hàng"
           }. Chỉ Admin mới được truy cập trang quản trị!`
         );
         setLoading(false);
@@ -113,25 +112,25 @@ const AdminLoginForm = ({ onLoginSuccess }) => {
       justifyContent: "center",
       background: "linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f172a 100%)",
     }}>
-      {}
+      { }
       <div style={{
         position: "absolute", inset: 0, overflow: "hidden", pointerEvents: "none",
       }}>
         {[
-          { w:300, h:300, top:"10%", left:"5%",  opacity:0.06 },
-          { w:400, h:400, top:"50%", right:"5%", opacity:0.05 },
-          { w:200, h:200, bottom:"10%", left:"30%", opacity:0.07 },
+          { w: 300, h: 300, top: "10%", left: "5%", opacity: 0.06 },
+          { w: 400, h: 400, top: "50%", right: "5%", opacity: 0.05 },
+          { w: 200, h: 200, bottom: "10%", left: "30%", opacity: 0.07 },
         ].map((c, i) => (
           <div key={i} style={{
-            position:"absolute", width:c.w, height:c.h, top:c.top,
-            left:c.left, right:c.right, bottom:c.bottom,
-            borderRadius:"50%", background:"#e30019", opacity:c.opacity,
-            filter:"blur(60px)",
-          }}/>
+            position: "absolute", width: c.w, height: c.h, top: c.top,
+            left: c.left, right: c.right, bottom: c.bottom,
+            borderRadius: "50%", background: "#e30019", opacity: c.opacity,
+            filter: "blur(60px)",
+          }} />
         ))}
       </div>
 
-      {}
+      { }
       <div style={{
         position: "relative", zIndex: 1,
         background: "rgba(255,255,255,0.05)",
@@ -141,7 +140,7 @@ const AdminLoginForm = ({ onLoginSuccess }) => {
         width: "100%", maxWidth: 420,
         boxShadow: "0 25px 50px rgba(0,0,0,0.5)",
       }}>
-        {}
+        { }
         <div style={{ textAlign: "center", marginBottom: 32 }}>
           <div style={{
             width: 70, height: 70, borderRadius: 16,
@@ -160,7 +159,7 @@ const AdminLoginForm = ({ onLoginSuccess }) => {
           </p>
         </div>
 
-        {}
+        { }
         {error && (
           <div style={{
             background: "rgba(239,68,68,0.15)", border: "1px solid rgba(239,68,68,0.4)",
@@ -172,7 +171,7 @@ const AdminLoginForm = ({ onLoginSuccess }) => {
         )}
 
         <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-          {}
+          { }
           <div>
             <label style={{ color: "#cbd5e1", fontSize: 13, fontWeight: 600, display: "block", marginBottom: 6 }}>
               Email hoặc Số điện thoại
@@ -196,7 +195,7 @@ const AdminLoginForm = ({ onLoginSuccess }) => {
             />
           </div>
 
-          {}
+          { }
           <div>
             <label style={{ color: "#cbd5e1", fontSize: 13, fontWeight: 600, display: "block", marginBottom: 6 }}>
               Mật khẩu
@@ -228,7 +227,7 @@ const AdminLoginForm = ({ onLoginSuccess }) => {
             </div>
           </div>
 
-          {}
+          { }
           <button type="submit" disabled={loading} style={{
             marginTop: 8, padding: "13px", borderRadius: 10, border: "none",
             background: loading
@@ -246,7 +245,7 @@ const AdminLoginForm = ({ onLoginSuccess }) => {
                   width: 16, height: 16, border: "2px solid rgba(255,255,255,0.4)",
                   borderTopColor: "#fff", borderRadius: "50%",
                   animation: "spin 0.7s linear infinite", display: "inline-block",
-                }}/>
+                }} />
                 Đang xác thực...
               </>
             ) : "🔐 Đăng nhập"}
@@ -266,7 +265,7 @@ const AdminLoginForm = ({ onLoginSuccess }) => {
 };
 
 const AdminMasterLayout = ({ children, title = "Admin – ToiYeuPC" }) => {
-  const [authState, setAuthState] = useState("checking"); 
+  const [authState, setAuthState] = useState("checking");
   const [adminUser, setAdminUser] = useState(null);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [notifications, setNotifications] = useState([]);
@@ -276,7 +275,7 @@ const AdminMasterLayout = ({ children, title = "Admin – ToiYeuPC" }) => {
   useEffect(() => {
     const fetchNotifications = async () => {
       try {
-        const token = localStorage.getItem("admin_access_token") || localStorage.getItem("access_token");
+        const token = localStorage.getItem("admin_access_token");
         if (!token) return;
         const res = await fetch(`${API}/admin/notifications`, {
           headers: { Authorization: `Bearer ${token}` }
@@ -314,13 +313,13 @@ const AdminMasterLayout = ({ children, title = "Admin – ToiYeuPC" }) => {
 
   const handleMarkAsRead = async (id, link) => {
     try {
-      const token = localStorage.getItem("admin_access_token") || localStorage.getItem("access_token");
+      const token = localStorage.getItem("admin_access_token");
       await fetch(`${API}/admin/notifications/${id}/read`, {
         method: 'PUT',
         headers: { Authorization: `Bearer ${token}` }
       });
 
-      setNotifications(notifications.map(n => n.id_ThongBao === id ? { ...n, da_doc: true } : n));
+      setNotifications(notifications.map(n => n.id_thongbao === id ? { ...n, da_doc: true } : n));
       setUnreadCount(prev => Math.max(0, prev - 1));
 
       if (link) window.location.href = link;
@@ -331,7 +330,7 @@ const AdminMasterLayout = ({ children, title = "Admin – ToiYeuPC" }) => {
 
   const handleMarkAllAsRead = async () => {
     try {
-      const token = localStorage.getItem("admin_access_token") || localStorage.getItem("access_token");
+      const token = localStorage.getItem("admin_access_token");
       await fetch(`${API}/admin/notifications/read-all`, {
         method: 'PUT',
         headers: { Authorization: `Bearer ${token}` }
@@ -348,7 +347,7 @@ const AdminMasterLayout = ({ children, title = "Admin – ToiYeuPC" }) => {
   }, [title]);
 
   useEffect(() => {
-    const token = localStorage.getItem("admin_access_token") || localStorage.getItem("access_token");
+    const token = localStorage.getItem("admin_access_token");
     if (!token) { setAuthState("login"); return; }
 
     fetch(`${API}/me`, {
@@ -361,6 +360,7 @@ const AdminMasterLayout = ({ children, title = "Admin – ToiYeuPC" }) => {
           localStorage.setItem("admin_user", JSON.stringify(data.user));
           setAuthState("ok");
         } else {
+
           localStorage.removeItem("admin_access_token");
           setAuthState("login");
         }
@@ -377,7 +377,7 @@ const AdminMasterLayout = ({ children, title = "Admin – ToiYeuPC" }) => {
 
   const handleLogout = async () => {
     try {
-      const token = localStorage.getItem("admin_access_token") || localStorage.getItem("access_token");
+      const token = localStorage.getItem("admin_access_token");
       if (token) {
         await fetch(`${API}/logout`, {
           method: 'POST',
@@ -406,7 +406,7 @@ const AdminMasterLayout = ({ children, title = "Admin – ToiYeuPC" }) => {
             width: 44, height: 44, border: "3px solid rgba(227,0,25,0.3)",
             borderTopColor: "#e30019", borderRadius: "50%",
             animation: "spin 0.8s linear infinite", margin: "0 auto 16px",
-          }}/>
+          }} />
           <p style={{ color: "#64748b", fontSize: 14 }}>Đang xác thực...</p>
         </div>
         <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
@@ -429,7 +429,7 @@ const AdminMasterLayout = ({ children, title = "Admin – ToiYeuPC" }) => {
         <header className="admin-layout__topbar">
           <div />
           <div className="admin-layout__topbar-right" style={{ position: "relative" }}>
-            {}
+            { }
             <div style={{ position: "relative" }}>
               <button className="admin-layout__bell" aria-label="Thông báo" onClick={() => { setShowNotif(!showNotif); setUnreadCount(0); setDropdownOpen(false); }}>
                 <BellIcon />
@@ -446,7 +446,7 @@ const AdminMasterLayout = ({ children, title = "Admin – ToiYeuPC" }) => {
                 )}
               </button>
 
-              {}
+              { }
               {showNotif && (
                 <div style={{
                   position: "absolute", top: "calc(100% + 10px)", right: 0,
@@ -465,11 +465,11 @@ const AdminMasterLayout = ({ children, title = "Admin – ToiYeuPC" }) => {
                       <div style={{ padding: 24, textAlign: "center", color: "#94a3b8", fontSize: 13 }}>Không có thông báo mới</div>
                     ) : (
                       notifications.map((n) => (
-                        <div 
-                          key={n.id_ThongBao} 
-                          onClick={() => handleMarkAsRead(n.id_ThongBao, n.link)}
-                          style={{ 
-                            padding: "12px 16px", 
+                        <div
+                          key={n.id_thongbao}
+                          onClick={() => handleMarkAsRead(n.id_thongbao, n.link)}
+                          style={{
+                            padding: "12px 16px",
                             borderBottom: "1px solid #f8fafc",
                             background: n.da_doc ? '#fff' : '#f0f9ff',
                             cursor: 'pointer',
@@ -489,16 +489,18 @@ const AdminMasterLayout = ({ children, title = "Admin – ToiYeuPC" }) => {
               )}
             </div>
 
-            {}
+            { }
             <div
               onClick={() => { setDropdownOpen(!dropdownOpen); setShowNotif(false); }}
               style={{ display: "flex", alignItems: "center", gap: 8, cursor: "pointer" }}
             >
-              {}
+              { }
               {adminUser?.avatar ? (
                 <img src={adminUser.avatar} alt=""
-                  style={{ width: 34, height: 34, borderRadius: "50%", objectFit: "cover",
-                    border: "2px solid #e30019" }}
+                  style={{
+                    width: 34, height: 34, borderRadius: "50%", objectFit: "cover",
+                    border: "2px solid #e30019"
+                  }}
                 />
               ) : (
                 <div style={{
@@ -514,15 +516,17 @@ const AdminMasterLayout = ({ children, title = "Admin – ToiYeuPC" }) => {
 
               <div style={{ lineHeight: 1.2 }}>
                 <div style={{ fontSize: 11, color: "#94a3b8" }}>Quản trị viên</div>
-                <div style={{ fontSize: 13, fontWeight: 700, color: "#1e293b", maxWidth: 120,
-                  overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                <div style={{
+                  fontSize: 13, fontWeight: 700, color: "#1e293b", maxWidth: 120,
+                  overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap"
+                }}>
                   {adminUser?.ten || "Admin"}
                 </div>
               </div>
               <ChevronIcon />
             </div>
 
-            {}
+            { }
             {dropdownOpen && (
               <div style={{
                 position: "absolute", top: "calc(100% + 10px)", right: 0,
@@ -530,9 +534,9 @@ const AdminMasterLayout = ({ children, title = "Admin – ToiYeuPC" }) => {
                 boxShadow: "0 10px 30px rgba(0,0,0,0.12)", width: 240, zIndex: 100,
                 overflow: "hidden",
               }}
-              onClick={e => e.stopPropagation()}
+                onClick={e => e.stopPropagation()}
               >
-                {}
+                { }
                 <div style={{
                   padding: "14px 16px", borderBottom: "1px solid #f1f5f9",
                   display: "flex", gap: 12, alignItems: "center",
@@ -547,12 +551,16 @@ const AdminMasterLayout = ({ children, title = "Admin – ToiYeuPC" }) => {
                     {initial}
                   </div>
                   <div style={{ overflow: "hidden" }}>
-                    <div style={{ fontWeight: 700, color: "#1e293b", fontSize: 14,
-                      overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                    <div style={{
+                      fontWeight: 700, color: "#1e293b", fontSize: 14,
+                      overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap"
+                    }}>
                       {adminUser?.ten}
                     </div>
-                    <div style={{ fontSize: 12, color: "#64748b",
-                      overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                    <div style={{
+                      fontSize: 12, color: "#64748b",
+                      overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap"
+                    }}>
                       {adminUser?.email || adminUser?.sdt}
                     </div>
                     <span style={{
@@ -565,7 +573,7 @@ const AdminMasterLayout = ({ children, title = "Admin – ToiYeuPC" }) => {
                   </div>
                 </div>
 
-                {}
+                { }
                 <div style={{ padding: "8px 0" }}>
                   {[
                     { icon: "🆔", label: "ID tài khoản", value: `#${adminUser?.id}` },
@@ -579,9 +587,11 @@ const AdminMasterLayout = ({ children, title = "Admin – ToiYeuPC" }) => {
                       <span style={{ fontSize: 15 }}>{item.icon}</span>
                       <div>
                         <div style={{ color: "#94a3b8", fontSize: 11 }}>{item.label}</div>
-                        <div style={{ color: "#1e293b", fontWeight: 500, fontSize: 13,
+                        <div style={{
+                          color: "#1e293b", fontWeight: 500, fontSize: 13,
                           maxWidth: 160, overflow: "hidden", textOverflow: "ellipsis",
-                          whiteSpace: "nowrap" }}>
+                          whiteSpace: "nowrap"
+                        }}>
                           {item.value}
                         </div>
                       </div>
@@ -589,7 +599,7 @@ const AdminMasterLayout = ({ children, title = "Admin – ToiYeuPC" }) => {
                   ))}
                 </div>
 
-                {}
+                { }
                 <div style={{ padding: "8px 12px 12px", borderTop: "1px solid #f1f5f9" }}>
                   <button onClick={handleLogout} style={{
                     width: "100%", padding: "9px", borderRadius: 8, border: "none",
@@ -598,10 +608,10 @@ const AdminMasterLayout = ({ children, title = "Admin – ToiYeuPC" }) => {
                     display: "flex", alignItems: "center", justifyContent: "center", gap: 6,
                     transition: "background .15s",
                   }}
-                  onMouseEnter={e => e.currentTarget.style.background = "#dc2626"}
-                  onMouseLeave={e => e.currentTarget.style.background = "#fee2e2"}
-                  onMouseOver={e => { e.currentTarget.style.background="#dc2626"; e.currentTarget.style.color="#fff"; }}
-                  onMouseOut={e => { e.currentTarget.style.background="#fee2e2"; e.currentTarget.style.color="#dc2626"; }}
+                    onMouseEnter={e => e.currentTarget.style.background = "#dc2626"}
+                    onMouseLeave={e => e.currentTarget.style.background = "#fee2e2"}
+                    onMouseOver={e => { e.currentTarget.style.background = "#dc2626"; e.currentTarget.style.color = "#fff"; }}
+                    onMouseOut={e => { e.currentTarget.style.background = "#fee2e2"; e.currentTarget.style.color = "#dc2626"; }}
                   >
                     🚪 Đăng xuất
                   </button>
@@ -609,11 +619,11 @@ const AdminMasterLayout = ({ children, title = "Admin – ToiYeuPC" }) => {
               </div>
             )}
 
-            {}
+            { }
             {dropdownOpen && (
               <div onClick={() => setDropdownOpen(false)} style={{
                 position: "fixed", inset: 0, zIndex: 99,
-              }}/>
+              }} />
             )}
           </div>
         </header>

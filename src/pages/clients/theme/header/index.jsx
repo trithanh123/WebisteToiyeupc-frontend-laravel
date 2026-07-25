@@ -146,7 +146,7 @@ const Header = () => {
       })
         .then(res => {
           if (res.status === 401) {
-            localStorage.removeItem('access_token'); 
+            localStorage.removeItem('access_token');
             throw new Error('Token expired');
           }
           return res.json();
@@ -201,7 +201,7 @@ const Header = () => {
     setSearchQuery(kw);
     addToHistory(kw);
     setTimeout(() => {
-      const event = { preventDefault: () => {} };
+      const event = { preventDefault: () => { } };
       handleSearch(Object.assign(event, { target: null }));
     }, 80);
   };
@@ -212,12 +212,12 @@ const Header = () => {
     <header className="header" ref={headerRef}>
       <div className="header__inner">
 
-        {}
+        { }
         <Link to={ROUTERS.CLIENT.HOME} className="header__logo">
           <img src={logo} alt="ToiYeuPC" />
         </Link>
 
-        {}
+        { }
         <div
           className="header__menu"
           ref={menuRef}
@@ -253,7 +253,7 @@ const Header = () => {
             >
               <div className="mgear-mega-inner">
 
-                {}
+                { }
                 <div className="mgear-mega-col-left">
                   {categories.map((cat, index) => {
                     const iconSrc = getCatIcon(cat.hinhanh_icon);
@@ -276,14 +276,14 @@ const Header = () => {
                   })}
                 </div>
 
-                {}
+                { }
                 {hoveredCat && (
                   <div className="mgear-mega-col-right">
                     {hoveredCat.danh_muc_con && hoveredCat.danh_muc_con.length > 0 ? (
                       <div className="mgear-mega-grid">
                         {hoveredCat.danh_muc_con.map((l2, index2) => (
                           <div key={l2.id || l2.id_danhmuc || index2}>
-                            {}
+                            { }
                             <Link
                               to={`${ROUTERS.CLIENT.PRODUCTS}?danh-muc=${l2.slug || l2.id_danhmuc}`}
                               className="mgear-l2-title"
@@ -292,7 +292,7 @@ const Header = () => {
                               {l2.ten_danhmuc}
                             </Link>
 
-                            {}
+                            { }
                             {l2.danh_muc_con && l2.danh_muc_con.length > 0
                               ? l2.danh_muc_con.map((l3, index3) => (
                                 <Link
@@ -337,7 +337,7 @@ const Header = () => {
           )}
         </div>
 
-        {}
+        { }
         <div className="header__branch" ref={branchRef}>
           <button
             className="header__branch-btn"
@@ -369,7 +369,7 @@ const Header = () => {
           )}
         </div>
 
-        {/* ── SEARCH BAR ── */}
+
         <div className="pv-search" ref={searchRef}>
           <form className="pv-search__form" onSubmit={handleSearch}>
             <svg className="pv-search__icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2">
@@ -397,25 +397,25 @@ const Header = () => {
             </button>
           </form>
 
-          {/* ── DROPDOWN ── */}
+
           {isSearchFocused && (
             <div className="pv-search__dropdown">
 
-              {/* Kết quả AI */}
+              { }
               {isSearching && (
                 <div className="pv-search__loading">
                   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ animation: 'spin 1s linear infinite' }}>
-                    <circle cx="12" cy="12" r="10" stroke="#2563eb" strokeWidth="4" strokeOpacity="0.25"/>
-                    <path d="M4 12a8 8 0 018-8" stroke="#2563eb" strokeWidth="4" strokeLinecap="round"/>
+                    <circle cx="12" cy="12" r="10" stroke="#2563eb" strokeWidth="4" strokeOpacity="0.25" />
+                    <path d="M4 12a8 8 0 018-8" stroke="#2563eb" strokeWidth="4" strokeLinecap="round" />
                   </svg>
-                  AI đang phân tích...
+                  Đang tìm kiếm nhu cầu của bạn
                 </div>
               )}
 
               {aiResults.length > 0 && !isSearching && (
                 <div className="pv-search__section">
                   <div className="pv-search__section-header">
-                    <span className="pv-search__section-title">✨ AI Đề Xuất</span>
+                    <span className="pv-search__section-title">Sản phẩm đề xuất</span>
                   </div>
                   <div className="pv-search__ai-list">
                     {aiResults.map((product) => (
@@ -436,10 +436,9 @@ const Header = () => {
                 </div>
               )}
 
-              {/* Lịch sử + Từ khóa phổ biến (khi chưa có kết quả) */}
+
               {aiResults.length === 0 && !isSearching && (
                 <>
-                  {/* Lịch sử tìm kiếm */}
                   {searchHistory.length > 0 && (
                     <div className="pv-search__section">
                       <div className="pv-search__section-header">
@@ -450,8 +449,8 @@ const Header = () => {
                         {searchHistory.map((kw, i) => (
                           <li key={i} className="pv-search__history-item" onClick={() => handleKeywordClick(kw)}>
                             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" strokeWidth="2">
-                              <circle cx="12" cy="12" r="10"/>
-                              <polyline points="12 6 12 12 16 14"/>
+                              <circle cx="12" cy="12" r="10" />
+                              <polyline points="12 6 12 12 16 14" />
                             </svg>
                             {kw}
                           </li>
@@ -460,7 +459,7 @@ const Header = () => {
                     </div>
                   )}
 
-                  {/* Từ khóa phổ biến */}
+
                   <div className="pv-search__section">
                     <div className="pv-search__section-header">
                       <span className="pv-search__section-title">TỪ KHÓA PHỔ BIẾN</span>
@@ -477,7 +476,7 @@ const Header = () => {
           )}
         </div>
 
-        {}
+        { }
         <div className="header__auth" style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
 
           <Link to={ROUTERS.CLIENT.CART} className="header__cart" aria-label="Giỏ hàng">

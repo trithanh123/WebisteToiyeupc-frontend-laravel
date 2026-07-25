@@ -40,13 +40,25 @@ const CheckoutPage = () => {
   const [needSupport, setNeedSupport] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState('vnpay'); 
 
-  const BRANCHES = [
-    { id: 1, name: 'HCM - Quận 8', address: '45 cao lỗ phường 4 Quận 8, TP.HCM' },
-    { id: 2, name: 'HCM - Quận 2', address: '275 Nguyễn Thị Định, Bình Trưng Quận 2, TP.HCM' },
-    { id: 3, name: 'HCM - Quận 3', address: '330-332 Võ Văn Tần, Phường Bàn Cờ Quận 3, TP.HCM' },
-    { id: 4, name: 'HCM - Bình Dương', address: '882 Lê Hồng Phong, Thủ Dầu Một, TP.HCM' },
-    { id: 5, name: 'HCM - Đồng Nai', address: '272 Phạm Văn Thuận, Biên Hòa, TP.HCM' }
-  ];
+  const [branches, setBranches] = useState([]);
+
+  React.useEffect(() => {
+    axios.get(`${API}/branches`)
+      .then(res => {
+        if (res.data.status === 'success') {
+          const formattedBranches = res.data.data.map(b => ({
+            id: b.id_chinhanh,
+            name: b.ten_chinhanh,
+            address: b.diachi_chitiet
+          }));
+          setBranches(formattedBranches);
+          if (formattedBranches.length > 0 && !selectedBranch) {
+            setSelectedBranch(formattedBranches[0]);
+          }
+        }
+      })
+      .catch(err => console.error('Error fetching branches:', err));
+  }, []);
 
   const defaultAddress = addresses.find(a => a.isDefault) || addresses[0];
   const [selectedHomeAddressId, setSelectedHomeAddressId] = useState(defaultAddress?.id || null);
@@ -353,7 +365,7 @@ const CheckoutPage = () => {
                         </select>
                       </div>
                       <div className="space-y-2 max-h-[350px] overflow-y-auto custom-scrollbar pr-2">
-                        {BRANCHES.map(branch => (
+                        {branches.map(branch => (
                           <label key={branch.id} className="flex gap-3 items-start cursor-pointer hover:bg-gray-50 p-3 rounded transition-colors border border-transparent hover:border-gray-100">
                             <input 
                               type="radio" 

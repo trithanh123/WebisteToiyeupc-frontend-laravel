@@ -29,6 +29,8 @@ export const ROUTERS = {
     STATISTICS: "/admin/thong-ke",
     MONITOR:    "/admin/giam-sat",
     ORDERS:     "/admin/don-hang",
+    WARRANTY:   "/admin/bao-hanh",
+    TRANSFER:   "/admin/dieu-chuyen",
   },
   STAFF: {
     HOME:       "/staff",

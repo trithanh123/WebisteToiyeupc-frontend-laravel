@@ -24,9 +24,16 @@ import BranchManagement from "./pages/admin/branches";
 import PersonnelManagement from "./pages/admin/personnel";
 import WarehouseManagement from "./pages/admin/warehouse";
 import OrderSupervise from "./pages/admin/orders";
+import AdminWarrantyPage from "./pages/admin/warranty";
+import TransferTickets from "./pages/admin/transfers";
 
 import StaffDashboard from "./pages/staff/dashboard";
 import StaffOrders from "./pages/staff/orders";
+import LocalStockPage from "./pages/staff/localStock";
+import SystemStockPage from "./pages/staff/systemStock";
+import StaffWarrantyPage from "./pages/staff/warranty";
+
+import StaffTransferTickets from "./pages/staff/transfers";
 
 import AddToCartModal from "./components/AddToCartModal";
 import { CartContext } from "./context/CartContext";
@@ -77,14 +84,16 @@ const RouterCustom = () => {
         <Route path={ROUTERS.ADMIN.STATISTICS} element={<AdminDashboard />} />
         <Route path={ROUTERS.ADMIN.MONITOR}    element={<AdminDashboard />} />
         <Route path={ROUTERS.ADMIN.ORDERS}     element={<OrderSupervise />} />
+        <Route path={ROUTERS.ADMIN.WARRANTY}   element={<AdminWarrantyPage />} />
+        <Route path={ROUTERS.ADMIN.TRANSFER}   element={<TransferTickets />} />
 
-        {}
+        {/* STAFF ROUTES */}
         <Route path={ROUTERS.STAFF.HOME}       element={<StaffDashboard />} />
         <Route path={ROUTERS.STAFF.ORDERS}     element={<StaffOrders />} />
-        <Route path={ROUTERS.STAFF.WAREHOUSE}  element={<StaffDashboard />} />
-        <Route path={ROUTERS.STAFF.TRANSFER}   element={<StaffDashboard />} />
-        <Route path={ROUTERS.STAFF.WARRANTY}   element={<StaffDashboard />} />
-        <Route path={ROUTERS.STAFF.STATISTICS} element={<StaffDashboard />} />
+        <Route path={ROUTERS.STAFF.WAREHOUSE}  element={<LocalStockPage />} />
+        <Route path={ROUTERS.STAFF.TRANSFER}   element={<StaffTransferTickets />} />
+        <Route path={ROUTERS.STAFF.WARRANTY}   element={<StaffWarrantyPage />} />
+        <Route path={ROUTERS.STAFF.STATISTICS} element={<SystemStockPage />} />
 
         {}
         <Route path="*" element={<HomePage />} />

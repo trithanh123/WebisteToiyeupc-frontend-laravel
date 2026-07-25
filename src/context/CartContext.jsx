@@ -1,5 +1,5 @@
 import React, { createContext, useState, useEffect } from 'react';
-
+import axios from 'axios';
 export const CartContext = createContext();
 
 export const CartProvider = ({ children }) => {
@@ -17,7 +17,7 @@ export const CartProvider = ({ children }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [currentProduct, setCurrentProduct] = useState(null);
 
-  const cartCount = Array.isArray(cartItems) 
+  const cartCount = Array.isArray(cartItems)
     ? cartItems.reduce((acc, item) => acc + (item?.quantity || 1), 0)
     : 0;
 
@@ -25,23 +25,34 @@ export const CartProvider = ({ children }) => {
     localStorage.setItem('cartItems', JSON.stringify(cartItems || []));
   }, [cartItems]);
 
-  const addToCart = (product, quantity = 1, selectedVoucher = null) => {
-    setCartItems(prev => {
-      const id = product.id || product.id_sanpham;
-      const existingItem = prev.find(item => (item.id || item.id_sanpham) === id);
-      if (existingItem) {
-        return prev.map(item => 
-          (item.id || item.id_sanpham) === id 
-            ? { ...item, quantity: item.quantity + quantity }
-            : item
-        );
-      }
-      return [...prev, { ...product, quantity, selectedVoucher }];
-    });
+  const addToCart = async (product, quantity = 1, selectedVoucher = null) => {
+    const id = product.id || product.id_sanpham;
+    try {
 
-    setCurrentProduct({ ...product, quantity, selectedVoucher });
-    setIsModalOpen(true);
-  };
+      const res = await axios.get(`http://127.0.0.1:8000/api/products/${id}/check-stock`);
+      const { is_available, stock } = res.data;
+      if (!is_available || stock < quantity) {
+        alert('Sản phẩm hiện tại đã hết hàng, vui lòng chọn sản phẩm khác.');
+        return;
+      }
+      setCartItems(prev => {
+        const existingItem = prev.find(item => (item.id || item.id_sanpham) === id);
+        if (existingItem) {
+          return prev.map(item =>
+            (item.id || item.id_sanpham) === id
+              ? { ...item, quantity: item.quantity + quantity }
+              : item
+          );
+        }
+        return [...prev, { ...product, quantity, selectedVoucher }];
+      });
+      setCurrentProduct({ ...product, quantity, selectedVoucher });
+      setIsModalOpen(true);
+    } catch (error) {
+      console.error("Lỗi kiểm tra tồn kho", error);
+      alert('Lỗi hệ thống, không thể thêm vào giỏ lúc này!');
+    }
+  }
 
   const closeModal = () => {
     setIsModalOpen(false);

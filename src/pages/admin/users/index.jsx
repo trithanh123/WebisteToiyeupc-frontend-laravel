@@ -19,6 +19,7 @@ const RoleBadge = ({ role }) => {
     1: { label: 'Admin', classes: 'bg-red-100 text-red-700 border-red-300', dot: 'bg-red-600' },
     2: { label: 'Nhân viên', classes: 'bg-blue-100 text-blue-700 border-blue-300', dot: 'bg-blue-600' },
     3: { label: 'Khách hàng', classes: 'bg-green-100 text-green-700 border-green-300', dot: 'bg-green-600' },
+    4: { label: 'Khách vip', classes: 'bg-yellow-100 text-yellow-700 border-yellow-300', dot: 'bg-yellow-600' },
   };
   const style = map[role] ?? { label: 'Không rõ', classes: 'bg-gray-100 text-gray-500 border-gray-300', dot: 'bg-gray-500' };
 
@@ -51,30 +52,30 @@ const SkeletonRow = () => (
 
 const UserModal = ({ isOpen, onClose, user, onSaveSuccess }) => {
   const [formData, setFormData] = useState({
-    Ten: '',
+    ten: '',
     email: '',
-    SDT: '',
+    sdt: '',
     matkhau: '',
-    Phanquyen: 3,
+    phanquyen: 3,
   });
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     if (user) {
       setFormData({
-        Ten: user.ten || '',
+        ten: user.ten || '',
         email: user.email || '',
-        SDT: user.sdt || '',
-        matkhau: '', // Không tải mật khẩu lên
-        Phanquyen: user.phanquyen || 3,
+        sdt: user.sdt || '',
+        matkhau: '',
+        phanquyen: user.phanquyen || 3,
       });
     } else {
       setFormData({
-        Ten: '',
+        ten: '',
         email: '',
-        SDT: '',
+        sdt: '',
         matkhau: '',
-        Phanquyen: 3,
+        phanquyen: 3,
       });
     }
   }, [user, isOpen]);
@@ -89,11 +90,10 @@ const UserModal = ({ isOpen, onClose, user, onSaveSuccess }) => {
       const token = localStorage.getItem("access_token") || localStorage.getItem("admin_access_token");
 
       if (user) {
-        // Gọi API Cập nhật (PUT) - backend cho phép cập nhật Ten, SDT và Phanquyen
         const res = await axios.put(`${API}/admin/users/${user.id_nguoidung}`, {
-          Ten: formData.ten,
-          SDT: formData.sdt,
-          Phanquyen: formData.phanquyen
+          ten: formData.ten,
+          sdt: formData.sdt,
+          phanquyen: formData.phanquyen
         }, {
           headers: { Authorization: `Bearer ${token}` }
         });
@@ -128,12 +128,16 @@ const UserModal = ({ isOpen, onClose, user, onSaveSuccess }) => {
         }
       }
     } catch (error) {
-      const msg = error.response?.data?.message || 'Có lỗi xảy ra, vui lòng kiểm tra lại!';
+      const data = error.response?.data;
+      const msg = data?.message || 'Có lỗi xảy ra, vui lòng kiểm tra lại!';
+      const errorDetails = data?.errors
+        ? Object.values(data.errors).flat().join('\n')
+        : null;
       Swal.fire({
         icon: 'error',
         title: 'Lỗi!',
-        text: msg,
-        toast: true, position: 'top-end', showConfirmButton: false, timer: 3000
+        text: errorDetails || msg,
+        toast: true, position: 'top-end', showConfirmButton: false, timer: 5000
       });
     } finally {
       setLoading(false);
@@ -158,7 +162,7 @@ const UserModal = ({ isOpen, onClose, user, onSaveSuccess }) => {
               Họ và Tên <span className="text-red-500">*</span>
               {user && <span className="text-gray-400 font-normal ml-1">(có thể sửa)</span>}
             </label>
-            <input type="text" required value={formData.ten} onChange={e => setFormData({ ...formData, Ten: e.target.value })}
+            <input type="text" required value={formData.ten} onChange={e => setFormData({ ...formData, ten: e.target.value })}
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 outline-none transition-all"
               placeholder="Nhập họ và tên..." />
           </div>
@@ -188,18 +192,19 @@ const UserModal = ({ isOpen, onClose, user, onSaveSuccess }) => {
 
           <div>
             <label className="block text-sm font-semibold text-gray-700 mb-1">Số điện thoại {user && <span className="text-gray-400 font-normal">(có thể sửa)</span>}</label>
-            <input type="text" value={formData.sdt} onChange={e => setFormData({ ...formData, SDT: e.target.value })}
+            <input type="text" value={formData.sdt} onChange={e => setFormData({ ...formData, sdt: e.target.value })}
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 outline-none transition-all"
               placeholder="0912345678" />
           </div>
 
           <div>
             <label className="block text-sm font-semibold text-gray-700 mb-1">Phân quyền {user && <span className="text-gray-400 font-normal">(có thể sửa)</span>}</label>
-            <select value={formData.phanquyen} onChange={e => setFormData({ ...formData, Phanquyen: Number(e.target.value) })}
+            <select value={formData.phanquyen} onChange={e => setFormData({ ...formData, phanquyen: Number(e.target.value) })}
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 outline-none transition-all cursor-pointer">
               <option value={1}>Admin</option>
               <option value={2}>Nhân viên</option>
               <option value={3}>Khách hàng</option>
+              <option value={4}>Khách vip</option>
             </select>
           </div>
 
@@ -329,7 +334,7 @@ const UserManagement = () => {
 
   return (
     <AdminMasterLayout title="Quản lý Người dùng – Admin">
-      {}
+      { }
       <div className="mb-6 flex justify-between items-end">
         <div>
           <h1 className="text-2xl font-bold text-slate-800 m-0">
@@ -337,10 +342,10 @@ const UserManagement = () => {
           </h1>
         </div>
       </div>
-      {}
+      { }
       <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
         <div className="flex flex-wrap items-center justify-between p-4 border-b border-slate-100 gap-3">
-          {}
+          { }
           <div className="relative flex-1 min-w-[200px] max-w-[340px]">
             <svg className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"
               width="16" height="16" viewBox="0 0 24 24" fill="none"
@@ -356,7 +361,7 @@ const UserManagement = () => {
           </div>
 
           <div className="flex flex-wrap gap-2.5 items-center">
-            {}
+            { }
             <select value={filterRole} onChange={e => setFilterRole(e.target.value)}
               className="py-2 px-3 rounded-lg border border-slate-200 text-sm bg-slate-50 cursor-pointer outline-none focus:border-red-500 focus:ring-1 focus:ring-red-500 transition-colors">
               <option value="all">Tất cả quyền</option>
@@ -365,13 +370,13 @@ const UserManagement = () => {
               <option value="3">Khách hàng</option>
             </select>
 
-            {}
+            { }
             <button onClick={fetchUsers}
               className="py-2 px-3.5 rounded-lg border border-slate-200 bg-slate-50 hover:bg-slate-200 text-slate-600 cursor-pointer text-sm flex items-center gap-1.5 transition-colors">
               <img src={iconReload} alt="Tải lại" className="w-4 h-4 object-contain" /> Tải lại
             </button>
 
-            {}
+            { }
             <button onClick={handleAddNew}
               className="py-2 px-4 rounded-lg border-none bg-red-600 hover:bg-red-700 text-white cursor-pointer text-sm font-semibold flex items-center gap-1.5 transition-colors shadow-sm">
               + Thêm người dùng
@@ -379,7 +384,7 @@ const UserManagement = () => {
           </div>
         </div>
 
-        {}
+        { }
         {error ? (
           <div className="p-12 text-center text-red-600">
             <div className="text-4xl mb-3">⚠️</div>
@@ -415,12 +420,12 @@ const UserManagement = () => {
                     )
                     : currentItems.map((u, idx) => (
                       <tr key={u.id_nguoidung} className={`border-b border-slate-100 transition-colors hover:bg-red-50/30 ${idx % 2 === 0 ? 'bg-white' : 'bg-slate-50/50'}`}>
-                        {}
+                        { }
                         <td className="p-3.5 px-4 font-bold text-slate-500">
                           #{u.id_nguoidung}
                         </td>
 
-                        {}
+                        { }
                         <td className="p-3.5 px-4">
                           <div className="flex items-center gap-2.5">
                             <div className={`w-8 h-8 rounded-full shrink-0 text-white flex items-center justify-center font-bold text-sm bg-gradient-to-br ${u.phanquyen === 1 ? 'from-red-500 to-red-700' :
@@ -433,7 +438,7 @@ const UserManagement = () => {
                           </div>
                         </td>
 
-                        {}
+                        { }
                         <td className="p-3.5 px-4 text-slate-600">
                           {u.email
                             ? <a href={`mailto:${u.email}`} className="text-blue-600 hover:underline">
@@ -443,12 +448,12 @@ const UserManagement = () => {
                           }
                         </td>
 
-                        {}
+                        { }
                         <td className="p-3.5 px-4">
                           <span className="font-mono tracking-widest text-slate-400 text-base">••••••••</span>
                         </td>
 
-                        {}
+                        { }
                         <td className="p-3.5 px-4 text-slate-600">
                           {u.sdt
                             ? <span className="bg-slate-100 py-0.5 px-2 rounded-md text-xs font-mono">
@@ -458,12 +463,12 @@ const UserManagement = () => {
                           }
                         </td>
 
-                        {}
+                        { }
                         <td className="p-3.5 px-4">
                           <RoleBadge role={u.phanquyen} />
                         </td>
 
-                        {}
+                        { }
                         <td className="p-3.5 px-4">
                           <div className="flex gap-1.5">
                             <button onClick={() => handleEdit(u)}
@@ -484,7 +489,7 @@ const UserManagement = () => {
           </div>
         )}
 
-        {}
+        { }
         {!loading && !error && (
           <div className="p-3 px-5 border-t border-slate-100 flex flex-col md:flex-row justify-between items-center gap-4 text-sm text-slate-500">
             <span>
@@ -516,7 +521,7 @@ const UserManagement = () => {
         )}
       </div>
 
-      {}
+      { }
       <UserModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}

@@ -202,7 +202,7 @@ const ProductDetailPage = () => {
                    <table className="w-full text-[13.5px] text-left">
                      <tbody>
                        {specs.map(({ type, value, key }, idx) => (
-                         <tr key={type || key} className="border-b border-gray-100 last:border-0">
+                         <tr key={`${type || key}-${idx}`} className="border-b border-gray-100 last:border-0">
                            <td className="py-3 px-4 bg-gray-50/50 w-2/5 font-semibold text-gray-800 capitalize border-r border-gray-100">
                              {key ? key.replace(/_/g, ' ') : type}
                            </td>
@@ -285,27 +285,41 @@ const ProductDetailPage = () => {
                  )}
                </div>
 
-               {}
-               <div className="flex flex-col sm:flex-row gap-3 mt-auto pt-2">
-                 <button 
-                   onClick={() => {
-                     addToCart(product, 1, vouchers.length > 0 ? vouchers[0] : null);
-                     closeModal();
-                     navigate('/thanh-toan', { state: { selectedItems: [product.id || product.id_sanpham] } });
-                   }}
-                   className="flex-1 bg-gradient-to-r from-red-600 to-red-500 hover:from-red-700 hover:to-red-600 text-white font-bold py-3.5 px-6 rounded-xl transition-all shadow-[0_4px_12px_rgba(220,38,38,0.25)] flex flex-col items-center justify-center hover:-translate-y-0.5"
-                 >
-                   <span className="text-[16px] uppercase">Mua ngay</span>
-                   <span className="text-[11px] font-normal opacity-90 mt-0.5">Giao hàng miễn phí tận nơi</span>
-                 </button>
-                 <button 
-                   onClick={() => addToCart(product, 1, vouchers.length > 0 ? vouchers[0] : null)}
-                   className="sm:w-[220px] border-[1.5px] border-blue-600 text-blue-600 hover:bg-blue-50 font-bold py-3.5 px-6 rounded-xl transition-colors flex flex-col items-center justify-center group"
-                 >
-                   <span className="text-[15px] uppercase">Thêm vào giỏ</span>
-                   <span className="text-[11px] font-normal opacity-80 mt-0.5 group-hover:opacity-100">Mua sau cũng được</span>
-                 </button>
-               </div>
+               {(() => {
+                 const isOutOfStock = !product.ton_kho || !product.ton_kho.some(tk => tk.soluongtonkho > 0);
+                 return (
+                   <div className="flex flex-col sm:flex-row gap-3 mt-auto pt-2">
+                     <button 
+                       disabled={isOutOfStock}
+                       onClick={() => {
+                         addToCart(product, 1, vouchers.length > 0 ? vouchers[0] : null);
+                         closeModal();
+                         navigate('/thanh-toan', { state: { selectedItems: [product.id || product.id_sanpham] } });
+                       }}
+                       className={`flex-1 font-bold py-3.5 px-6 rounded-xl transition-all flex flex-col items-center justify-center ${
+                         isOutOfStock 
+                           ? "bg-gray-400 cursor-not-allowed text-white shadow-none" 
+                           : "bg-gradient-to-r from-red-600 to-red-500 hover:from-red-700 hover:to-red-600 text-white shadow-[0_4px_12px_rgba(220,38,38,0.25)] hover:-translate-y-0.5"
+                       }`}
+                     >
+                       <span className="text-[16px] uppercase">{isOutOfStock ? "Sản phẩm đã hết" : "Mua ngay"}</span>
+                       <span className="text-[11px] font-normal opacity-90 mt-0.5">{isOutOfStock ? "Vui lòng quay lại sau" : "Giao hàng miễn phí tận nơi"}</span>
+                     </button>
+                     <button 
+                       disabled={isOutOfStock}
+                       onClick={() => addToCart(product, 1, vouchers.length > 0 ? vouchers[0] : null)}
+                       className={`sm:w-[220px] border-[1.5px] font-bold py-3.5 px-6 rounded-xl transition-colors flex flex-col items-center justify-center group ${
+                         isOutOfStock 
+                           ? "border-gray-300 text-gray-400 cursor-not-allowed bg-gray-50" 
+                           : "border-blue-600 text-blue-600 hover:bg-blue-50"
+                       }`}
+                     >
+                       <span className="text-[15px] uppercase">Thêm vào giỏ</span>
+                       <span className="text-[11px] font-normal opacity-80 mt-0.5 group-hover:opacity-100">Mua sau cũng được</span>
+                     </button>
+                   </div>
+                 );
+               })()}
             </div>
           </div>
 
