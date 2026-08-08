@@ -62,6 +62,7 @@ const Header = () => {
   const { activeBranch, setBranch } = useContext(BranchContext);
   const [branchesList, setBranchesList] = useState([]);
   const menuRef = useRef(null);
+  const megaMenuRef = useRef(null);
   const branchRef = useRef(null);
   const searchRef = useRef(null);
   const menuLeaveTimer = useRef(null);
@@ -81,7 +82,9 @@ const Header = () => {
   // Đóng menu khi click ra ngoài
   useEffect(() => {
     const handler = (e) => {
-      if (menuRef.current && !menuRef.current.contains(e.target)) setMenuOpen(false);
+      const inMenuArea = (menuRef.current && menuRef.current.contains(e.target)) ||
+                        (megaMenuRef.current && megaMenuRef.current.contains(e.target));
+      if (!inMenuArea) setMenuOpen(false);
       if (branchRef.current && !branchRef.current.contains(e.target)) setBranchOpen(false);
       if (userDropdownRef.current && !userDropdownRef.current.contains(e.target)) setIsDropdownOpen(false);
       if (searchRef.current && !searchRef.current.contains(e.target)) setIsSearchFocused(false);
@@ -255,6 +258,7 @@ const Header = () => {
           {menuOpen && (
             <div
               className="mgear-mega-wrap"
+              ref={megaMenuRef}
               style={{ top: headerBottom }}
               onMouseEnter={() => clearTimeout(menuLeaveTimer.current)}
               onMouseLeave={() => {
