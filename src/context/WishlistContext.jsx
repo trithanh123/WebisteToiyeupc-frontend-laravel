@@ -15,7 +15,7 @@ export const WishlistProvider = ({ children }) => {
         return;
       }
       
-      const response = await axios.get('http://127.0.0.1:8000/api/wishlist', {
+      const response = await axios.get('https://webistetoiyeupc-backend-laravel.onrender.com/api/wishlist', {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       
@@ -41,7 +41,7 @@ export const WishlistProvider = ({ children }) => {
         return false;
       }
       
-      const response = await axios.post('http://127.0.0.1:8000/api/wishlist/toggle', 
+      const response = await axios.post('https://webistetoiyeupc-backend-laravel.onrender.com/api/wishlist/toggle', 
         { id_sanpham },
         { headers: { 'Authorization': `Bearer ${token}` } }
       );

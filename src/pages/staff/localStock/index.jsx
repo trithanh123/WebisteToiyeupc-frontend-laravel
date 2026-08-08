@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from "react";
 import StaffMasterLayout from "../theme/masterLayout";
 import axios from "axios";
-const API = "http://127.0.0.1:8000/api";
+const API = "https://webistetoiyeupc-backend-laravel.onrender.com/api";
 const staffApi = axios.create({ baseURL: API });
 staffApi.interceptors.request.use(cfg => {
   const token = localStorage.getItem("staff_access_token");
@@ -194,7 +194,7 @@ const LocalStockPage = () => {
   };
 
   const filtered = stocks.filter(s =>
-    (s.san_pham?.tensp || "").toLowerCase().includes(search.toLowerCase())
+    (s.san_pham?.tensp || "").toLowerCase().includes(search.trim().toLowerCase())
   );
 
   const lowStockCount = stocks.filter(s => s.soluongtonkho > 0 && s.soluongtonkho <= (s.soluongkhothap ?? 5)).length;

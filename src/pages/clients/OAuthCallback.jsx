@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 
-const API = import.meta.env.VITE_API_URL || "http://127.0.0.1:8000/api";
+const API = import.meta.env.VITE_API_URL || "https://webistetoiyeupc-backend-laravel.onrender.com/api";
 
 function OAuthCallback() {
   const navigate = useNavigate();

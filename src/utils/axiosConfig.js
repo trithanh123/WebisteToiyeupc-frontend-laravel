@@ -4,6 +4,6 @@ import axios from 'axios';
 axios.defaults.withCredentials = true;
 
 // Nếu backend bạn ở port 8000, bạn có thể thiết lập baseURL luôn để code gọn hơn, nhưng mình giữ nguyên
-// axios.defaults.baseURL = 'http://127.0.0.1:8000';
+// axios.defaults.baseURL = 'https://webistetoiyeupc-backend-laravel.onrender.com';
 
 export default axios;

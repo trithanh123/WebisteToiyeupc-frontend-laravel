@@ -8,12 +8,19 @@ const TransferTickets = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedTicket, setSelectedTicket] = useState(null);
+  const [filterStatus, setFilterStatus] = useState('');
+  const [filterTuNgay, setFilterTuNgay] = useState('');
 
-  const fetchTransfers = async () => {
+  const fetchTransfers = async (status = filterStatus, tuNgay = filterTuNgay) => {
     setIsLoading(true);
     try {
-      const token = localStorage.getItem("access_token") || localStorage.getItem("admin_access_token");
-      const res = await fetch('http://127.0.0.1:8000/api/admin/transfers', {
+      const token = localStorage.getItem("admin_access_token");
+
+      const params = new URLSearchParams();
+      if (status) params.append('trang_thai', status);
+      if (tuNgay) params.append('tu_ngay', tuNgay);
+
+      const res = await fetch(`https://webistetoiyeupc-backend-laravel.onrender.com/api/admin/transfers?${params.toString()}`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       const result = await res.json();
@@ -34,8 +41,8 @@ const TransferTickets = () => {
   const handleDelete = async (id) => {
     if (!window.confirm(`Bạn có chắc muốn xóa phiếu #${id} không?`)) return;
     try {
-      const token = localStorage.getItem("access_token") || localStorage.getItem("admin_access_token");
-      const res = await fetch(`http://127.0.0.1:8000/api/admin/transfers/${id}`, {
+      const token = localStorage.getItem("admin_access_token");
+      const res = await fetch(`https://webistetoiyeupc-backend-laravel.onrender.com/api/admin/transfers/${id}`, {
         method: 'DELETE',
         headers: { 'Authorization': `Bearer ${token}` }
       });
@@ -55,7 +62,7 @@ const TransferTickets = () => {
       case 'Chờ duyệt': return <span className="px-3 py-1 bg-yellow-100 text-yellow-700 rounded-full text-xs font-bold">Chờ duyệt</span>;
       case 'Đang vận chuyển': return <span className="px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-xs font-bold">Đang vận chuyển</span>;
       case 'Hoàn thành': return <span className="px-3 py-1 bg-green-100 text-green-700 rounded-full text-xs font-bold">Hoàn thành</span>;
-      case 'Từ chối':
+      case 'Từ chối': return <span className="px-3 py-1 bg-red-100 text-red-700 rounded-full text-xs font-bold">{status}</span>;
       case 'Đã hủy': return <span className="px-3 py-1 bg-red-100 text-red-700 rounded-full text-xs font-bold">{status}</span>;
       default: return <span className="px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-xs font-bold">{status}</span>;
     }
@@ -66,7 +73,48 @@ const TransferTickets = () => {
       <div className="mb-6 flex justify-between items-end">
         <div>
           <h1 className="text-2xl font-bold text-slate-800 m-0">Quản lý Phiếu Điều Chuyển</h1>
-          <p className="text-sm text-slate-500 mt-1">Điều chuyển hàng hóa giữa các chi nhánh</p>
+
+          <div className="flex gap-3 mt-4 items-center">
+            <select
+              value={filterStatus}
+              onChange={(e) => setFilterStatus(e.target.value)}
+              className="border border-slate-300 rounded px-3 py-1.5 text-sm"
+            >
+              <option value="">-- Tất cả trạng thái --</option>
+              <option value="Chờ duyệt">Chờ duyệt</option>
+              <option value="Đang vận chuyển">Đang vận chuyển</option>
+              <option value="Hoàn thành">Hoàn thành</option>
+              <option value="Từ chối">Từ chối</option>
+              <option value="Đã hủy">Đã hủy</option>
+            </select>
+
+            <input
+              type="date"
+              value={filterTuNgay}
+              onChange={(e) => setFilterTuNgay(e.target.value)}
+              className="border border-slate-300 rounded px-3 py-1.5 text-sm"
+            />
+
+            <button
+              onClick={() => fetchTransfers()}
+              className="px-4 py-1.5 bg-slate-800 text-white text-sm font-semibold rounded hover:bg-slate-700"
+            >
+              Lọc
+            </button>
+
+            {(filterStatus || filterTuNgay) && (
+              <button
+                onClick={() => {
+                  setFilterStatus('');
+                  setFilterTuNgay('');
+                  fetchTransfers('', '');
+                }}
+                className="text-sm text-blue-600 hover:underline font-semibold ml-2"
+              >
+                Xóa lọc
+              </button>
+            )}
+          </div>
         </div>
         <button
           onClick={() => setIsModalOpen(true)}
@@ -129,8 +177,8 @@ const TransferTickets = () => {
       </div>
 
       {isModalOpen && (
-        <TransferModal 
-          onClose={() => setIsModalOpen(false)} 
+        <TransferModal
+          onClose={() => setIsModalOpen(false)}
           onSuccess={() => {
             setIsModalOpen(false);
             fetchTransfers();
@@ -139,9 +187,9 @@ const TransferTickets = () => {
       )}
 
       {selectedTicket && (
-        <TransferDetailModal 
-          id={selectedTicket} 
-          onClose={() => setSelectedTicket(null)} 
+        <TransferDetailModal
+          id={selectedTicket}
+          onClose={() => setSelectedTicket(null)}
           onUpdated={() => {
             setSelectedTicket(null);
             fetchTransfers();

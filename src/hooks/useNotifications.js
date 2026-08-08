@@ -9,7 +9,7 @@ const useNotifications = () => {
     try {
       const token = localStorage.getItem('access_token');
       if (!token) return;
-      const response = await axios.get('http://127.0.0.1:8000/api/my-notifications', {
+      const response = await axios.get('https://webistetoiyeupc-backend-laravel.onrender.com/api/my-notifications', {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       if (response.data.status === 'success') {
@@ -28,7 +28,7 @@ const useNotifications = () => {
   const markAsRead = async (id) => {
     try {
       const token = localStorage.getItem('access_token');
-      const response = await axios.put(`http://127.0.0.1:8000/api/my-notifications/${id}/read`, {}, {
+      const response = await axios.put(`https://webistetoiyeupc-backend-laravel.onrender.com/api/my-notifications/${id}/read`, {}, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       if (response.data.status === 'success') {
@@ -45,7 +45,7 @@ const useNotifications = () => {
   const markAllAsRead = async () => {
     try {
       const token = localStorage.getItem('access_token');
-      const response = await axios.put('http://127.0.0.1:8000/api/my-notifications/read-all', {}, {
+      const response = await axios.put('https://webistetoiyeupc-backend-laravel.onrender.com/api/my-notifications/read-all', {}, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       if (response.data.status === 'success') {

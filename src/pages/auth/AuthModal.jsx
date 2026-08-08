@@ -1,13 +1,31 @@
 import React, { useState, useRef, useEffect } from 'react';
 
-const API = 'http://127.0.0.1:8000/api';
+const API = 'https://webistetoiyeupc-backend-laravel.onrender.com/api';
+
+const StepIndicator = ({ current }) => (
+  <div className="flex items-center justify-center gap-2 mb-6">
+    {[1, 2, 3].map(step => (
+      <React.Fragment key={step}>
+        <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold transition-all ${step < current ? 'bg-green-500 text-white' :
+          step === current ? 'bg-[#e30019] text-white' :
+            'bg-gray-200 text-gray-400'
+          }`}>
+          {step < current ? '✓' : step}
+        </div>
+        {step < 3 && (
+          <div className={`h-0.5 w-8 transition-all ${step < current ? 'bg-green-500' : 'bg-gray-200'}`} />
+        )}
+      </React.Fragment>
+    ))}
+  </div>
+);
 
 const AuthModal = ({ isOpen, onClose }) => {
   const [view, setView] = useState('login');
   const [loginMethod, setLoginMethod] = useState('email');
   const [regMethod, setRegMethod] = useState('phone');
   const [formData, setFormData] = useState({
-    ho: '', ten: '', email: '', phone: '', password: ''
+    ho: '', ten: '', email: '', phone: '', password: '', password_confirmation: ''
   });
 
   const [fpIdentifier, setFpIdentifier] = useState('');
@@ -72,16 +90,20 @@ const AuthModal = ({ isOpen, onClose }) => {
         })
         .catch(err => console.log('Lỗi:', err));
     } else {
+      if (formData.password !== formData.password_confirmation) {
+        alert('Mật khẩu xác nhận không khớp!');
+        return;
+      }
       //gọm lại thành payload
       const payload = {
         ho: formData.ho,
         ten: formData.ten,
         matkhau: formData.password,
-        matkhau_confirmation: formData.password,
+        matkhau_confirmation: formData.password_confirmation,
         email: regMethod === 'email' ? formData.email : null,
         sdt: regMethod === 'phone' ? formData.phone : null,
       };
-      fetch(`${API}/register`, {
+      fetch(`${API}/register/send-otp`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
         body: JSON.stringify(payload)
@@ -89,9 +111,10 @@ const AuthModal = ({ isOpen, onClose }) => {
         .then(res => res.json())
         .then(data => {
           if (data.status === 'success') {
-            alert('Đăng ký thành công!');
-            localStorage.setItem('access_token', data.token);
-            window.location.reload();
+            setFpOtp(['', '', '', '', '', '']);
+            setFpError('');
+            setCountdown(60);
+            setView('register-otp');
           } else {
             alert(data.message || 'Có lỗi xảy ra, vui lòng kiểm tra lại!');
           }
@@ -216,23 +239,40 @@ const AuthModal = ({ isOpen, onClose }) => {
     }
   };
 
-  const StepIndicator = ({ current }) => (
-    <div className="flex items-center justify-center gap-2 mb-6">
-      {[1, 2, 3].map(step => (
-        <React.Fragment key={step}>
-          <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold transition-all ${step < current ? 'bg-green-500 text-white' :
-              step === current ? 'bg-[#e30019] text-white' :
-                'bg-gray-200 text-gray-400'
-            }`}>
-            {step < current ? '✓' : step}
-          </div>
-          {step < 3 && (
-            <div className={`h-0.5 w-8 transition-all ${step < current ? 'bg-green-500' : 'bg-gray-200'}`} />
-          )}
-        </React.Fragment>
-      ))}
-    </div>
-  );
+  const handleRegisterVerifyOtp = async (e) => {
+    e.preventDefault();
+    const otpString = fpOtp.join('');
+    if (otpString.length < 6) {
+      setFpError('Vui lòng nhập đủ 6 chữ số!');
+      return;
+    }
+    setFpLoading(true);
+    setFpError('');
+    try {
+      const payload = {
+        email: regMethod === 'email' ? formData.email : null,
+        sdt: regMethod === 'phone' ? formData.phone : null,
+        otp: otpString
+      };
+      const res = await fetch(`${API}/register/verify-otp`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+      const data = await res.json();
+      if (data.status === 'success') {
+        alert('Đăng ký thành công!');
+        localStorage.setItem('access_token', data.token);
+        window.location.reload();
+      } else {
+        setFpError(data.message || 'Mã OTP không đúng!');
+      }
+    } catch {
+      setFpError('Không thể kết nối đến server!');
+    } finally {
+      setFpLoading(false);
+    }
+  };
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-[2px]"
@@ -323,8 +363,19 @@ const AuthModal = ({ isOpen, onClose }) => {
 
               <div>
                 <input type="password" name="password" placeholder="Mật khẩu" required
+                  autoComplete={view === 'register' ? 'new-password' : 'current-password'}
+                  value={formData.password || ''}
                   className="w-full border border-gray-300 rounded px-3 py-2.5 focus:outline-none focus:border-red-500"
                   onChange={handleInputChange} />
+
+                {view === 'register' && (
+                  <input type="password" name="password_confirmation" placeholder="Xác nhận mật khẩu" required
+                    autoComplete="new-password"
+                    value={formData.password_confirmation || ''}
+                    className="w-full border border-gray-300 rounded px-3 py-2.5 focus:outline-none focus:border-red-500 mt-4"
+                    onChange={handleInputChange} />
+                )}
+
                 {view === 'login' && (
                   <div className="text-right mt-1.5">
                     <button type="button"
@@ -368,6 +419,57 @@ const AuthModal = ({ isOpen, onClose }) => {
                 {view === 'login' ? 'Đăng ký ngay!' : 'Đăng nhập!'}
               </button>
             </div>
+          </>
+        )}
+
+        {view === 'register-otp' && (
+          <>
+            <button type="button" onClick={() => { setView('register'); setFpError(''); }}
+              className="flex items-center gap-1 text-sm text-gray-500 hover:text-gray-800 mb-4 transition-colors">
+              ← Quay lại
+            </button>
+
+            <h2 className="text-xl font-bold text-gray-800 mb-1">Xác thực OTP 🔐</h2>
+            <p className="text-sm text-gray-500 mb-1">
+              Mã OTP 6 chữ số đã được gửi đến:
+            </p>
+            <p className="text-sm font-semibold text-[#e30019] mb-5">
+              {regMethod === 'email' ? formData.email : formData.phone}
+            </p>
+
+            {fpError && (
+              <div className="bg-red-50 border border-red-200 text-red-600 text-sm rounded-lg px-4 py-3 mb-4">
+                ⚠️ {fpError}
+              </div>
+            )}
+
+            <form onSubmit={handleRegisterVerifyOtp} className="flex flex-col gap-5">
+              <div className="flex gap-2 justify-center">
+                {fpOtp.map((digit, index) => (
+                  <input
+                    key={index}
+                    ref={el => otpRefs.current[index] = el}
+                    type="text"
+                    inputMode="numeric"
+                    maxLength={1}
+                    value={digit}
+                    onChange={e => handleOtpInput(index, e.target.value)}
+                    onKeyDown={e => handleOtpKeyDown(index, e)}
+                    className={`w-12 h-14 text-center text-2xl font-bold border-2 rounded-xl focus:outline-none transition-all ${digit
+                      ? 'border-[#e30019] bg-red-50 text-[#e30019]'
+                      : 'border-gray-300 focus:border-red-400'
+                      }`}
+                  />
+                ))}
+              </div>
+
+              <button type="submit" disabled={fpLoading || fpOtp.join('').length < 6}
+                className="w-full bg-[#e30019] hover:bg-red-700 disabled:bg-gray-300 disabled:cursor-not-allowed text-white font-bold py-3 rounded-lg transition-colors flex items-center justify-center gap-2">
+                {fpLoading ? (
+                  <><span className="inline-block w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" /> Đang xác thực...</>
+                ) : '✅ Xác nhận OTP Đăng Ký'}
+              </button>
+            </form>
           </>
         )}
 
@@ -449,8 +551,8 @@ const AuthModal = ({ isOpen, onClose }) => {
                     onChange={e => handleOtpInput(index, e.target.value)}
                     onKeyDown={e => handleOtpKeyDown(index, e)}
                     className={`w-12 h-14 text-center text-2xl font-bold border-2 rounded-xl focus:outline-none transition-all ${digit
-                        ? 'border-[#e30019] bg-red-50 text-[#e30019]'
-                        : 'border-gray-300 focus:border-red-400'
+                      ? 'border-[#e30019] bg-red-50 text-[#e30019]'
+                      : 'border-gray-300 focus:border-red-400'
                       }`}
                   />
                 ))}

@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 const TransferModal = ({ onClose, onSuccess }) => {
   const [branches, setBranches] = useState([]);
   const [products, setProducts] = useState([]);
-  
+
   const [form, setForm] = useState({
     ma_kho_xuat: '',
     ma_kho_nhap: '',
@@ -16,19 +16,19 @@ const TransferModal = ({ onClose, onSuccess }) => {
 
   useEffect(() => {
     const fetchData = async () => {
-      const token = localStorage.getItem("access_token") || localStorage.getItem("admin_access_token");
+      const token = localStorage.getItem("admin_access_token");
       try {
         const [branchRes, prodRes] = await Promise.all([
-          fetch('http://127.0.0.1:8000/api/admin/branches', { headers: { 'Authorization': `Bearer ${token}` } }),
-          fetch('http://127.0.0.1:8000/api/admin/products', { headers: { 'Authorization': `Bearer ${token}` } })
+          fetch('https://webistetoiyeupc-backend-laravel.onrender.com/api/admin/branches', { headers: { 'Authorization': `Bearer ${token}` } }),
+          fetch('https://webistetoiyeupc-backend-laravel.onrender.com/api/admin/products', { headers: { 'Authorization': `Bearer ${token}` } })
         ]);
-        
+
         const branchData = await branchRes.json();
         const prodData = await prodRes.json();
-        
+
         if (branchRes.ok) setBranches(branchData.data || []);
         if (prodRes.ok) {
-          // Sometimes products are paginated
+
           setProducts(prodData.data?.data || prodData.data || []);
         }
       } catch (err) {
@@ -39,7 +39,7 @@ const TransferModal = ({ onClose, onSuccess }) => {
   }, []);
 
   const handleAddItem = () => setItems([...items, { ma_sanpham: '', so_luong: 1 }]);
-  
+
   const handleRemoveItem = (idx) => {
     const newItems = [...items];
     newItems.splice(idx, 1);
@@ -56,15 +56,13 @@ const TransferModal = ({ onClose, onSuccess }) => {
     e.preventDefault();
     if (!form.ma_kho_xuat || !form.ma_kho_nhap) return alert("Vui lòng chọn đầy đủ Kho Xuất và Kho Nhập");
     if (form.ma_kho_xuat === form.ma_kho_nhap) return alert("Kho xuất và Kho nhập phải khác nhau");
-    
-    // Validate items
     const validItems = items.filter(i => i.ma_sanpham && i.so_luong > 0);
     if (validItems.length === 0) return alert("Vui lòng chọn ít nhất 1 sản phẩm hợp lệ");
 
     setLoading(true);
     try {
-      const token = localStorage.getItem("access_token") || localStorage.getItem("admin_access_token");
-      const res = await fetch('http://127.0.0.1:8000/api/admin/transfers', {
+      const token = localStorage.getItem("admin_access_token");
+      const res = await fetch('https://webistetoiyeupc-backend-laravel.onrender.com/api/admin/transfers', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -103,9 +101,9 @@ const TransferModal = ({ onClose, onSuccess }) => {
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <label className="block text-xs font-semibold text-slate-600 uppercase mb-1">Kho Xuất (Nguồn)</label>
-                <select 
+                <select
                   className="w-full border border-slate-200 rounded-lg p-2.5 text-sm"
-                  value={form.ma_kho_xuat} onChange={e => setForm({...form, ma_kho_xuat: e.target.value})} required
+                  value={form.ma_kho_xuat} onChange={e => setForm({ ...form, ma_kho_xuat: e.target.value })} required
                 >
                   <option value="">-- Chọn kho xuất --</option>
                   {branches.map(b => <option key={b.id_chinhanh} value={b.id_chinhanh}>{b.ten_chinhanh}</option>)}
@@ -113,9 +111,9 @@ const TransferModal = ({ onClose, onSuccess }) => {
               </div>
               <div>
                 <label className="block text-xs font-semibold text-slate-600 uppercase mb-1">Kho Nhập (Đích)</label>
-                <select 
+                <select
                   className="w-full border border-slate-200 rounded-lg p-2.5 text-sm"
-                  value={form.ma_kho_nhap} onChange={e => setForm({...form, ma_kho_nhap: e.target.value})} required
+                  value={form.ma_kho_nhap} onChange={e => setForm({ ...form, ma_kho_nhap: e.target.value })} required
                 >
                   <option value="">-- Chọn kho nhập --</option>
                   {branches.map(b => <option key={b.id_chinhanh} value={b.id_chinhanh}>{b.ten_chinhanh}</option>)}
@@ -125,14 +123,14 @@ const TransferModal = ({ onClose, onSuccess }) => {
 
             <div>
               <label className="block text-xs font-semibold text-slate-600 uppercase mb-1">Lý do điều chuyển</label>
-              <input type="text" className="w-full border border-slate-200 rounded-lg p-2.5 text-sm" 
-                     value={form.ly_do} onChange={e => setForm({...form, ly_do: e.target.value})} placeholder="VD: Khách hàng cần gấp..." />
+              <input type="text" className="w-full border border-slate-200 rounded-lg p-2.5 text-sm"
+                value={form.ly_do} onChange={e => setForm({ ...form, ly_do: e.target.value })} placeholder="VD: Khách hàng cần gấp..." />
             </div>
-            
+
             <div>
               <label className="block text-xs font-semibold text-slate-600 uppercase mb-1">Ghi chú thêm (Tùy chọn)</label>
-              <textarea className="w-full border border-slate-200 rounded-lg p-2.5 text-sm min-h-[60px]" 
-                     value={form.ghi_chu} onChange={e => setForm({...form, ghi_chu: e.target.value})} placeholder="Các ghi chú đặc biệt khác..." />
+              <textarea className="w-full border border-slate-200 rounded-lg p-2.5 text-sm min-h-[60px]"
+                value={form.ghi_chu} onChange={e => setForm({ ...form, ghi_chu: e.target.value })} placeholder="Các ghi chú đặc biệt khác..." />
             </div>
 
             <div className="border-t border-slate-100 pt-4 mt-4">
@@ -140,18 +138,18 @@ const TransferModal = ({ onClose, onSuccess }) => {
                 <label className="block text-xs font-semibold text-slate-600 uppercase">Danh sách Sản Phẩm</label>
                 <button type="button" onClick={handleAddItem} className="text-xs text-blue-600 font-bold hover:underline">+ Thêm sản phẩm</button>
               </div>
-              
+
               <div className="space-y-2">
                 {items.map((item, idx) => (
                   <div key={idx} className="flex gap-2 items-center bg-slate-50 p-2 rounded border border-slate-100">
-                    <select 
+                    <select
                       className="flex-1 border border-slate-200 rounded p-2 text-sm"
                       value={item.ma_sanpham} onChange={e => handleChangeItem(idx, 'ma_sanpham', e.target.value)} required
                     >
                       <option value="">-- Chọn SP --</option>
                       {products.map(p => <option key={p.id_sanpham} value={p.id_sanpham}>{p.tensp} ({p.masp})</option>)}
                     </select>
-                    <input 
+                    <input
                       type="number" min="1" className="w-20 border border-slate-200 rounded p-2 text-sm text-center"
                       value={item.so_luong} onChange={e => handleChangeItem(idx, 'so_luong', parseInt(e.target.value) || 1)} required
                     />

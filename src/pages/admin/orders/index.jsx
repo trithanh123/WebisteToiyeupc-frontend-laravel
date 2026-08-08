@@ -1,18 +1,20 @@
 import React, { useState, useEffect } from 'react';
 import AdminMasterLayout from '../theme/masterLayout';
+import SerialSelectionModal from './SerialSelectionModal';
 
 const OrderSupervise = () => {
   const [orders, setOrders] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isEmergencyMode, setIsEmergencyMode] = useState(false);
+  const [selectedDeliveryOrder, setSelectedDeliveryOrder] = useState(null);
 
   const fetchOrders = async (emergency = false) => {
     setIsLoading(true);
     try {
-      const token = localStorage.getItem("access_token") || localStorage.getItem("admin_access_token");
-      const endpoint = emergency 
-        ? 'http://127.0.0.1:8000/api/admin/orders/emergency'
-        : 'http://127.0.0.1:8000/api/admin/orders/monitor';
+      const token = localStorage.getItem("admin_access_token");
+      const endpoint = emergency
+        ? 'https://webistetoiyeupc-backend-laravel.onrender.com/api/admin/orders/emergency'
+        : 'https://webistetoiyeupc-backend-laravel.onrender.com/api/admin/orders/monitor';
 
       const response = await fetch(endpoint, {
         headers: {
@@ -40,8 +42,8 @@ const OrderSupervise = () => {
 
   const handleUpdateStatus = async (orderId, newStatus) => {
     try {
-      const token = localStorage.getItem("access_token") || localStorage.getItem("admin_access_token");
-      const res = await fetch(`http://127.0.0.1:8000/api/admin/orders/${orderId}/status`, {
+      const token = localStorage.getItem("admin_access_token");
+      const res = await fetch(`https://webistetoiyeupc-backend-laravel.onrender.com/api/admin/orders/${orderId}/status`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -67,19 +69,19 @@ const OrderSupervise = () => {
   };
 
   const handlePrint = (orderId) => {
-    const token = localStorage.getItem("access_token") || localStorage.getItem("admin_access_token");
+    const token = localStorage.getItem("admin_access_token");
 
-    fetch(`http://127.0.0.1:8000/api/admin/orders/${orderId}/print`, {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
+    fetch(`https://webistetoiyeupc-backend-laravel.onrender.com/api/admin/orders/${orderId}/print`, {
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
     })
-    .then(res => res.blob())
-    .then(blob => {
+      .then(res => res.blob())
+      .then(blob => {
         const url = window.URL.createObjectURL(blob);
         window.open(url, '_blank');
-    })
-    .catch(err => console.error("Lỗi in hóa đơn:", err));
+      })
+      .catch(err => console.error("Lỗi in hóa đơn:", err));
   };
 
   const formatCurrency = (value) => {
@@ -104,7 +106,7 @@ const OrderSupervise = () => {
       case 'Chờ duyệt': return 'bg-amber-100 text-amber-700';
       case 'Đang chuẩn bị': return 'bg-blue-100 text-blue-700';
       case 'Đang giao': return 'bg-indigo-100 text-indigo-700';
-      case 'Thành công': return 'bg-green-100 text-green-700';
+      case 'Hoàn thành': return 'bg-green-100 text-green-700';
       case 'Đã hủy': return 'bg-red-100 text-red-700';
       default: return 'bg-slate-100 text-slate-700';
     }
@@ -112,11 +114,20 @@ const OrderSupervise = () => {
 
   return (
     <AdminMasterLayout title="Giám Sát Đơn Hàng – Admin">
-      {}
+      {selectedDeliveryOrder && (
+        <SerialSelectionModal
+          orderId={selectedDeliveryOrder}
+          onClose={() => setSelectedDeliveryOrder(null)}
+          onSuccess={() => {
+            setSelectedDeliveryOrder(null);
+            fetchOrders(isEmergencyMode);
+          }}
+        />
+      )}
       <div className="mb-6 flex flex-col md:flex-row md:justify-between md:items-end gap-4">
         <div>
           <h1 className="text-2xl font-bold text-slate-800 m-0">
-            {isEmergencyMode ? '⚠️ Cảnh Báo: Đơn Hàng Bị Treo' : 'Giám Sát Đơn Hàng'}
+            {isEmergencyMode ? ' Cảnh Báo: Đơn Hàng Bị Treo' : 'Giám Sát Đơn Hàng'}
           </h1>
           <p className="text-sm text-slate-500 mt-1">
             {isEmergencyMode ? 'Danh sách các đơn hàng chờ duyệt quá 2 tiếng cần xử lý gấp.' : 'Theo dõi trạng thái và tình hình thanh toán của tất cả đơn hàng.'}
@@ -125,11 +136,10 @@ const OrderSupervise = () => {
 
         <button
           onClick={toggleEmergency}
-          className={`py-2 px-5 rounded-lg font-bold flex items-center gap-2 transition-all ${
-            isEmergencyMode 
-              ? 'bg-slate-800 hover:bg-slate-700 text-white shadow-lg' 
-              : 'bg-red-50 hover:bg-red-100 text-red-600 border border-red-200'
-          }`}
+          className={`py-2 px-5 rounded-lg font-bold flex items-center gap-2 transition-all ${isEmergencyMode
+            ? 'bg-slate-800 hover:bg-slate-700 text-white shadow-lg'
+            : 'bg-red-50 hover:bg-red-100 text-red-600 border border-red-200'
+            }`}
         >
           {isEmergencyMode ? (
             <>
@@ -145,7 +155,7 @@ const OrderSupervise = () => {
         </button>
       </div>
 
-      {}
+      { }
       <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden min-h-[400px]">
         {isLoading ? (
           <div className="p-16 flex justify-center items-center">
@@ -211,17 +221,28 @@ const OrderSupervise = () => {
                             <button onClick={() => handleCancelOrder(order.id_donhang)} className="px-4 py-1.5 rounded bg-red-50 text-red-600 hover:bg-red-600 hover:text-white text-sm font-medium transition-colors border border-red-100 whitespace-nowrap">
                               Hủy đơn
                             </button>
-                            <button onClick={() => handleUpdateStatus(order.id_donhang, 'Đang giao')} className="px-4 py-1.5 rounded bg-amber-50 text-amber-600 hover:bg-amber-600 hover:text-white text-sm font-medium transition-colors border border-amber-100 whitespace-nowrap">
+                            <button onClick={() => {
+                              if (order.trang_thai_dh === 'Đang chuẩn bị') {
+                                setSelectedDeliveryOrder(order.id_donhang);
+                              } else {
+                                handleUpdateStatus(order.id_donhang, 'Đang giao');
+                              }
+                            }} className="px-4 py-1.5 rounded bg-amber-50 text-amber-600 hover:bg-amber-600 hover:text-white text-sm font-medium transition-colors border border-amber-100 whitespace-nowrap">
                               {order.trang_thai_dh === 'Đang chuẩn bị' ? 'Giao hàng' : 'Xác nhận ĐH'}
                             </button>
                           </div>
                         )}
                         {(order.trang_thai_dh === 'Đang giao' || order.trang_thai_dh === 'Đang giao hàng') && (
-                          <button onClick={() => handleUpdateStatus(order.id_donhang, 'Thành công')} className="px-4 py-1.5 rounded bg-indigo-50 text-indigo-600 hover:bg-indigo-600 hover:text-white text-sm font-medium transition-colors border border-indigo-100 whitespace-nowrap">
-                            Đã giao xong
-                          </button>
+                          <div className="flex gap-2">
+                            <button onClick={() => handleUpdateStatus(order.id_donhang, 'Giao thất bại')} className="px-4 py-1.5 rounded bg-red-50 text-red-600 hover:bg-red-600 hover:text-white text-sm font-medium transition-colors border border-red-100 whitespace-nowrap">
+                              Bơm hàng (Thất bại)
+                            </button>
+                            <button onClick={() => handleUpdateStatus(order.id_donhang, 'Hoàn thành')} className="px-4 py-1.5 rounded bg-indigo-50 text-indigo-600 hover:bg-indigo-600 hover:text-white text-sm font-medium transition-colors border border-indigo-100 whitespace-nowrap">
+                              Đã giao xong
+                            </button>
+                          </div>
                         )}
-                        <button 
+                        <button
                           onClick={() => handlePrint(order.id_donhang)}
                           className="px-4 py-1.5 rounded bg-blue-50 text-blue-600 hover:bg-blue-600 hover:text-white text-sm font-medium transition-colors border border-blue-100 inline-flex items-center gap-1.5 whitespace-nowrap"
                         >

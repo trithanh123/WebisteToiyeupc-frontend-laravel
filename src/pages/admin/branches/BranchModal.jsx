@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import Swal from 'sweetalert2';
 
-const API = 'http://127.0.0.1:8000/api';
+const API = 'https://webistetoiyeupc-backend-laravel.onrender.com/api';
 
 const BranchModal = ({ isOpen, onClose, branch, onSaveSuccess }) => {
   const [formData, setFormData] = useState({
@@ -17,16 +17,13 @@ const BranchModal = ({ isOpen, onClose, branch, onSaveSuccess }) => {
     Maso_TInh: '',
   });
   const [loading, setLoading] = useState(false);
-
-  // Cascading Dropdown States
   const [provinces, setProvinces] = useState([]);
   const [districts, setDistricts] = useState([]);
   const [wards, setWards] = useState([]);
-
-  // Fetch Danh sách Tỉnh/Thành phố khi component mount
   useEffect(() => {
-    axios.get('https://provinces.open-api.vn/api/p/')
-      .then(res => setProvinces(res.data))
+    fetch('https://provinces.open-api.vn/api/p/')
+      .then(res => res.json())
+      .then(data => setProvinces(data))
       .catch(err => console.error("Lỗi tải Tỉnh:", err));
   }, []);
 
@@ -44,20 +41,18 @@ const BranchModal = ({ isOpen, onClose, branch, onSaveSuccess }) => {
           Maso_TP: branch.maso_tp || '',
           Maso_TInh: branch.maso_tinh || '',
         });
-
-        // Tải Quận/Huyện dựa trên Tỉnh hiện tại
         if (branch.maso_tinh) {
-          axios.get(`https://provinces.open-api.vn/api/p/${branch.maso_tinh}?depth=2`)
-            .then(res => setDistricts(res.data.districts || []))
+          fetch(`https://provinces.open-api.vn/api/p/${branch.maso_tinh}?depth=2`)
+            .then(res => res.json())
+            .then(data => setDistricts(data.districts || []))
             .catch(err => console.error(err));
         } else {
           setDistricts([]);
         }
-
-        // Tải Phường/Xã dựa trên Quận hiện tại
         if (branch.maso_tp) {
-          axios.get(`https://provinces.open-api.vn/api/d/${branch.maso_tp}?depth=2`)
-            .then(res => setWards(res.data.wards || []))
+          fetch(`https://provinces.open-api.vn/api/d/${branch.maso_tp}?depth=2`)
+            .then(res => res.json())
+            .then(data => setWards(data.wards || []))
             .catch(err => console.error(err));
         } else {
           setWards([]);
@@ -80,15 +75,15 @@ const BranchModal = ({ isOpen, onClose, branch, onSaveSuccess }) => {
     }
   }, [branch, isOpen]);
 
-  // Xử lý khi Tỉnh/Thành thay đổi
   const handleProvinceChange = async (e) => {
     const provinceCode = e.target.value;
     setFormData({ ...formData, Maso_TInh: provinceCode, Maso_TP: '', Maso_phuong: '' });
-    setWards([]); // Xóa danh sách phường
+    setWards([]);
     if (provinceCode) {
       try {
-        const res = await axios.get(`https://provinces.open-api.vn/api/p/${provinceCode}?depth=2`);
-        setDistricts(res.data.districts || []);
+        const res = await fetch(`https://provinces.open-api.vn/api/p/${provinceCode}?depth=2`);
+        const data = await res.json();
+        setDistricts(data.districts || []);
       } catch (err) {
         console.error(err);
       }
@@ -96,15 +91,14 @@ const BranchModal = ({ isOpen, onClose, branch, onSaveSuccess }) => {
       setDistricts([]);
     }
   };
-
-  // Xử lý khi Quận/Huyện thay đổi
   const handleDistrictChange = async (e) => {
     const districtCode = e.target.value;
     setFormData({ ...formData, Maso_TP: districtCode, Maso_phuong: '' });
     if (districtCode) {
       try {
-        const res = await axios.get(`https://provinces.open-api.vn/api/d/${districtCode}?depth=2`);
-        setWards(res.data.wards || []);
+        const res = await fetch(`https://provinces.open-api.vn/api/d/${districtCode}?depth=2`);
+        const data = await res.json();
+        setWards(data.wards || []);
       } catch (err) {
         console.error(err);
       }
@@ -120,7 +114,7 @@ const BranchModal = ({ isOpen, onClose, branch, onSaveSuccess }) => {
     setLoading(true);
 
     try {
-      const token = localStorage.getItem("access_token") || localStorage.getItem("admin_access_token");
+      const token = localStorage.getItem("admin_access_token");
       const payload = {
         ...formData,
         Maso_phuong: formData.maso_phuong || null,
@@ -176,7 +170,7 @@ const BranchModal = ({ isOpen, onClose, branch, onSaveSuccess }) => {
         <form onSubmit={handleSubmit} className="overflow-y-auto flex-1">
           <div className="p-6 grid grid-cols-1 md:grid-cols-2 gap-8">
 
-            {}
+            { }
             <div className="space-y-4">
               <h3 className="font-bold text-lg border-b pb-2 text-slate-800 flex items-center gap-2">
                 <span className="w-6 h-6 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-sm">1</span>
@@ -229,7 +223,7 @@ const BranchModal = ({ isOpen, onClose, branch, onSaveSuccess }) => {
               </div>
             </div>
 
-            {}
+            { }
             <div className="space-y-4">
               <h3 className="font-bold text-lg border-b pb-2 text-slate-800 flex items-center gap-2">
                 <span className="w-6 h-6 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center text-sm">2</span>

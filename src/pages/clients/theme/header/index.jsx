@@ -11,6 +11,7 @@ import iconNotif from "../../../../assets/icons/icons8-notification.png";
 import axios from "axios";
 import { CartContext } from "../../../../context/CartContext";
 import { BranchContext } from "../../../../context/BranchContext";
+import { getImageUrl } from "../../../../utils/getImageUrl";
 
 const allIcons = import.meta.glob(
   '../../../../assets/icons/*.png',
@@ -25,13 +26,15 @@ const getCatIcon = (filename) => {
   return entry ? entry[1].default : null;
 };
 
-const API = "http://127.0.0.1:8000/api";
+const API = "https://webistetoiyeupc-backend-laravel.onrender.com/api";
 
 const Header = () => {
-  const [searchQuery, setSearchQuery] = useState("");
+
   const [isSearchFocused, setIsSearchFocused] = useState(false);
-  const [isSearching, setIsSearching] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
   const [aiResults, setAiResults] = useState([]);
+  const [isSearching, setIsSearching] = useState(false);
+  const [hasSearched, setHasSearched] = useState(false);
   const [searchHistory, setSearchHistory] = useState(
     () => JSON.parse(localStorage.getItem('pv_search_history') || '[]')
   );
@@ -141,7 +144,7 @@ const Header = () => {
 
     const token = localStorage.getItem('access_token');
     if (token) {
-      fetch('http://127.0.0.1:8000/api/user', {
+      fetch('https://webistetoiyeupc-backend-laravel.onrender.com/api/user', {
         headers: { 'Authorization': `Bearer ${token}`, 'Accept': 'application/json' }
       })
         .then(res => {
@@ -185,6 +188,7 @@ const Header = () => {
     addToHistory(searchQuery);
     setIsSearchFocused(true);
     setIsSearching(true);
+    setHasSearched(true);
     try {
       const response = await axios.post(`${API}/products/ai-search`, {
         query: searchQuery,
@@ -241,7 +245,13 @@ const Header = () => {
             </svg>
             Danh Mục
           </button>
+        </div>
 
+        <Link to={ROUTERS.CLIENT.BUILD_PC} className="header__menu-btn ms-3" style={{ background: 'linear-gradient(45deg, #FF512F 0%, #F09819  51%, #FF512F  100%)', textDecoration: 'none' }}>
+          ✨ AI Build PC
+        </Link>
+
+        <div className="header__menu">
           {menuOpen && (
             <div
               className="mgear-mega-wrap"
@@ -382,11 +392,11 @@ const Header = () => {
               placeholder="Bạn muốn mua gì hôm nay..."
               value={searchQuery}
               onFocus={() => setIsSearchFocused(true)}
-              onChange={(e) => { setSearchQuery(e.target.value); setAiResults([]); }}
+              onChange={(e) => { setSearchQuery(e.target.value); setAiResults([]); setHasSearched(false); }}
               autoComplete="off"
             />
             {searchQuery && (
-              <button type="button" className="pv-search__clear" onClick={() => { setSearchQuery(''); setAiResults([]); }}>
+              <button type="button" className="pv-search__clear" onClick={() => { setSearchQuery(''); setAiResults([]); setHasSearched(false); }}>
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
                   <line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" />
                 </svg>
@@ -417,7 +427,7 @@ const Header = () => {
                   <div className="pv-search__section-header">
                     <span className="pv-search__section-title">Sản phẩm đề xuất</span>
                   </div>
-                  <div className="pv-search__ai-list">
+                  <div className="pv-search__ai-list" style={{ maxHeight: '400px', overflowY: 'auto' }}>
                     {aiResults.map((product) => (
                       <Link
                         to={`${ROUTERS.CLIENT.PRODUCTS}/${product.slug || product.id_sanpham}`}
@@ -425,7 +435,7 @@ const Header = () => {
                         onClick={() => setIsSearchFocused(false)}
                         className="pv-search__ai-item"
                       >
-                        <img src={`http://127.0.0.1:8000/storage/${product.thumbail}`} alt={product.tensp} className="pv-search__ai-img" />
+                        <img src={getImageUrl(product.thumbail)} alt={product.tensp} className="pv-search__ai-img" />
                         <div>
                           <div className="pv-search__ai-name">{product.tensp}</div>
                           <div className="pv-search__ai-price">{product.gia?.toLocaleString('vi-VN')} đ</div>
@@ -437,7 +447,18 @@ const Header = () => {
               )}
 
 
-              {aiResults.length === 0 && !isSearching && (
+              {aiResults.length === 0 && !isSearching && hasSearched && (
+                <div className="pv-search__not-found">
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <line x1="12" y1="8" x2="12" y2="12"></line>
+                    <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                  </svg>
+                  <span>Không tìm thấy nhu cầu cho bạn</span>
+                </div>
+              )}
+
+              {aiResults.length === 0 && !isSearching && !hasSearched && (
                 <>
                   {searchHistory.length > 0 && (
                     <div className="pv-search__section">

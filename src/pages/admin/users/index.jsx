@@ -12,14 +12,13 @@ import iconReload from '../../../assets/icons/icons8-reload-50.png';
 import iconEdit from '../../../assets/icons/icons8-pencil-50.png';
 import iconDelete from '../../../assets/icons/icons8-remove-24.png';
 
-const API = 'http://127.0.0.1:8000/api';
+const API = 'https://webistetoiyeupc-backend-laravel.onrender.com/api';
 
 const RoleBadge = ({ role }) => {
   const map = {
     1: { label: 'Admin', classes: 'bg-red-100 text-red-700 border-red-300', dot: 'bg-red-600' },
     2: { label: 'Nhân viên', classes: 'bg-blue-100 text-blue-700 border-blue-300', dot: 'bg-blue-600' },
     3: { label: 'Khách hàng', classes: 'bg-green-100 text-green-700 border-green-300', dot: 'bg-green-600' },
-    4: { label: 'Khách vip', classes: 'bg-yellow-100 text-yellow-700 border-yellow-300', dot: 'bg-yellow-600' },
   };
   const style = map[role] ?? { label: 'Không rõ', classes: 'bg-gray-100 text-gray-500 border-gray-300', dot: 'bg-gray-500' };
 
@@ -87,7 +86,7 @@ const UserModal = ({ isOpen, onClose, user, onSaveSuccess }) => {
     setLoading(true);
 
     try {
-      const token = localStorage.getItem("access_token") || localStorage.getItem("admin_access_token");
+      const token = localStorage.getItem("admin_access_token");
 
       if (user) {
         const res = await axios.put(`${API}/admin/users/${user.id_nguoidung}`, {
@@ -189,7 +188,6 @@ const UserModal = ({ isOpen, onClose, user, onSaveSuccess }) => {
               <span className="font-semibold">Lưu ý:</span> Không thể thay đổi Email và Mật khẩu ở chế độ Cập nhật.
             </div>
           )}
-
           <div>
             <label className="block text-sm font-semibold text-gray-700 mb-1">Số điện thoại {user && <span className="text-gray-400 font-normal">(có thể sửa)</span>}</label>
             <input type="text" value={formData.sdt} onChange={e => setFormData({ ...formData, sdt: e.target.value })}
@@ -204,7 +202,6 @@ const UserModal = ({ isOpen, onClose, user, onSaveSuccess }) => {
               <option value={1}>Admin</option>
               <option value={2}>Nhân viên</option>
               <option value={3}>Khách hàng</option>
-              <option value={4}>Khách vip</option>
             </select>
           </div>
 
@@ -245,7 +242,7 @@ const UserManagement = () => {
     setLoading(true);
     setError('');
     try {
-      const token = localStorage.getItem("access_token") || localStorage.getItem("admin_access_token");
+      const token = localStorage.getItem("admin_access_token");
       const res = await axios.get(`${API}/admin/users`, {
         headers: { Authorization: `Bearer ${token}` }
       });
@@ -275,7 +272,7 @@ const UserManagement = () => {
 
     if (result.isConfirmed) {
       try {
-        const token = localStorage.getItem("access_token") || localStorage.getItem("admin_access_token");
+        const token = localStorage.getItem("admin_access_token");
         const res = await axios.delete(`${API}/admin/users/${id}`, {
           headers: { Authorization: `Bearer ${token}` }
         });

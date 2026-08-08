@@ -23,8 +23,8 @@ const AdminDashboard = () => {
     setIsLoading(true);
     setError(null);
     try {
-      const token = localStorage.getItem("access_token") || localStorage.getItem("admin_access_token") || localStorage.getItem('admin_token');
-      const response = await fetch(`http://127.0.0.1:8000/api/admin/dashboard?month=${month}&year=${year}`, {
+      const token = localStorage.getItem("admin_access_token");
+      const response = await fetch(`https://webistetoiyeupc-backend-laravel.onrender.com/api/admin/dashboard?month=${month}&year=${year}`, {
         headers: {
           'Accept': 'application/json',
           'Authorization': `Bearer ${token}`

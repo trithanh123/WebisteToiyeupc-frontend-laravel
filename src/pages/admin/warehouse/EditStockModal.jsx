@@ -29,8 +29,8 @@ const EditStockModal = ({ isOpen, onClose, tonKho, onSuccess }) => {
     setError(null);
 
     try {
-      const token = localStorage.getItem("access_token") || localStorage.getItem("admin_access_token");
-      const response = await fetch(`http://127.0.0.1:8000/api/admin/warehouse/${tonKho.id_khoton}`, {
+      const token = localStorage.getItem("admin_access_token");
+      const response = await fetch(`https://webistetoiyeupc-backend-laravel.onrender.com/api/admin/warehouse/${tonKho.id_khoton}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -41,7 +41,7 @@ const EditStockModal = ({ isOpen, onClose, tonKho, onSuccess }) => {
 
       const result = await response.json();
       if (response.ok && result.status === 'success') {
-        onSuccess(result.data); 
+        onSuccess(result.data);
         onClose();
       } else {
         setError(result.message || 'Lỗi cập nhật');
@@ -81,34 +81,34 @@ const EditStockModal = ({ isOpen, onClose, tonKho, onSuccess }) => {
           )}
 
           <div className="space-y-4">
-              <p className="text-xs text-slate-500 p-3 bg-slate-50 rounded-lg">
-                ℹ️ Hệ thống tự tính số tồn kho từ phiếu nhập và đơn hàng. Số tồn kho thực tế dựa trên số Serial đang trong kho.
-              </p>
+            <p className="text-xs text-slate-500 p-3 bg-slate-50 rounded-lg">
+              Hệ thống tự tính số tồn kho từ phiếu nhập và đơn hàng. Số tồn kho thực tế dựa trên số Serial đang trong kho.
+            </p>
 
-              <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1">Định mức cảnh báo (Sắp hết hàng)</label>
-                <input
-                  type="number"
-                  name="Soluongkhothap"
-                  min="0"
-                  value={formData.Soluongkhothap}
-                  onChange={handleChange}
-                  className="w-full px-4 py-2.5 rounded-lg border border-slate-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors font-semibold"
-                />
-                <p className="text-xs text-slate-400 mt-1">Khi tồn kho ≤ định mức này, hệ thống sẽ hiển thị cảnh báo "Sắp hết hàng".</p>
-              </div>
+            <div>
+              <label className="block text-sm font-medium text-slate-700 mb-1">Định mức cảnh báo (Sắp hết hàng)</label>
+              <input
+                type="number"
+                name="soluongkhothap"
+                min="0"
+                value={formData.Soluongkhothap}
+                onChange={handleChange}
+                className="w-full px-4 py-2.5 rounded-lg border border-slate-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors font-semibold"
+              />
+              <p className="text-xs text-slate-400 mt-1">Khi tồn kho ≤ định mức này, hệ thống sẽ hiển thị cảnh báo "Sắp hết hàng".</p>
+            </div>
           </div>
 
           <div className="mt-8 flex justify-end gap-3">
-            <button 
-              type="button" 
+            <button
+              type="button"
               onClick={onClose}
               className="px-5 py-2.5 rounded-lg font-medium text-slate-600 hover:bg-slate-50 transition-colors"
             >
               Hủy
             </button>
-            <button 
-              type="submit" 
+            <button
+              type="submit"
               disabled={isSubmitting}
               className="px-6 py-2.5 rounded-lg font-bold text-white bg-indigo-600 hover:bg-indigo-700 disabled:opacity-70 flex items-center transition-colors"
             >

@@ -38,7 +38,7 @@ const Wishlist = () => {
               </button>
 
               <div className="bg-gray-50 rounded-lg h-36 flex items-center justify-center mb-3 overflow-hidden">
-                <img src={`http://127.0.0.1:8000/storage/${p.thumbail}`} alt={p.tensp} className="h-32 object-contain group-hover:scale-105 transition-transform" />
+                <img src={`https://webistetoiyeupc-backend-laravel.onrender.com/storage/${p.thumbail}`} alt={p.tensp} className="h-32 object-contain group-hover:scale-105 transition-transform" />
               </div>
               <p className="text-xs font-medium text-gray-800 line-clamp-2 mb-1">{p.tensp}</p>
               <p className="text-red-600 font-bold text-sm">{new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(p.gia || 0)}</p>

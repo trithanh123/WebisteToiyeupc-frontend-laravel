@@ -19,7 +19,7 @@ const EmptyState = ({ message }) => (
   </div>
 );
 
-const API = 'http://127.0.0.1:8000/api';
+const API = 'https://webistetoiyeupc-backend-laravel.onrender.com/api';
 
 const TABS = [
   { id: 'info',     label: 'Thông tin tài khoản', icon: iconUser    },

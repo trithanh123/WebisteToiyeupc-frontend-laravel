@@ -3,7 +3,7 @@ import axios from "axios";
 import SectionTitle from "../../../components/SectionTitle";
 import ProductCard from "../../../components/ProductCard";
 
-const API = 'http://127.0.0.1:8000/api';
+const API = 'https://webistetoiyeupc-backend-laravel.onrender.com/api';
 
 const ProductGrid = () => {
   const [products, setProducts] = useState([]);

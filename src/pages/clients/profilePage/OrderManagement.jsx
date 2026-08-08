@@ -41,7 +41,7 @@ const OrderManagement = () => {
     const token = localStorage.getItem('access_token');
     if (!token) return;
 
-    fetch('http://127.0.0.1:8000/api/my-orders', {
+    fetch('https://webistetoiyeupc-backend-laravel.onrender.com/api/my-orders', {
       headers: {
         'Authorization': `Bearer ${token}`,
         'Accept': 'application/json'
@@ -100,7 +100,7 @@ const OrderManagement = () => {
     }).then((result) => {
       if (result.isConfirmed) {
         const token = localStorage.getItem('access_token');
-        fetch(`http://127.0.0.1:8000/api/my-orders/${orderId}/cancel`, {
+        fetch(`https://webistetoiyeupc-backend-laravel.onrender.com/api/my-orders/${orderId}/cancel`, {
           method: 'PUT',
           headers: {
             'Authorization': `Bearer ${token}`,

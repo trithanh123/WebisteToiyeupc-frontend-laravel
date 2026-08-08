@@ -10,7 +10,7 @@ export const useAddressBook = () => {
       try {
         const token = localStorage.getItem('access_token');
         if (!token) return;
-        const res = await axios.get('http://127.0.0.1:8000/api/addresses', {
+        const res = await axios.get('https://webistetoiyeupc-backend-laravel.onrender.com/api/addresses', {
           headers: { 'Authorization': `Bearer ${token}` }
         });
         if (res.data.status === 'success') {
@@ -49,7 +49,7 @@ export const useAddressBook = () => {
       // 2. Lấy Token đăng nhập từ LocalStorage (để chứng minh mình đã đăng nhập)
       const token = localStorage.getItem('access_token');
       // 3. Gọi Axios POST xuống Backend
-      const response = await axios.post('http://127.0.0.1:8000/api/addresses', payload, {
+      const response = await axios.post('https://webistetoiyeupc-backend-laravel.onrender.com/api/addresses', payload, {
         headers: {
           'Authorization': `Bearer ${token}` // Gắn token vào thẻ thông hành
         }
@@ -105,7 +105,7 @@ export const useAddressBook = () => {
         matudien_diachi: form.isDefault
       };
       const token = localStorage.getItem('access_token');
-      const response = await axios.put(`http://127.0.0.1:8000/api/addresses/${id}`, payload, {
+      const response = await axios.put(`https://webistetoiyeupc-backend-laravel.onrender.com/api/addresses/${id}`, payload, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       if (response.data.status === 'success') {
@@ -145,7 +145,7 @@ export const useAddressBook = () => {
     if(!window.confirm("Bạn có chắc chắn muốn xóa địa chỉ này?")) return;
     try {
       const token = localStorage.getItem('access_token');
-      const response = await axios.delete(`http://127.0.0.1:8000/api/addresses/${id}`, {
+      const response = await axios.delete(`https://webistetoiyeupc-backend-laravel.onrender.com/api/addresses/${id}`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       if (response.data.status === 'success') {
@@ -164,7 +164,7 @@ export const useAddressBook = () => {
   const setDefaultAddress = async (id) => {
     try {
       const token = localStorage.getItem('access_token');
-      const response = await axios.put(`http://127.0.0.1:8000/api/addresses/${id}/default`, {}, {
+      const response = await axios.put(`https://webistetoiyeupc-backend-laravel.onrender.com/api/addresses/${id}/default`, {}, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       if (response.data.status === 'success') {

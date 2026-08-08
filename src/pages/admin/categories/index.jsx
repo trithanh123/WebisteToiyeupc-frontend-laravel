@@ -22,22 +22,22 @@ import iconRAM from '../../../assets/icons/icons8-ram-64.png';
 import iconScreen from '../../../assets/icons/icons8-screen-50.png';
 import iconVGA from '../../../assets/icons/icons8-vga-50.png';
 
-const API = 'http://127.0.0.1:8000/api';
+const API = 'https://webistetoiyeupc-backend-laravel.onrender.com/api';
 
 export const ICON_LIST = [
-  { name: 'icons8-case-64.png',           src: iconCase,         label: 'Case máy tính' },
-  { name: 'icons8-cpu-50.png',            src: iconCPU,          label: 'CPU' },
-  { name: 'icons8-hdd-50.png',            src: iconHDD,          label: 'Ổ cứng HDD' },
-  { name: 'icons8-keyboard-32.png',       src: iconKeyboard,     label: 'Bàn phím' },
-  { name: 'icons8-laptop-50.png',         src: iconLaptop,       label: 'Laptop' },
-  { name: 'icons8-laptop-gaming-64.png',  src: iconLaptopGaming, label: 'Laptop Gaming' },
-  { name: 'icons8-mainboard-32.png',      src: iconMainboard,    label: 'Mainboard' },
-  { name: 'icons8-mouse-50.png',          src: iconMouse,        label: 'Chuột' },
-  { name: 'icons8-pc-64.png',             src: iconPC,           label: 'PC' },
-  { name: 'icons8-power-supply-64.png',   src: iconPower,        label: 'Nguồn điện' },
-  { name: 'icons8-ram-64.png',            src: iconRAM,          label: 'RAM' },
-  { name: 'icons8-screen-50.png',         src: iconScreen,       label: 'Màn hình' },
-  { name: 'icons8-vga-50.png',            src: iconVGA,          label: 'Card VGA' },
+  { name: 'icons8-case-64.png', src: iconCase, label: 'Case máy tính' },
+  { name: 'icons8-cpu-50.png', src: iconCPU, label: 'CPU' },
+  { name: 'icons8-hdd-50.png', src: iconHDD, label: 'Ổ cứng HDD' },
+  { name: 'icons8-keyboard-32.png', src: iconKeyboard, label: 'Bàn phím' },
+  { name: 'icons8-laptop-50.png', src: iconLaptop, label: 'Laptop' },
+  { name: 'icons8-laptop-gaming-64.png', src: iconLaptopGaming, label: 'Laptop Gaming' },
+  { name: 'icons8-mainboard-32.png', src: iconMainboard, label: 'Mainboard' },
+  { name: 'icons8-mouse-50.png', src: iconMouse, label: 'Chuột' },
+  { name: 'icons8-pc-64.png', src: iconPC, label: 'PC' },
+  { name: 'icons8-power-supply-64.png', src: iconPower, label: 'Nguồn điện' },
+  { name: 'icons8-ram-64.png', src: iconRAM, label: 'RAM' },
+  { name: 'icons8-screen-50.png', src: iconScreen, label: 'Màn hình' },
+  { name: 'icons8-vga-50.png', src: iconVGA, label: 'Card VGA' },
 ];
 
 export const getIconSrc = (name) => {
@@ -86,7 +86,7 @@ export const CategoryModal = ({ isOpen, onClose, category, onSaveSuccess, catego
     e.preventDefault();
     setLoading(true);
     try {
-      const token = localStorage.getItem("access_token") || localStorage.getItem("admin_access_token");
+      const token = localStorage.getItem("admin_access_token");
       const payload = {
         Ten_DanhMuc: formData.ten_danhmuc,
         slug: formData.slug || undefined,
@@ -127,7 +127,7 @@ export const CategoryModal = ({ isOpen, onClose, category, onSaveSuccess, catego
 
       <div style={{ background: '#fff', width: 460, borderRadius: 6, boxShadow: '0 4px 16px rgba(0,0,0,0.18)', overflow: 'hidden' }}>
 
-        {}
+        { }
         <div style={{ background: '#dc2626', padding: '12px 16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <h3 style={{ margin: 0, fontSize: 15, fontWeight: 700, color: '#fff' }}>
             {category ? 'Sửa danh mục' : 'Thêm danh mục mới'}
@@ -135,7 +135,7 @@ export const CategoryModal = ({ isOpen, onClose, category, onSaveSuccess, catego
           <button onClick={onClose} style={{ background: 'none', border: 'none', color: '#fff', cursor: 'pointer', fontSize: 22, lineHeight: 1, padding: 0 }}>×</button>
         </div>
 
-        {}
+        { }
         <form onSubmit={handleSubmit} style={{ padding: '16px 18px 14px' }}>
 
           <div className="cm-group">
@@ -244,7 +244,7 @@ const CategoryManagement = () => {
     setLoading(true);
     setError('');
     try {
-      const token = localStorage.getItem("access_token") || localStorage.getItem("admin_access_token");
+      const token = localStorage.getItem("admin_access_token");
       const headers = { Authorization: `Bearer ${token}` };
 
       const [resAll, resTree] = await Promise.all([
@@ -287,7 +287,7 @@ const CategoryManagement = () => {
     if (!result.isConfirmed) return;
 
     try {
-      const token = localStorage.getItem("access_token") || localStorage.getItem("admin_access_token");
+      const token = localStorage.getItem("admin_access_token");
       await axios.delete(`${API}/admin/categories/${id}`, { headers: { Authorization: `Bearer ${token}` } });
       Swal.fire({ icon: 'success', title: 'Đã xóa!', toast: true, position: 'top-end', showConfirmButton: false, timer: 2500 });
       fetchCategories();
@@ -298,7 +298,7 @@ const CategoryManagement = () => {
 
   const handleToggle = async (id) => {
     try {
-      const token = localStorage.getItem("access_token") || localStorage.getItem("admin_access_token");
+      const token = localStorage.getItem("admin_access_token");
       await axios.patch(`${API}/admin/categories/${id}/toggle`, {}, { headers: { Authorization: `Bearer ${token}` } });
       fetchCategories();
     } catch {
@@ -337,7 +337,7 @@ const CategoryManagement = () => {
         .action-del:hover { background: #dc2626; color: #fff; }
       `}</style>
 
-      {}
+      { }
       <div style={{ marginBottom: 20, display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 10 }}>
         <div>
           <h1 style={{ margin: 0, fontSize: 22, fontWeight: 700, color: '#111827' }}>Quản lý Danh mục</h1>
@@ -351,14 +351,14 @@ const CategoryManagement = () => {
         </button>
       </div>
 
-      {}
+      { }
       <div style={{ background: '#fff', borderRadius: 8, border: '1px solid #e5e7eb', overflow: 'hidden' }}>
 
-        {}
+        { }
         <div style={{ padding: '12px 16px', borderBottom: '1px solid #e5e7eb', display: 'flex', gap: 10, alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap' }}>
           <div style={{ position: 'relative', flex: 1, minWidth: 200, maxWidth: 320 }}>
             <svg style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)', color: '#9ca3af' }} width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+              <circle cx="11" cy="11" r="8" /><line x1="21" y1="21" x2="16.65" y2="16.65" />
             </svg>
             <input
               type="text" value={search}

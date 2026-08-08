@@ -1,20 +1,56 @@
-import React, { useContext, useState, useEffect } from 'react';
+import { useContext, useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import axios from 'axios';
 import { CartContext } from '../../../context/CartContext';
+import { BranchContext } from '../../../context/BranchContext';
 import { formatCurrency } from '../../../utils/formatter';
 import { ROUTERS } from '../../../utils/route';
 import { getImageUrl } from '../../../utils/getImageUrl';
 import MasterLayout from '../theme/masterLayout';
 import VoucherModal from '../../../components/VoucherModal';
+import AuthModal from '../../auth/AuthModal';
+
+const QuantityInput = ({ item, setQuantity }) => {
+  const [val, setVal] = useState(item.quantity);
+  
+  useEffect(() => {
+    setVal(item.quantity);
+  }, [item.quantity]);
+  
+  const handleBlur = () => {
+    let v = parseInt(val);
+    if (isNaN(v) || v < 1) v = 1;
+    setVal(v);
+    if (v !== item.quantity) {
+      setQuantity(item.id || item.id_sanpham, v);
+    }
+  };
+
+  const handleChange = (e) => {
+    setVal(e.target.value);
+  };
+
+  return (
+    <input 
+      type="number" 
+      value={val} 
+      onChange={handleChange} 
+      onBlur={handleBlur}
+      className="w-10 md:w-12 text-center py-1 md:py-1.5 text-[13px] md:text-[14px] font-medium border-none outline-none focus:ring-2 focus:ring-blue-500 [-moz-appearance:_textfield] [&::-webkit-outer-spin-button]:m-0 [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:m-0 [&::-webkit-inner-spin-button]:appearance-none"
+    />
+  );
+};
 
 const CartPage = () => {
-  const { cartItems, updateQuantity, removeFromCart, clearCart } = useContext(CartContext);
+  const { cartItems, updateQuantity, setQuantity, removeFromCart, clearCart } = useContext(CartContext);
+  const { activeBranch } = useContext(BranchContext);
   const navigate = useNavigate();
 
   const [selectedItems, setSelectedItems] = useState([]);
 
   const [isVoucherModalOpen, setIsVoucherModalOpen] = useState(false);
   const [orderVoucher, setOrderVoucher] = useState(null);
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
 
   const handleSelectAll = (e) => {
     if (e.target.checked) {
@@ -32,10 +68,31 @@ const CartPage = () => {
     }
   };
 
-  const handleCheckout = () => {
+  const handleCheckout = async () => {
     if (selectedItems.length === 0) {
       alert("Vui lòng chọn ít nhất 1 sản phẩm để thanh toán.");
       return;
+    }
+
+    const token = localStorage.getItem('access_token');
+    if (!token) {
+      setIsAuthModalOpen(true);
+      return;
+    }
+
+    const selected = cartItems.filter(item => selectedItems.includes(item.id || item.id_sanpham));
+    for (const item of selected) {
+      const id = item.id || item.id_sanpham;
+      try {
+        const res = await axios.get(`https://webistetoiyeupc-backend-laravel.onrender.com/api/products/${id}/check-stock${activeBranch?.id_chinhanh ? `?branch_id=${activeBranch.id_chinhanh}` : ''}`);
+        const { stock } = res.data;
+        if (item.quantity > stock) {
+          alert(`Sản phẩm "${item.name || item.tensp}" chỉ còn ${stock} trong kho. Vui lòng giảm số lượng trước khi tiếp tục.`);
+          return;
+        }
+      } catch {
+        // nếu check lỗi thì bỏ qua, backend sẽ chặn lại khi checkout
+      }
     }
 
     navigate(ROUTERS.CLIENT.CHECKOUT, { state: { selectedItems, orderVoucher } });
@@ -49,7 +106,7 @@ const CartPage = () => {
 
   const calculateDiscount = (subtotal) => {
     if (!orderVoucher) return 0;
-    if (orderVoucher.Loai_giamgia === 'Phần trăm') {
+    if (orderVoucher.loai_giamgia === 'Phần trăm') {
       let discount = subtotal * (orderVoucher.gia_trigiam / 100);
       if (orderVoucher.giam_toida) {
         discount = Math.min(discount, orderVoucher.giam_toida);
@@ -65,7 +122,8 @@ const CartPage = () => {
 
   useEffect(() => {
     if (orderVoucher && subtotal < orderVoucher.don_toithieu) {
-      setOrderVoucher(null); 
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setOrderVoucher(null);
     }
   }, [subtotal, orderVoucher]);
 
@@ -73,7 +131,7 @@ const CartPage = () => {
     <MasterLayout>
       <div className="bg-[#f8f9fa] min-h-screen py-6">
         <div className="max-w-[1280px] mx-auto px-4">
-          {}
+          { }
           <div className="text-[13px] text-gray-500 mb-4 flex items-center gap-2">
             <Link to={ROUTERS.CLIENT.HOME} className="text-blue-600 hover:underline">Trang chủ</Link>
             <span>›</span>
@@ -83,7 +141,7 @@ const CartPage = () => {
           <div className="flex items-center justify-between mb-4">
             <h1 className="text-[20px] font-bold text-gray-800 m-0">Giỏ hàng ({cartItems.length})</h1>
             {cartItems.length > 0 && (
-              <button 
+              <button
                 onClick={clearCart}
                 className="text-blue-500 text-[13px] hover:underline bg-transparent border-none cursor-pointer"
               >
@@ -102,7 +160,7 @@ const CartPage = () => {
                 </svg>
               </div>
               <h2 className="text-lg font-medium text-gray-700 mb-4">Giỏ hàng của bạn đang trống</h2>
-              <Link 
+              <Link
                 to={ROUTERS.CLIENT.HOME}
                 className="inline-block bg-blue-600 text-white font-medium px-8 py-3 rounded-lg hover:bg-blue-700 transition-colors"
               >
@@ -111,14 +169,14 @@ const CartPage = () => {
             </div>
           ) : (
             <div className="flex flex-col lg:flex-row gap-5 items-start">
-              {}
+              { }
               <div className="w-full lg:w-[70%]">
                 <div className="bg-white rounded-xl shadow-sm overflow-hidden border border-gray-100">
-                  {}
+                  { }
                   <div className="hidden md:grid grid-cols-[auto_1fr_120px_140px_140px] gap-4 p-4 items-center text-[13px] text-gray-600 border-b border-gray-100">
                     <div className="flex items-center justify-center">
-                      <input 
-                        type="checkbox" 
+                      <input
+                        type="checkbox"
                         className="w-4 h-4 text-blue-600 rounded border-gray-300 cursor-pointer"
                         checked={selectedItems.length === cartItems.length && cartItems.length > 0}
                         onChange={handleSelectAll}
@@ -130,7 +188,7 @@ const CartPage = () => {
                     <div className="text-right font-medium">Thành tiền</div>
                   </div>
 
-                  {}
+                  { }
                   <div className="divide-y divide-gray-100">
                     {cartItems.map((item) => {
                       const id = item.id || item.id_sanpham;
@@ -143,17 +201,17 @@ const CartPage = () => {
                         <div key={id} className="p-4 md:p-5 hover:bg-gray-50/50 transition-colors">
                           <div className="grid grid-cols-[auto_1fr] md:grid-cols-[auto_1fr_120px_140px_140px] gap-4 items-start md:items-center">
 
-                            {}
+                            { }
                             <div className="pt-2 md:pt-0 flex justify-center">
-                              <input 
-                                type="checkbox" 
+                              <input
+                                type="checkbox"
                                 className="w-4 h-4 text-blue-600 rounded border-gray-300 cursor-pointer"
                                 checked={selectedItems.includes(id)}
                                 onChange={(e) => handleSelectItem(id, e.target.checked)}
                               />
                             </div>
 
-                            {}
+                            { }
                             <div className="flex gap-4">
                               <Link to={`${ROUTERS.CLIENT.PRODUCTS}/${id}`} className="w-[80px] h-[80px] border border-gray-200 rounded p-1 bg-white flex-shrink-0">
                                 <img src={getImageUrl(img)} alt={name} className="w-full h-full object-contain" />
@@ -164,13 +222,13 @@ const CartPage = () => {
                                 </Link>
                                 <span className="text-[12px] text-gray-500 mb-1">SKU: {item.masp || id}</span>
 
-                                {}
+                                { }
                                 <div className="md:hidden mt-2 flex flex-col gap-2">
                                   <span className="font-bold text-red-600">{formatCurrency(price)}</span>
                                   <div className="flex items-center gap-3">
                                     <div className="flex border border-gray-300 rounded overflow-hidden w-fit">
                                       <button onClick={() => updateQuantity(id, -1)} className="px-2.5 py-1 bg-gray-50 hover:bg-gray-100 text-gray-600 border-r border-gray-300">-</button>
-                                      <div className="w-10 text-center py-1 text-[13px] font-medium">{item.quantity}</div>
+                                      <QuantityInput item={item} setQuantity={setQuantity} />
                                       <button onClick={() => updateQuantity(id, 1)} className="px-2.5 py-1 bg-gray-50 hover:bg-gray-100 text-gray-600 border-l border-gray-300">+</button>
                                     </div>
                                     <button onClick={() => removeFromCart(id)} className="text-blue-500 text-[13px] bg-transparent border-none">Xóa</button>
@@ -179,28 +237,28 @@ const CartPage = () => {
                               </div>
                             </div>
 
-                            {}
+                            { }
                             <div className="hidden md:block text-center font-bold text-[14px] text-[#111]">
                               {formatCurrency(price)}
                             </div>
 
-                            {}
+                            { }
                             <div className="hidden md:flex flex-col items-center gap-2">
                               <div className="flex border border-gray-200 rounded-md overflow-hidden">
                                 <button onClick={() => updateQuantity(id, -1)} className="px-3 py-1.5 bg-white hover:bg-gray-50 text-gray-600 border-r border-gray-200 transition-colors">-</button>
-                                <div className="w-12 text-center py-1.5 text-[14px] font-medium">{item.quantity}</div>
+                                <QuantityInput item={item} setQuantity={setQuantity} />
                                 <button onClick={() => updateQuantity(id, 1)} className="px-3 py-1.5 bg-white hover:bg-gray-50 text-gray-600 border-l border-gray-200 transition-colors">+</button>
                               </div>
                               <button onClick={() => removeFromCart(id)} className="text-blue-500 text-[12px] hover:underline bg-transparent border-none cursor-pointer">Xóa</button>
                             </div>
 
-                            {}
+                            { }
                             <div className="hidden md:block text-right font-bold text-[15px] text-red-600">
                               {formatCurrency(price * item.quantity)}
                             </div>
                           </div>
 
-                          {}
+                          { }
                           {selectedVoucher && (
                             <div className="mt-4 ml-8 md:ml-[140px] p-3 bg-gray-50 rounded-lg border border-gray-100">
                               <div className="flex gap-2 items-start">
@@ -226,10 +284,10 @@ const CartPage = () => {
                 </div>
               </div>
 
-              {}
+              { }
               <div className="w-full lg:w-[30%] space-y-4">
-                {}
-                <div 
+                { }
+                <div
                   className={`bg-white p-4 rounded-xl shadow-sm border flex items-center justify-between cursor-pointer transition-colors group ${orderVoucher ? 'border-blue-500 bg-blue-50/10' : 'border-gray-100 hover:border-blue-300'}`}
                   onClick={() => setIsVoucherModalOpen(true)}
                 >
@@ -259,7 +317,7 @@ const CartPage = () => {
                   </span>
                 </div>
 
-                {}
+                { }
                 <div className="bg-white p-5 rounded-xl shadow-sm border border-gray-100">
                   <h3 className="font-bold text-gray-800 text-[16px] mb-4 pb-3 border-b border-gray-100 m-0">Thanh toán</h3>
 
@@ -285,13 +343,12 @@ const CartPage = () => {
                     </div>
                   </div>
 
-                  <button 
+                  <button
                     onClick={handleCheckout}
-                    className={`w-full mt-5 font-bold py-3.5 rounded-lg transition-all text-[15px] ${
-                      selectedItems.length > 0 
-                      ? 'bg-[#1435c3] hover:bg-[#0f2899] text-white shadow-md hover:shadow-lg' 
+                    className={`w-full mt-5 font-bold py-3.5 rounded-lg transition-all text-[15px] ${selectedItems.length > 0
+                      ? 'bg-[#1435c3] hover:bg-[#0f2899] text-white shadow-md hover:shadow-lg'
                       : 'bg-gray-200 text-gray-400 cursor-not-allowed'
-                    }`}
+                      }`}
                   >
                     TIẾP TỤC
                   </button>
@@ -303,12 +360,17 @@ const CartPage = () => {
         </div>
       </div>
 
-      <VoucherModal 
+      <VoucherModal
         isOpen={isVoucherModalOpen}
         onClose={() => setIsVoucherModalOpen(false)}
         onApply={(voucher) => setOrderVoucher(voucher)}
         appliedVoucher={orderVoucher}
         orderTotal={subtotal}
+      />
+
+      <AuthModal
+        isOpen={isAuthModalOpen}
+        onClose={() => setIsAuthModalOpen(false)}
       />
     </MasterLayout>
   );

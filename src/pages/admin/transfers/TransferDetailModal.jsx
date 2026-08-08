@@ -4,10 +4,10 @@ const TransferDetailModal = ({ id, onClose, onUpdated }) => {
   const [ticket, setTicket] = useState(null);
   const [loading, setLoading] = useState(true);
   const [processing, setProcessing] = useState(false);
-  const [availableSerials, setAvailableSerials] = useState({}); // { [ma_sanpham]: [serial1, serial2] }
-  const [selectedSerials, setSelectedSerials] = useState({}); // { [id_chitiet]: [id_serial1, ...] }
+  const [availableSerials, setAvailableSerials] = useState({});
+  const [selectedSerials, setSelectedSerials] = useState({});
 
-  const token = localStorage.getItem("access_token") || localStorage.getItem("admin_access_token");
+  const token = localStorage.getItem("admin_access_token");
 
   useEffect(() => {
     fetchDetail();
@@ -16,25 +16,23 @@ const TransferDetailModal = ({ id, onClose, onUpdated }) => {
   const fetchDetail = async () => {
     setLoading(true);
     try {
-      const res = await fetch(`http://127.0.0.1:8000/api/admin/transfers/${id}`, {
+      const res = await fetch(`https://webistetoiyeupc-backend-laravel.onrender.com/api/admin/transfers/${id}`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       const result = await res.json();
       if (res.ok && result.status === 'success') {
         const data = result.data;
         setTicket(data);
-        
-        // If status is "Chờ duyệt", fetch available serials for each product in kho_xuat
         if (data.trang_thai === 'Chờ duyệt') {
           const serialsMap = {};
           const selMap = {};
           for (let ct of data.chi_tiet) {
-            const sRes = await fetch(`http://127.0.0.1:8000/api/admin/transfers/serials?ma_sanpham=${ct.ma_sanpham}&ma_chinhanh=${data.ma_kho_xuat}`, {
+            const sRes = await fetch(`https://webistetoiyeupc-backend-laravel.onrender.com/api/admin/transfers/serials?ma_sanpham=${ct.ma_sanpham}&ma_chinhanh=${data.ma_kho_xuat}`, {
               headers: { 'Authorization': `Bearer ${token}` }
             });
             const sData = await sRes.json();
             serialsMap[ct.ma_sanpham] = sData.data || [];
-            selMap[ct.id_chitiet] = []; // initialize empty selection
+            selMap[ct.id_chitiet] = [];
           }
           setAvailableSerials(serialsMap);
           setSelectedSerials(selMap);
@@ -67,7 +65,6 @@ const TransferDetailModal = ({ id, onClose, onUpdated }) => {
   };
 
   const handleApprove = async () => {
-    // Validate selections
     for (let ct of ticket.chi_tiet) {
       const sel = selectedSerials[ct.id_chitiet] || [];
       if (sel.length !== ct.so_luong) {
@@ -77,7 +74,7 @@ const TransferDetailModal = ({ id, onClose, onUpdated }) => {
 
     setProcessing(true);
     try {
-      const res = await fetch(`http://127.0.0.1:8000/api/admin/transfers/${id}/approve`, {
+      const res = await fetch(`https://webistetoiyeupc-backend-laravel.onrender.com/api/admin/transfers/${id}/approve`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -100,11 +97,36 @@ const TransferDetailModal = ({ id, onClose, onUpdated }) => {
     }
   };
 
+  const handleReject = async () => {
+    if (!window.confirm("Bạn có chắc chắn muốn từ chối phiếu điều chuyển này?")) return;
+    setProcessing(true);
+    try {
+      const res = await fetch(`https://webistetoiyeupc-backend-laravel.onrender.com/api/admin/transfers/${id}/reject`, {
+        method: 'PUT',
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      const result = await res.json();
+      if (res.ok && (result.status === 'success' || !result.status)) {
+        alert("Đã từ chối phiếu thành công.");
+        onUpdated();
+      } else {
+        alert("Lỗi: " + (result.message || 'Không thể từ chối phiếu'));
+      }
+    } catch (err) {
+      console.error(err);
+      alert("Lỗi kết nối");
+    } finally {
+      setProcessing(false);
+    }
+  };
+
   const handleComplete = async () => {
     if (!window.confirm("Xác nhận phiếu này đã đến nơi và nhập kho thành công?")) return;
     setProcessing(true);
     try {
-      const res = await fetch(`http://127.0.0.1:8000/api/admin/transfers/${id}/complete`, {
+      const res = await fetch(`https://webistetoiyeupc-backend-laravel.onrender.com/api/admin/transfers/${id}/complete`, {
         method: 'PUT',
         headers: {
           'Authorization': `Bearer ${token}`
@@ -186,11 +208,10 @@ const TransferDetailModal = ({ id, onClose, onUpdated }) => {
                               <button
                                 key={ser.id_serial}
                                 onClick={() => handleToggleSerial(ct.id_chitiet, ser.id_serial, ct.so_luong)}
-                                className={`text-xs px-2.5 py-1.5 rounded font-medium border transition-colors ${
-                                  isSelected 
-                                    ? 'bg-blue-600 text-white border-blue-600 shadow-md scale-105' 
-                                    : 'bg-white text-slate-600 border-slate-300 hover:border-blue-400'
-                                }`}
+                                className={`text-xs px-2.5 py-1.5 rounded font-medium border transition-colors ${isSelected
+                                  ? 'bg-blue-600 text-white border-blue-600 shadow-md scale-105'
+                                  : 'bg-white text-slate-600 border-slate-300 hover:border-blue-400'
+                                  }`}
                               >
                                 {ser.serial_code}
                               </button>
@@ -232,21 +253,31 @@ const TransferDetailModal = ({ id, onClose, onUpdated }) => {
 
         <div className="px-6 py-4 border-t border-slate-200 flex justify-end gap-3 bg-white">
           <button type="button" onClick={onClose} className="px-5 py-2.5 text-sm font-semibold text-slate-600 hover:bg-slate-100 rounded-lg">Đóng</button>
-          
+
           {ticket.trang_thai === 'Chờ duyệt' && (
-            <button 
-              onClick={handleApprove} 
-              disabled={processing} 
-              className="px-5 py-2.5 text-sm font-bold text-white bg-blue-600 hover:bg-blue-700 rounded-lg"
-            >
-              {processing ? "Đang xử lý..." : "Duyệt Phiếu & Xuất Kho"}
-            </button>
+            <>
+              <button
+                onClick={handleReject}
+                disabled={processing}
+                className="px-5 py-2.5 text-sm font-bold text-white bg-red-600 hover:bg-red-700 rounded-lg"
+              >
+                {processing ? "Đang xử lý..." : "Từ Chối Phiếu"}
+              </button>
+              
+              <button
+                onClick={handleApprove}
+                disabled={processing}
+                className="px-5 py-2.5 text-sm font-bold text-white bg-blue-600 hover:bg-blue-700 rounded-lg"
+              >
+                {processing ? "Đang xử lý..." : "Duyệt Phiếu & Xuất Kho"}
+              </button>
+            </>
           )}
 
           {ticket.trang_thai === 'Đang vận chuyển' && (
-            <button 
-              onClick={handleComplete} 
-              disabled={processing} 
+            <button
+              onClick={handleComplete}
+              disabled={processing}
               className="px-5 py-2.5 text-sm font-bold text-white bg-green-600 hover:bg-green-700 rounded-lg shadow-sm flex items-center gap-2"
             >
               <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M5 13l4 4L19 7"></path></svg>

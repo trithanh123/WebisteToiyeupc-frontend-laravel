@@ -12,7 +12,7 @@ import iconEdit from '../../../assets/icons/icons8-pencil-50.png';
 import iconDelete from '../../../assets/icons/icons8-remove-24.png';
 import iconProfile from '../../../assets/icons/icons8-employee-50.png';
 
-const API = 'http://127.0.0.1:8000/api';
+const API = 'https://webistetoiyeupc-backend-laravel.onrender.com/api';
 
 const SkeletonRow = () => (
   <tr>
@@ -41,7 +41,7 @@ const PersonnelManagement = () => {
     setLoading(true);
     setError('');
     try {
-      const token = localStorage.getItem("access_token") || localStorage.getItem("admin_access_token");
+      const token = localStorage.getItem("admin_access_token");
       const res = await axios.get(`${API}/admin/personnel`, {
         headers: { Authorization: `Bearer ${token}` }
       });
@@ -71,7 +71,7 @@ const PersonnelManagement = () => {
 
     if (result.isConfirmed) {
       try {
-        const token = localStorage.getItem("access_token") || localStorage.getItem("admin_access_token");
+        const token = localStorage.getItem("admin_access_token");
         const res = await axios.delete(`${API}/admin/personnel/${id}`, {
           headers: { Authorization: `Bearer ${token}` }
         });

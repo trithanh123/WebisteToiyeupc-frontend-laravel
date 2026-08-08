@@ -12,7 +12,7 @@ import icon3 from '../../../assets/icons/3.png';
 import icon4 from '../../../assets/icons/4.png';
 import { CartContext } from '../../../context/CartContext';
 
-const API = 'http://127.0.0.1:8000/api';
+const API = 'https://webistetoiyeupc-backend-laravel.onrender.com/api';
 
 const ProductDetailPage = () => {
   const navigate = useNavigate();

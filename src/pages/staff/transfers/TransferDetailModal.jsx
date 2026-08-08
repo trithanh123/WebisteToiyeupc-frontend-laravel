@@ -16,7 +16,7 @@ const TransferDetailModal = ({ id, myBranchId, onClose, onUpdated }) => {
   const fetchDetail = async () => {
     setLoading(true);
     try {
-      const res = await fetch(`http://127.0.0.1:8000/api/staff/transfers/${id}`, {
+      const res = await fetch(`https://webistetoiyeupc-backend-laravel.onrender.com/api/staff/transfers/${id}`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       const result = await res.json();
@@ -29,7 +29,7 @@ const TransferDetailModal = ({ id, myBranchId, onClose, onUpdated }) => {
           const serialsMap = {};
           const selMap = {};
           for (let ct of data.chi_tiet) {
-            const sRes = await fetch(`http://127.0.0.1:8000/api/staff/transfers/serials?ma_sanpham=${ct.ma_sanpham}&ma_chinhanh=${data.ma_kho_xuat}`, {
+            const sRes = await fetch(`https://webistetoiyeupc-backend-laravel.onrender.com/api/staff/transfers/serials?ma_sanpham=${ct.ma_sanpham}&ma_chinhanh=${data.ma_kho_xuat}`, {
               headers: { 'Authorization': `Bearer ${token}` }
             });
             const sData = await sRes.json();
@@ -76,7 +76,7 @@ const TransferDetailModal = ({ id, myBranchId, onClose, onUpdated }) => {
 
     setProcessing(true);
     try {
-      const res = await fetch(`http://127.0.0.1:8000/api/staff/transfers/${id}/approve`, {
+      const res = await fetch(`https://webistetoiyeupc-backend-laravel.onrender.com/api/staff/transfers/${id}/approve`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -103,7 +103,7 @@ const TransferDetailModal = ({ id, myBranchId, onClose, onUpdated }) => {
     if (!window.confirm("Xác nhận phiếu này đã đến nơi và nhập kho thành công?")) return;
     setProcessing(true);
     try {
-      const res = await fetch(`http://127.0.0.1:8000/api/staff/transfers/${id}/complete`, {
+      const res = await fetch(`https://webistetoiyeupc-backend-laravel.onrender.com/api/staff/transfers/${id}/complete`, {
         method: 'PUT',
         headers: {
           'Authorization': `Bearer ${token}`

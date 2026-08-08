@@ -1,5 +1,6 @@
 import React, { createContext, useState, useEffect } from 'react';
 import axios from 'axios';
+import StockAlertModal from '../components/StockAlertModal';
 export const CartContext = createContext();
 
 export const CartProvider = ({ children }) => {
@@ -16,6 +17,8 @@ export const CartProvider = ({ children }) => {
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [currentProduct, setCurrentProduct] = useState(null);
+  
+  const [stockAlertData, setStockAlertData] = useState(null);
 
   const cartCount = Array.isArray(cartItems)
     ? cartItems.reduce((acc, item) => acc + (item?.quantity || 1), 0)
@@ -28,11 +31,11 @@ export const CartProvider = ({ children }) => {
   const addToCart = async (product, quantity = 1, selectedVoucher = null) => {
     const id = product.id || product.id_sanpham;
     try {
-
-      const res = await axios.get(`http://127.0.0.1:8000/api/products/${id}/check-stock`);
-      const { is_available, stock } = res.data;
+      const branchId = (() => { try { return JSON.parse(localStorage.getItem('activeBranch'))?.id_chinhanh; } catch { return null; } })();
+      const res = await axios.get(`https://webistetoiyeupc-backend-laravel.onrender.com/api/products/${id}/check-stock${branchId ? `?branch_id=${branchId}` : ''}`);
+      const { is_available, stock, other_branches } = res.data;
       if (!is_available || stock < quantity) {
-        alert('Sản phẩm hiện tại đã hết hàng, vui lòng chọn sản phẩm khác.');
+        setStockAlertData({ stock, otherBranches: other_branches });
         return;
       }
       setCartItems(prev => {
@@ -63,14 +66,61 @@ export const CartProvider = ({ children }) => {
     setCartItems(prev => prev.filter(item => (item.id || item.id_sanpham) !== productId));
   };
 
-  const updateQuantity = (productId, delta) => {
-    setCartItems(prev => prev.map(item => {
-      if ((item.id || item.id_sanpham) === productId) {
-        const newQuantity = Math.max(1, item.quantity + delta);
-        return { ...item, quantity: newQuantity };
+  const updateQuantity = async (productId, delta) => {
+    if (delta > 0) {
+      try {
+        const branchId = (() => { try { return JSON.parse(localStorage.getItem('activeBranch'))?.id_chinhanh; } catch { return null; } })();
+        const res = await axios.get(`https://webistetoiyeupc-backend-laravel.onrender.com/api/products/${productId}/check-stock${branchId ? `?branch_id=${branchId}` : ''}`);
+        const { stock, other_branches } = res.data;
+        setCartItems(prev => prev.map(item => {
+          if ((item.id || item.id_sanpham) === productId) {
+            if (item.quantity >= stock) {
+              setStockAlertData({ stock, otherBranches: other_branches });
+              return item;
+            }
+            return { ...item, quantity: Math.min(item.quantity + delta, stock) };
+          }
+          return item;
+        }));
+      } catch (error) {
+        console.error("Lỗi kiểm tra tồn kho", error);
       }
-      return item;
-    }));
+    } else {
+      setCartItems(prev => prev.map(item => {
+        if ((item.id || item.id_sanpham) === productId) {
+          return { ...item, quantity: Math.max(1, item.quantity + delta) };
+        }
+        return item;
+      }));
+    }
+  };
+
+  const setQuantity = async (productId, quantity) => {
+    try {
+      const branchId = (() => { try { return JSON.parse(localStorage.getItem('activeBranch'))?.id_chinhanh; } catch { return null; } })();
+      const res = await axios.get(`https://webistetoiyeupc-backend-laravel.onrender.com/api/products/${productId}/check-stock${branchId ? `?branch_id=${branchId}` : ''}`);
+      const { stock, other_branches } = res.data;
+      
+      const newQuantity = Math.min(Math.max(1, quantity), stock);
+      if (quantity > stock) {
+         setStockAlertData({ stock, otherBranches: other_branches });
+      }
+      
+      setCartItems(prev => prev.map(item => {
+        if ((item.id || item.id_sanpham) === productId) {
+          return { ...item, quantity: newQuantity };
+        }
+        return item;
+      }));
+    } catch (error) {
+      console.error("Lỗi kiểm tra tồn kho", error);
+      setCartItems(prev => prev.map(item => {
+        if ((item.id || item.id_sanpham) === productId) {
+          return { ...item, quantity: Math.max(1, quantity) };
+        }
+        return item;
+      }));
+    }
   };
 
   const clearCart = () => {
@@ -78,8 +128,13 @@ export const CartProvider = ({ children }) => {
   };
 
   return (
-    <CartContext.Provider value={{ cartItems, cartCount, addToCart, removeFromCart, updateQuantity, clearCart, isModalOpen, currentProduct, closeModal }}>
+    <CartContext.Provider value={{ cartItems, cartCount, addToCart, removeFromCart, updateQuantity, setQuantity, clearCart, isModalOpen, currentProduct, closeModal }}>
       {children}
+      <StockAlertModal 
+        isOpen={!!stockAlertData} 
+        data={stockAlertData} 
+        onClose={() => setStockAlertData(null)} 
+      />
     </CartContext.Provider>
   );
 };

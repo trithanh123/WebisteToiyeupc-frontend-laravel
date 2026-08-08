@@ -11,8 +11,8 @@ const SerialsModal = ({ isOpen, onClose, tonKho }) => {
         setIsLoading(true);
         setError(null);
         try {
-          const token = localStorage.getItem("access_token") || localStorage.getItem("admin_access_token");
-          const response = await fetch(`http://127.0.0.1:8000/api/admin/warehouse/${tonKho.id_khoton}/serials`, {
+          const token = localStorage.getItem("admin_access_token");
+          const response = await fetch(`https://webistetoiyeupc-backend-laravel.onrender.com/api/admin/warehouse/${tonKho.id_khoton}/serials`, {
             headers: {
               'Authorization': `Bearer ${token}`
             }
@@ -40,7 +40,7 @@ const SerialsModal = ({ isOpen, onClose, tonKho }) => {
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-gray-900/60 backdrop-blur-sm animate-in fade-in duration-200">
       <div className="bg-white w-full max-w-3xl max-h-[85vh] rounded-2xl shadow-2xl flex flex-col overflow-hidden animate-in zoom-in-95 duration-200">
 
-        {}
+        { }
         <div className="flex justify-between items-center p-6 border-b border-gray-100 bg-white">
           <div>
             <h2 className="text-xl font-bold text-slate-800">
@@ -59,7 +59,7 @@ const SerialsModal = ({ isOpen, onClose, tonKho }) => {
           </button>
         </div>
 
-        {}
+        { }
         <div className="flex-1 overflow-y-auto p-6 bg-slate-50">
           {isLoading ? (
             <div className="flex justify-center items-center py-12">
@@ -87,7 +87,7 @@ const SerialsModal = ({ isOpen, onClose, tonKho }) => {
                     </span>
                     <span className="font-mono text-slate-700 font-bold">{s.serial_code}</span>
                   </div>
-                  <span className={`px-2.5 py-1 text-xs font-semibold rounded-full ${s.tinhtrang === 'Trong kho' ? 'bg-green-100 text-green-700' : 'bg-slate-100 text-slate-700'}`}>
+                  <span className={`px-2.5 py-1 text-xs font-semibold rounded-full ${s.tinhtrang === 'nằm trong kho' ? 'bg-green-100 text-green-700' : 'bg-slate-100 text-slate-700'}`}>
                     {s.tinhtrang}
                   </span>
                 </div>

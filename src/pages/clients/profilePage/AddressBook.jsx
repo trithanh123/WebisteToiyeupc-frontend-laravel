@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
 import ProfileLayout from './ProfileLayout';
 import { useAddressBook, PROVINCES } from '../../../hooks/useAddressBook';
 
@@ -19,8 +18,9 @@ const AddressBook = () => {
 
   // Tự động tải danh sách Tỉnh/Thành phố
   useEffect(() => {
-    axios.get('https://provinces.open-api.vn/api/p/')
-      .then(res => setProvinces(res.data))
+    fetch('https://provinces.open-api.vn/api/p/')
+      .then(res => res.json())
+      .then(data => setProvinces(data))
       .catch(err => console.log(err));
   }, []);
 
@@ -31,8 +31,9 @@ const AddressBook = () => {
     setDistricts([]);
     setWards([]);
     if (provinceCode) {
-      axios.get(`https://provinces.open-api.vn/api/p/${provinceCode}?depth=2`)
-        .then(res => setDistricts(res.data.districts))
+      fetch(`https://provinces.open-api.vn/api/p/${provinceCode}?depth=2`)
+        .then(res => res.json())
+        .then(data => setDistricts(data.districts))
         .catch(err => console.log(err));
     }
   };
@@ -43,8 +44,9 @@ const AddressBook = () => {
     setForm({ ...form, district: districtCode, ward: '' });
     setWards([]);
     if (districtCode) {
-      axios.get(`https://provinces.open-api.vn/api/d/${districtCode}?depth=2`)
-        .then(res => setWards(res.data.wards))
+      fetch(`https://provinces.open-api.vn/api/d/${districtCode}?depth=2`)
+        .then(res => res.json())
+        .then(data => setWards(data.wards))
         .catch(err => console.log(err));
     }
   };

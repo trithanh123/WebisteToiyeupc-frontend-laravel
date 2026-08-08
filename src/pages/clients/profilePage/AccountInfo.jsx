@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import ProfileLayout from './ProfileLayout';
 
-const API = 'http://127.0.0.1:8000/api';
+const API = 'https://webistetoiyeupc-backend-laravel.onrender.com/api';
 
 const AccountInfo = () => {
   const [user,    setUser]    = useState(null);

@@ -6,7 +6,7 @@ import { getImageUrl } from '../../../utils/getImageUrl';
 import { BranchContext } from '../../../context/BranchContext';
 import useWishlist from '../../../hooks/useWishlist';
 
-const API = 'http://127.0.0.1:8000/api';
+const API = 'https://webistetoiyeupc-backend-laravel.onrender.com/api';
 
 const formatPrice = (price) => {
   if (!price && price !== 0) return 'Liên hệ';

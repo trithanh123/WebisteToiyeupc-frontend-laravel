@@ -8,7 +8,7 @@ import iconFavorite from '../../../assets/icons/icons8-favorite-50.png';
 import iconAddress  from '../../../assets/icons/icons8-address-book-50.png';
 import iconNotif    from '../../../assets/icons/icons8-notification.png';
 
-const API = 'http://127.0.0.1:8000/api';
+const API = 'https://webistetoiyeupc-backend-laravel.onrender.com/api';
 
 const NAV = [
   { path: ROUTERS.CLIENT.PROFILE,        icon: iconUser,     label: 'Thông tin tài khoản' },

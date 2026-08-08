@@ -2,8 +2,8 @@ import React, { useState, useEffect } from "react";
 import StaffSidebar from "../sidebar";
 import axios from "../../../../utils/axiosConfig"; // Dùng axios đã cấu hình CSRF
 
-const API = "http://127.0.0.1:8000/api";
-const BACKEND_URL = "http://127.0.0.1:8000";
+const API = "https://webistetoiyeupc-backend-laravel.onrender.com/api";
+const BACKEND_URL = "https://webistetoiyeupc-backend-laravel.onrender.com";
 
 const BellIcon = () => (
   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">

@@ -21,8 +21,8 @@ const TransferModal = ({ myBranch, onClose, onSuccess }) => {
       const token = localStorage.getItem("staff_access_token");
       try {
         const [branchRes, prodRes] = await Promise.all([
-          fetch('http://127.0.0.1:8000/api/branches', { headers: { 'Authorization': `Bearer ${token}` } }), // Assuming public or staff can read branches. If not, we might need a specific endpoint. Let's assume /api/branches exists and works or use /api/admin/branches if staff has access. Actually, let's use the standard branch endpoint.
-          fetch('http://127.0.0.1:8000/api/products', { headers: { 'Authorization': `Bearer ${token}` } })
+          fetch('https://webistetoiyeupc-backend-laravel.onrender.com/api/branches', { headers: { 'Authorization': `Bearer ${token}` } }), // Assuming public or staff can read branches. If not, we might need a specific endpoint. Let's assume /api/branches exists and works or use /api/admin/branches if staff has access. Actually, let's use the standard branch endpoint.
+          fetch('https://webistetoiyeupc-backend-laravel.onrender.com/api/products', { headers: { 'Authorization': `Bearer ${token}` } })
         ]);
         
         const branchData = await branchRes.json();
@@ -76,7 +76,7 @@ const TransferModal = ({ myBranch, onClose, onSuccess }) => {
     setLoading(true);
     try {
       const token = localStorage.getItem("staff_access_token");
-      const res = await fetch('http://127.0.0.1:8000/api/staff/transfers', {
+      const res = await fetch('https://webistetoiyeupc-backend-laravel.onrender.com/api/staff/transfers', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

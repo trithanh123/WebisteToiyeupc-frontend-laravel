@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import Swal from 'sweetalert2';
 
-const API = 'http://127.0.0.1:8000/api';
+const API = 'https://webistetoiyeupc-backend-laravel.onrender.com/api';
 
 const PersonnelModal = ({ isOpen, onClose, personnel, onSaveSuccess }) => {
   const [formData, setFormData] = useState({
@@ -25,7 +25,7 @@ const PersonnelModal = ({ isOpen, onClose, personnel, onSaveSuccess }) => {
     if (isOpen) {
       const fetchData = async () => {
         try {
-          const token = localStorage.getItem("access_token") || localStorage.getItem("admin_access_token");
+          const token = localStorage.getItem("admin_access_token");
           const [resBranches, resUsers] = await Promise.all([
             axios.get(`${API}/admin/branches`, { headers: { Authorization: `Bearer ${token}` } }),
             axios.get(`${API}/admin/users`, { headers: { Authorization: `Bearer ${token}` } })
@@ -81,7 +81,7 @@ const PersonnelModal = ({ isOpen, onClose, personnel, onSaveSuccess }) => {
     setLoading(true);
 
     try {
-      const token = localStorage.getItem("access_token") || localStorage.getItem("admin_access_token");
+      const token = localStorage.getItem("admin_access_token");
 
       if (personnel) {
         const payload = { ...formData };

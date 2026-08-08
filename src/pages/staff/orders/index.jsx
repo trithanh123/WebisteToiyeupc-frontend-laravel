@@ -3,7 +3,7 @@ import StaffMasterLayout from "../theme/masterLayout";
 import axios from "axios";
 
 // ─── Staff API ─────────────────────────────────────────────────────────────────
-const staffApi = axios.create({ baseURL: "http://127.0.0.1:8000/api" });
+const staffApi = axios.create({ baseURL: "https://webistetoiyeupc-backend-laravel.onrender.com/api" });
 staffApi.interceptors.request.use(cfg => {
   const token = localStorage.getItem("staff_access_token");
   if (token) cfg.headers.Authorization = `Bearer ${token}`;
@@ -11,14 +11,16 @@ staffApi.interceptors.request.use(cfg => {
 });
 
 // ─── Constants ─────────────────────────────────────────────────────────────────
-const STATUS_LIST = ["all", "Chờ duyệt", "Đang chuẩn bị", "Đang giao hàng", "Đã giao", "Đã hủy"];
+const STATUS_LIST = ["all", "Chờ duyệt", "Đang chuẩn bị", "Đang giao hàng", "Đang giao", "Đã giao", "Đã hủy", "Giao thất bại"];
 
 const STATUS_STYLE = {
   "Chờ duyệt":      { bg: "#fffbeb", color: "#d97706", border: "#fde68a" },
   "Đang chuẩn bị":  { bg: "#eff6ff", color: "#2563eb", border: "#bfdbfe" },
   "Đang giao hàng": { bg: "#f0f9ff", color: "#0891b2", border: "#bae6fd" },
+  "Đang giao":      { bg: "#f0f9ff", color: "#0891b2", border: "#bae6fd" },
   "Đã giao":        { bg: "#f0fdf4", color: "#16a34a", border: "#bbf7d0" },
   "Đã hủy":         { bg: "#fef2f2", color: "#dc2626", border: "#fecaca" },
+  "Giao thất bại":  { bg: "#fef2f2", color: "#dc2626", border: "#fecaca" },
 };
 
 // Transitions allowed by staff
@@ -26,6 +28,7 @@ const NEXT_STATUS = {
   "Chờ duyệt":      "Đang chuẩn bị",
   "Đang chuẩn bị":  "Đang giao hàng",
   "Đang giao hàng": "Đã giao",
+  "Đang giao":      "Đã giao",
 };
 
 const fmt = (n) => Number(n).toLocaleString("vi-VN") + "₫";
@@ -47,6 +50,7 @@ const DetailModal = ({ orderId, onClose, onStatusUpdated }) => {
   const [loading, setLoading] = useState(true);
   const [updating, setUpdating] = useState(false);
   const [toast, setToast]     = useState(null);
+  const [selectedSerials, setSelectedSerials] = useState({});
 
   const showToast = (msg, type = "success") => {
     setToast({ msg, type });
@@ -60,13 +64,39 @@ const DetailModal = ({ orderId, onClose, onStatusUpdated }) => {
       .finally(() => setLoading(false));
   }, [orderId]);
 
-  const handleUpdateStatus = async () => {
-    const next = NEXT_STATUS[data?.order?.trang_thai_dh];
+  const handleSerialChange = (chitietId, index, serialId) => {
+    setSelectedSerials(prev => {
+      const arr = [...(prev[chitietId] || [])];
+      arr[index] = serialId;
+      return { ...prev, [chitietId]: arr };
+    });
+  };
+
+  const handleUpdateStatus = async (statusArg) => {
+    const next = typeof statusArg === 'string' ? statusArg : NEXT_STATUS[data?.order?.trang_thai_dh];
     if (!next) return;
+
+    let payload = { trang_thai_dh: next };
+    if (next === 'Đang giao hàng' || next === 'Đang giao') {
+        const serialsPayload = [];
+        for (const item of (data?.items || [])) {
+           const selected = selectedSerials[item.id_chitietdh] || [];
+           const validSelections = selected.filter(Boolean);
+           if (validSelections.length < item.soluong) {
+               showToast(`Vui lòng chọn đủ ${item.soluong} Serial cho SP: ${item.tensp}`, "error");
+               return;
+           }
+           validSelections.forEach(sid => {
+               serialsPayload.push({ id_chitietdh: item.id_chitietdh, id_serial: parseInt(sid) });
+           });
+        }
+        payload.serials = serialsPayload;
+    }
+
     if (!window.confirm(`Xác nhận chuyển đơn hàng #${orderId} sang "${next}"?`)) return;
     setUpdating(true);
     try {
-      await staffApi.put(`/staff/orders/${orderId}/status`, { trang_thai_dh: next });
+      await staffApi.put(`/staff/orders/${orderId}/status`, payload);
       showToast(`Đã cập nhật thành "${next}"!`, "success");
       setData(prev => ({ ...prev, order: { ...prev.order, trang_thai_dh: next } }));
       onStatusUpdated();
@@ -141,17 +171,47 @@ const DetailModal = ({ orderId, onClose, onStatusUpdated }) => {
               <div style={{ fontSize: 13, fontWeight: 700, color: "#475569", marginBottom: 10, textTransform: "uppercase", letterSpacing: "0.05em" }}>Sản phẩm trong đơn</div>
               <div style={{ border: "1px solid #e2e8f0", borderRadius: 10, overflow: "hidden" }}>
                 {items.map((item, idx) => (
-                  <div key={idx} style={{ display: "flex", alignItems: "center", gap: 12, padding: "12px 16px", borderTop: idx > 0 ? "1px solid #f1f5f9" : "none" }}>
-                    {item.thumbail ? (
-                      <img src={item.thumbail} alt="" style={{ width: 44, height: 44, objectFit: "cover", borderRadius: 8, border: "1px solid #e2e8f0", flexShrink: 0 }} />
-                    ) : (
-                      <div style={{ width: 44, height: 44, borderRadius: 8, background: "#f1f5f9", flexShrink: 0 }} />
-                    )}
-                    <div style={{ flex: 1, minWidth: 0 }}>
-                      <div style={{ fontWeight: 600, fontSize: 13, color: "#0f172a", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{item.tensp}</div>
-                      <div style={{ fontSize: 12, color: "#64748b", marginTop: 2 }}>x{item.soluong} · Đơn giá: {fmt(item.don_gia)}</div>
+                  <div key={idx} style={{ display: "flex", flexDirection: "column", padding: "12px 16px", borderTop: idx > 0 ? "1px solid #f1f5f9" : "none" }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                      {item.thumbail ? (
+                        <img src={item.thumbail} alt="" style={{ width: 44, height: 44, objectFit: "cover", borderRadius: 8, border: "1px solid #e2e8f0", flexShrink: 0 }} />
+                      ) : (
+                        <div style={{ width: 44, height: 44, borderRadius: 8, background: "#f1f5f9", flexShrink: 0 }} />
+                      )}
+                      <div style={{ flex: 1, minWidth: 0 }}>
+                        <div style={{ fontWeight: 600, fontSize: 13, color: "#0f172a", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{item.tensp}</div>
+                        <div style={{ fontSize: 12, color: "#64748b", marginTop: 2 }}>x{item.soluong} · Đơn giá: {fmt(item.don_gia)}</div>
+                      </div>
+                      <div style={{ fontWeight: 700, fontSize: 14, color: "#2563eb", flexShrink: 0 }}>{fmt(item.thanh_tien)}</div>
                     </div>
-                    <div style={{ fontWeight: 700, fontSize: 14, color: "#2563eb", flexShrink: 0 }}>{fmt(item.thanh_tien)}</div>
+                    {nextStatus === 'Đang giao hàng' && (
+                      <div style={{ marginTop: 12, padding: "10px", background: "#f8fafc", borderRadius: 8, border: "1px solid #e2e8f0" }}>
+                        <div style={{ fontSize: 12, fontWeight: 600, color: "#475569", marginBottom: 8 }}>Vui lòng chọn Serial để xuất kho:</div>
+                        {Array.from({ length: item.soluong }).map((_, i) => (
+                          <div key={i} style={{ marginBottom: 6 }}>
+                            <select
+                              value={(selectedSerials[item.id_chitietdh] || [])[i] || ""}
+                              onChange={e => handleSerialChange(item.id_chitietdh, i, e.target.value)}
+                              style={{ width: "100%", padding: "8px", borderRadius: 6, border: "1px solid #cbd5e1", fontSize: 13 }}
+                            >
+                              <option value="">-- Chọn Serial {i + 1} --</option>
+                              {(item.available_serials || []).map(ser => {
+                                // Prevent selecting the same serial twice
+                                const isSelectedByOther = (selectedSerials[item.id_chitietdh] || []).some((sid, idx) => idx !== i && sid == ser.id_serial);
+                                return (
+                                  <option key={ser.id_serial} value={ser.id_serial} disabled={isSelectedByOther}>
+                                    {ser.serial_code}
+                                  </option>
+                                );
+                              })}
+                            </select>
+                          </div>
+                        ))}
+                        {(!item.available_serials || item.available_serials.length < item.soluong) && (
+                           <div style={{ color: "#dc2626", fontSize: 12, marginTop: 4 }}>Kho hiện tại không đủ Serial để giao!</div>
+                        )}
+                      </div>
+                    )}
                   </div>
                 ))}
               </div>
@@ -164,9 +224,36 @@ const DetailModal = ({ orderId, onClose, onStatusUpdated }) => {
             </div>
 
             {/* Action */}
-            {nextStatus && (
+            {order.trang_thai_dh === 'Đang giao hàng' || order.trang_thai_dh === 'Đang giao' ? (
+              <div style={{ display: 'flex', gap: '10px' }}>
+                <button
+                  onClick={() => handleUpdateStatus('Giao thất bại')}
+                  disabled={updating}
+                  style={{
+                    flex: 1, padding: "13px", border: "none", borderRadius: 10,
+                    background: updating ? "#fca5a5" : "#ef4444",
+                    color: "#fff", fontWeight: 700, fontSize: 14, cursor: updating ? "not-allowed" : "pointer",
+                    boxShadow: "0 4px 15px rgba(239,68,68,0.35)"
+                  }}
+                >
+                  {updating ? "Đang xử lý..." : `❌ Bơm hàng (Thất bại)`}
+                </button>
+                <button
+                  onClick={() => handleUpdateStatus('Đã giao')}
+                  disabled={updating}
+                  style={{
+                    flex: 1, padding: "13px", border: "none", borderRadius: 10,
+                    background: updating ? "#86efac" : "#22c55e",
+                    color: "#fff", fontWeight: 700, fontSize: 14, cursor: updating ? "not-allowed" : "pointer",
+                    boxShadow: "0 4px 15px rgba(34,197,94,0.35)"
+                  }}
+                >
+                  {updating ? "Đang xử lý..." : `✅ Đã giao xong`}
+                </button>
+              </div>
+            ) : nextStatus && order.trang_thai_dh !== 'Đang giao hàng' && order.trang_thai_dh !== 'Đang giao' && (
               <button
-                onClick={handleUpdateStatus}
+                onClick={() => handleUpdateStatus(nextStatus)}
                 disabled={updating}
                 style={{
                   width: "100%", padding: "13px", border: "none", borderRadius: 10,
@@ -178,7 +265,7 @@ const DetailModal = ({ orderId, onClose, onStatusUpdated }) => {
                 {updating ? "Đang cập nhật..." : `✅ Chuyển sang "${nextStatus}"`}
               </button>
             )}
-            {!nextStatus && !["Đã giao", "Đã hủy"].includes(order.trang_thai_dh) && (
+            {!nextStatus && !["Đã giao", "Đã hủy", "Giao thất bại"].includes(order.trang_thai_dh) && order.trang_thai_dh !== 'Đang giao hàng' && order.trang_thai_dh !== 'Đang giao' && (
               <div style={{ textAlign: "center", padding: "12px", color: "#94a3b8", fontSize: 13 }}>
                 Đơn hàng đã ở trạng thái cuối.
               </div>

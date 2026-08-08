@@ -1,26 +1,22 @@
 import React, { useState, useEffect, useCallback } from "react";
 import AdminMasterLayout from "../theme/masterLayout";
 import axios from "axios";
-
-// ─── Admin API ──────────────────────────────────────────────────────────────
-const adminApi = axios.create({ baseURL: "http://127.0.0.1:8000/api" });
+const adminApi = axios.create({ baseURL: "https://webistetoiyeupc-backend-laravel.onrender.com/api" });
 adminApi.interceptors.request.use((cfg) => {
-  const token = localStorage.getItem("access_token");
+  const token = localStorage.getItem("admin_access_token");
   if (token) cfg.headers.Authorization = `Bearer ${token}`;
   return cfg;
 });
-
-// ─── Constants ──────────────────────────────────────────────────────────────
 const TRANG_THAI_LIST = ["all", "Chờ tiếp nhận", "Đang xử lý", "Hoàn thành", "Từ chối"];
 const TRANG_THAI_STYLE = {
   "Chờ tiếp nhận": { bg: "#fffbeb", color: "#d97706", border: "#fde68a" },
-  "Đang xử lý":   { bg: "#eff6ff", color: "#2563eb", border: "#bfdbfe" },
-  "Hoàn thành":   { bg: "#f0fdf4", color: "#16a34a", border: "#bbf7d0" },
-  "Từ chối":      { bg: "#fef2f2", color: "#dc2626", border: "#fecaca" },
+  "Đang xử lý": { bg: "#eff6ff", color: "#2563eb", border: "#bfdbfe" },
+  "Hoàn thành": { bg: "#f0fdf4", color: "#16a34a", border: "#bbf7d0" },
+  "Từ chối": { bg: "#fef2f2", color: "#dc2626", border: "#fecaca" },
 };
 const TRANG_THAI_NEXT = {
   "Chờ tiếp nhận": ["Đang xử lý", "Từ chối"],
-  "Đang xử lý":   ["Hoàn thành", "Từ chối"],
+  "Đang xử lý": ["Hoàn thành", "Từ chối"],
 };
 
 const fmt = (d) => (d ? new Date(d).toLocaleDateString("vi-VN") : "—");
@@ -43,27 +39,22 @@ const Toast = ({ toast }) => {
     </div>
   );
 };
-
-// ─── Stat Card ───────────────────────────────────────────────────────────────
 const StatCard = ({ label, value, color, bg }) => (
   <div style={{ background: bg, border: `1px solid ${color}22`, borderRadius: 12, padding: "16px 20px", flex: 1, minWidth: 130 }}>
     <div style={{ fontSize: 26, fontWeight: 800, color }}>{value}</div>
     <div style={{ fontSize: 12, color: "#64748b", marginTop: 2, fontWeight: 600 }}>{label}</div>
   </div>
 );
-
-// ─── Modal Chi Tiết ──────────────────────────────────────────────────────────
 const DetailModal = ({ phieuId, onClose, onUpdated, onDeleted }) => {
-  const [data, setData]         = useState(null);
-  const [loading, setLoading]   = useState(true);
+  const [data, setData] = useState(null);
+  const [loading, setLoading] = useState(true);
   const [updating, setUpdating] = useState(false);
   const [newStatus, setNewStatus] = useState("");
-  const [ketQua, setKetQua]     = useState("");
+  const [ketQua, setKetQua] = useState("");
   const [confirmDel, setConfirmDel] = useState(false);
-  const [toast, setToast]       = useState(null);
+  const [toast, setToast] = useState(null);
 
   const showToast = (msg, type = "success") => { setToast({ msg, type }); setTimeout(() => setToast(null), 3000); };
-
   useEffect(() => {
     adminApi.get(`/admin/warranty/${phieuId}`)
       .then(res => { setData(res.data.data); setKetQua(res.data.data?.ket_qua_xu_ly || ""); })
@@ -98,10 +89,10 @@ const DetailModal = ({ phieuId, onClose, onUpdated, onDeleted }) => {
       <Toast toast={toast} />
       <div style={{ ...styles.modal, maxWidth: 640 }}>
         <div style={styles.modalHeader}>
-          <h3 style={{ margin: 0, fontSize: 17, fontWeight: 700 }}>📋 Chi tiết Phiếu #{phieuId}</h3>
+          <h3 style={{ margin: 0, fontSize: 17, fontWeight: 700 }}> Chi tiết Phiếu #{phieuId}</h3>
           <div style={{ display: "flex", gap: 8 }}>
             <button onClick={() => setConfirmDel(true)} style={{ background: "#fef2f2", color: "#dc2626", border: "1px solid #fecaca", borderRadius: 8, padding: "6px 14px", fontWeight: 600, fontSize: 13, cursor: "pointer" }}>
-              🗑 Từ chối phiếu
+              Từ chối phiếu
             </button>
             <button onClick={onClose} style={styles.closeBtn}>✕</button>
           </div>
@@ -192,15 +183,15 @@ const DetailModal = ({ phieuId, onClose, onUpdated, onDeleted }) => {
   );
 };
 
-// ─── Main Admin Warranty Page ────────────────────────────────────────────────
+
 const AdminWarrantyPage = () => {
-  const [data, setData]       = useState(null);
+  const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [filter, setFilter]   = useState("all");
-  const [search, setSearch]   = useState("");
-  const [page, setPage]       = useState(1);
+  const [filter, setFilter] = useState("all");
+  const [search, setSearch] = useState("");
+  const [page, setPage] = useState(1);
   const [detailId, setDetailId] = useState(null);
-  const [toast, setToast]     = useState(null);
+  const [toast, setToast] = useState(null);
 
   const showToast = (msg, type = "success") => { setToast({ msg, type }); setTimeout(() => setToast(null), 3000); };
 
@@ -217,12 +208,11 @@ const AdminWarrantyPage = () => {
 
   const rows = data?.data || [];
 
-  // Stats from current page (ideally should be from a dedicated API but works for now)
   const stats = [
     { label: "Tổng phiếu", value: data?.total ?? "–", color: "#2563eb", bg: "#eff6ff" },
     { label: "Chờ tiếp nhận", value: rows.filter(r => r.trang_thai === "Chờ tiếp nhận").length, color: "#d97706", bg: "#fffbeb" },
-    { label: "Đang xử lý",   value: rows.filter(r => r.trang_thai === "Đang xử lý").length,   color: "#2563eb", bg: "#eff6ff" },
-    { label: "Hoàn thành",   value: rows.filter(r => r.trang_thai === "Hoàn thành").length,   color: "#16a34a", bg: "#f0fdf4" },
+    { label: "Đang xử lý", value: rows.filter(r => r.trang_thai === "Đang xử lý").length, color: "#2563eb", bg: "#eff6ff" },
+    { label: "Hoàn thành", value: rows.filter(r => r.trang_thai === "Hoàn thành").length, color: "#16a34a", bg: "#f0fdf4" },
   ];
 
   return (
@@ -234,18 +224,12 @@ const AdminWarrantyPage = () => {
       `}</style>
 
       <div style={{ padding: "24px 28px", fontFamily: "'Inter', sans-serif" }}>
-        {/* Header */}
         <div style={{ marginBottom: 24 }}>
-          <h1 style={{ margin: 0, fontSize: 22, fontWeight: 800, color: "#0f172a" }}>🛠️ Hỗ Trợ & Bảo Hành</h1>
-          <p style={{ margin: "4px 0 0", color: "#64748b", fontSize: 14 }}>Giám sát toàn bộ phiếu hỗ trợ kỹ thuật và bảo hành trên hệ thống</p>
+          <h1 style={{ margin: 0, fontSize: 22, fontWeight: 800, color: "#0f172a" }}> Hỗ Trợ & Bảo Hành</h1>
         </div>
-
-        {/* Stats */}
         <div style={{ display: "flex", gap: 12, marginBottom: 24, flexWrap: "wrap" }}>
           {stats.map(s => <StatCard key={s.label} {...s} />)}
         </div>
-
-        {/* Filters */}
         <div style={{ display: "flex", gap: 10, marginBottom: 20, flexWrap: "wrap", alignItems: "center" }}>
           <div style={{ position: "relative" }}>
             <select
@@ -260,20 +244,18 @@ const AdminWarrantyPage = () => {
             <span style={{ position: "absolute", right: 12, top: "50%", transform: "translateY(-50%)", pointerEvents: "none", color: "#64748b", fontSize: 12 }}>▼</span>
           </div>
           <div style={{ display: "flex", alignItems: "center", background: "#fff", border: "1px solid #e2e8f0", borderRadius: 10, padding: "6px 12px", gap: 8, flex: 1, maxWidth: 340 }}>
-            <span style={{ color: "#94a3b8" }}>🔍</span>
+            <span style={{ color: "#94a3b8" }}></span>
             <input style={{ border: "none", outline: "none", fontSize: 14, width: "100%", background: "transparent" }}
               placeholder="Tìm theo tên KH, SĐT, serial, chi nhánh…" value={search}
               onChange={e => { setSearch(e.target.value); setPage(1); }} />
           </div>
         </div>
-
-        {/* Table */}
         <div style={{ background: "#fff", borderRadius: 14, boxShadow: "0 1px 8px rgba(0,0,0,0.07)", overflow: "hidden" }}>
           <table style={{ width: "100%", borderCollapse: "collapse" }}>
             <thead>
-              <tr style={{ background: "linear-gradient(135deg,#1e3a8a,#2563eb)", color: "#fff" }}>
+              <tr style={{ background: "#f8fafc", color: "#1e3a8a", borderBottom: "1px solid #e2e8f0" }}>
                 {["#", "Khách hàng", "Loại YC", "Serial / Sản phẩm", "Nhân viên", "Chi nhánh", "Trạng thái", "Ngày tiếp nhận", ""].map(h => (
-                  <th key={h} style={{ padding: "13px 14px", textAlign: "left", fontSize: 12, fontWeight: 700, letterSpacing: .4, whiteSpace: "nowrap" }}>{h}</th>
+                  <th key={h} style={{ padding: "13px 14px", textAlign: "left", fontSize: 12, fontWeight: 700, letterSpacing: 0.5, textTransform: "uppercase", whiteSpace: "nowrap" }}>{h}</th>
                 ))}
               </tr>
             </thead>
@@ -318,8 +300,10 @@ const AdminWarrantyPage = () => {
             <div style={{ display: "flex", justifyContent: "center", gap: 8, padding: 16 }}>
               {Array.from({ length: data.last_page }, (_, i) => i + 1).map(p => (
                 <button key={p} onClick={() => setPage(p)}
-                  style={{ width: 34, height: 34, borderRadius: 8, border: "none", cursor: "pointer", fontWeight: 700, fontSize: 13,
-                    background: p === page ? "#1d4ed8" : "#f1f5f9", color: p === page ? "#fff" : "#64748b" }}>
+                  style={{
+                    width: 34, height: 34, borderRadius: 8, border: "none", cursor: "pointer", fontWeight: 700, fontSize: 13,
+                    background: p === page ? "#1d4ed8" : "#f1f5f9", color: p === page ? "#fff" : "#64748b"
+                  }}>
                   {p}
                 </button>
               ))}
@@ -340,7 +324,7 @@ const AdminWarrantyPage = () => {
   );
 };
 
-// ─── Shared Styles ───────────────────────────────────────────────────────────
+
 const styles = {
   overlay: { position: "fixed", inset: 0, background: "rgba(0,0,0,0.5)", zIndex: 1000, display: "flex", alignItems: "center", justifyContent: "center", padding: 16 },
   modal: { background: "#fff", borderRadius: 16, width: "100%", maxHeight: "90vh", overflowY: "auto", boxShadow: "0 20px 60px rgba(0,0,0,0.2)", animation: "fadeIn .25s" },

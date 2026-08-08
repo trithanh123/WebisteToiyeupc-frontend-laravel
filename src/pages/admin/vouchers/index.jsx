@@ -8,7 +8,7 @@ import iconReload from '../../../assets/icons/icons8-reload-50.png';
 import iconEdit from '../../../assets/icons/icons8-pencil-50.png';
 import iconDelete from '../../../assets/icons/icons8-remove-24.png';
 
-const API = 'http://127.0.0.1:8000/api';
+const API = 'https://webistetoiyeupc-backend-laravel.onrender.com/api';
 
 const formatDateForInput = (dateString) => {
   if (!dateString) return '';
@@ -42,9 +42,9 @@ const SkeletonRow = () => (
 
 const VoucherModal = ({ isOpen, onClose, voucher, onSaveSuccess }) => {
   const [formData, setFormData] = useState({
-    Tenkhuyenmai: '',
-    Ma_voucher: '',
-    Loai_giamgia: 'Phần trăm', 
+    tenkhuyenmai: '',
+    ma_voucher: '',
+    loai_giamgia: 'Phần trăm',
     gia_trigiam: '',
     don_toithieu: '',
     giam_toida: '',
@@ -58,9 +58,9 @@ const VoucherModal = ({ isOpen, onClose, voucher, onSaveSuccess }) => {
     if (isOpen) {
       if (voucher) {
         setFormData({
-          Tenkhuyenmai: voucher.tenkhuyenmai || '',
-          Ma_voucher: voucher.ma_voucher || '',
-          Loai_giamgia: voucher.Loai_giamgia || 'Phần trăm',
+          tenkhuyenmai: voucher.tenkhuyenmai || '',
+          ma_voucher: voucher.ma_voucher || '',
+          loai_giamgia: voucher.loai_giamgia || 'Phần trăm',
           gia_trigiam: voucher.gia_trigiam || '',
           don_toithieu: voucher.don_toithieu || '',
           giam_toida: voucher.giam_toida || '',
@@ -70,9 +70,9 @@ const VoucherModal = ({ isOpen, onClose, voucher, onSaveSuccess }) => {
         });
       } else {
         setFormData({
-          Tenkhuyenmai: '',
-          Ma_voucher: '',
-          Loai_giamgia: 'Phần trăm',
+          tenkhuyenmai: '',
+          ma_voucher: '',
+          loai_giamgia: 'Phần trăm',
           gia_trigiam: '',
           don_toithieu: '',
           giam_toida: '',
@@ -92,7 +92,7 @@ const VoucherModal = ({ isOpen, onClose, voucher, onSaveSuccess }) => {
     for (let i = 0; i < 8; i++) {
       code += chars.charAt(Math.floor(Math.random() * chars.length));
     }
-    setFormData({ ...formData, Ma_voucher: code });
+    setFormData({ ...formData, ma_voucher: code });
   };
 
   const handleSubmit = async (e) => {
@@ -100,18 +100,17 @@ const VoucherModal = ({ isOpen, onClose, voucher, onSaveSuccess }) => {
     setLoading(true);
 
     try {
-      const token = localStorage.getItem("access_token") || localStorage.getItem("admin_access_token");
+      const token = localStorage.getItem("admin_access_token");
 
       const payload = {
         ...formData,
-        // Ép sang định dạng yyyy-mm-dd HH:mm:ss để laravel dễ nhận nếu cần, nhưng gửi nguyên T cũng được
         ngaybdchuongtrinh: formData.ngaybdchuongtrinh.replace('T', ' ') + ':00',
         ngayketthucchuongtrinh: formData.ngayketthucchuongtrinh.replace('T', ' ') + ':00',
       };
 
       if (voucher) {
 
-        const res = await axios.put(`${API}/admin/vouchers/${voucher.id_khuyenmai}`, payload, {
+        const res = await axios.patch(`${API}/admin/vouchers/${voucher.id_khuyenmai}`, payload, {
           headers: { Authorization: `Bearer ${token}` }
         });
         if (res.data.status === 'success') {
@@ -167,7 +166,7 @@ const VoucherModal = ({ isOpen, onClose, voucher, onSaveSuccess }) => {
             <label className="block text-sm font-semibold text-gray-700 mb-1">
               Tên chương trình KM <span className="text-red-500">*</span>
             </label>
-            <input type="text" required value={formData.Tenkhuyenmai} onChange={e => setFormData({ ...formData, Tenkhuyenmai: e.target.value })}
+            <input type="text" required value={formData.tenkhuyenmai} onChange={e => setFormData({ ...formData, tenkhuyenmai: e.target.value })}
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 outline-none transition-all"
               placeholder="VD: Siêu sale 11/11..." />
           </div>
@@ -178,7 +177,7 @@ const VoucherModal = ({ isOpen, onClose, voucher, onSaveSuccess }) => {
                 Mã Voucher <span className="text-red-500">*</span>
               </label>
               <div className="relative flex items-center">
-                <input type="text" required value={formData.Ma_voucher} onChange={e => setFormData({ ...formData, Ma_voucher: e.target.value })}
+                <input type="text" required value={formData.ma_voucher} onChange={e => setFormData({ ...formData, ma_voucher: e.target.value })}
                   className="w-full pl-3 pr-24 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 outline-none transition-all uppercase"
                   placeholder="SALE50K" />
                 <button type="button" onClick={generateRandomCode}
@@ -192,7 +191,7 @@ const VoucherModal = ({ isOpen, onClose, voucher, onSaveSuccess }) => {
               <label className="block text-sm font-semibold text-gray-700 mb-1">
                 Loại giảm giá <span className="text-red-500">*</span>
               </label>
-              <select required value={formData.Loai_giamgia} onChange={e => setFormData({ ...formData, Loai_giamgia: e.target.value })}
+              <select required value={formData.loai_giamgia} onChange={e => setFormData({ ...formData, loai_giamgia: e.target.value })}
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 outline-none cursor-pointer">
                 <option value="Phần trăm">Phần trăm (%)</option>
                 <option value="Số tiền">Tiền mặt (VNĐ)</option>
@@ -206,11 +205,14 @@ const VoucherModal = ({ isOpen, onClose, voucher, onSaveSuccess }) => {
                 Giá trị giảm <span className="text-red-500">*</span>
               </label>
               <div className="relative">
-                <input type="number" required min="0" value={formData.gia_trigiam} onChange={e => setFormData({ ...formData, gia_trigiam: e.target.value })}
+                <input type="number" required min="0"
+                  value={formData.gia_trigiam}
+                  onChange={e => { e.target.setCustomValidity(''); setFormData({ ...formData, gia_trigiam: e.target.value }); }}
+                  onInvalid={e => e.target.setCustomValidity('Giá trị giảm phải lớn hơn hoặc bằng 0!')}
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 outline-none transition-all"
-                  placeholder={formData.Loai_giamgia === 'Phần trăm' ? 'VD: 10' : 'VD: 50000'} />
+                  placeholder={formData.loai_giamgia === 'Phần trăm' ? 'VD: 10' : 'VD: 50000'} />
                 <span className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 font-semibold text-sm">
-                  {formData.Loai_giamgia === 'Phần trăm' ? '%' : 'đ'}
+                  {formData.loai_giamgia === 'Phần trăm' ? '%' : 'đ'}
                 </span>
               </div>
             </div>
@@ -219,7 +221,10 @@ const VoucherModal = ({ isOpen, onClose, voucher, onSaveSuccess }) => {
               <label className="block text-sm font-semibold text-gray-700 mb-1">
                 Số lượng mã <span className="text-red-500">*</span>
               </label>
-              <input type="number" required min="0" value={formData.soluongma} onChange={e => setFormData({ ...formData, soluongma: e.target.value })}
+              <input type="number" required min="0"
+                value={formData.soluongma}
+                onChange={e => { e.target.setCustomValidity(''); setFormData({ ...formData, soluongma: e.target.value }); }}
+                onInvalid={e => e.target.setCustomValidity('Số lượng mã phải lớn hơn hoặc bằng 0!')}
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 outline-none transition-all"
                 placeholder="Số lượng phát hành..." />
             </div>
@@ -231,7 +236,10 @@ const VoucherModal = ({ isOpen, onClose, voucher, onSaveSuccess }) => {
                 Đơn tối thiểu để áp dụng (Tùy chọn)
               </label>
               <div className="relative">
-                <input type="number" min="0" value={formData.don_toithieu} onChange={e => setFormData({ ...formData, don_toithieu: e.target.value })}
+                <input type="number" min="0"
+                  value={formData.don_toithieu}
+                  onChange={e => { e.target.setCustomValidity(''); setFormData({ ...formData, don_toithieu: e.target.value }); }}
+                  onInvalid={e => e.target.setCustomValidity('Đơn tối thiểu không được là số âm!')}
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 outline-none transition-all"
                   placeholder="Để trống nếu không yêu cầu..." />
                 <span className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 font-semibold text-sm">đ</span>
@@ -243,7 +251,10 @@ const VoucherModal = ({ isOpen, onClose, voucher, onSaveSuccess }) => {
                 Giảm tối đa (Tùy chọn)
               </label>
               <div className="relative">
-                <input type="number" min="0" value={formData.giam_toida} onChange={e => setFormData({ ...formData, giam_toida: e.target.value })}
+                <input type="number" min="0"
+                  value={formData.giam_toida}
+                  onChange={e => { e.target.setCustomValidity(''); setFormData({ ...formData, giam_toida: e.target.value }); }}
+                  onInvalid={e => e.target.setCustomValidity('Mức giảm tối đa không được là số âm!')}
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 outline-none transition-all"
                   placeholder="Áp dụng khi giảm %..." />
                 <span className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 font-semibold text-sm">đ</span>
@@ -300,12 +311,13 @@ const VoucherManagement = () => {
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingVoucher, setEditingVoucher] = useState(null);
+  const [filterStatus, setFilterStatus] = useState('all'); // 'all' | 'active' | 'upcoming' | 'expired'
 
   const fetchVouchers = async () => {
     setLoading(true);
     setError('');
     try {
-      const token = localStorage.getItem("access_token") || localStorage.getItem("admin_access_token");
+      const token = localStorage.getItem("admin_access_token");
       const res = await axios.get(`${API}/admin/vouchers`, {
         headers: { Authorization: `Bearer ${token}` }
       });
@@ -335,7 +347,7 @@ const VoucherManagement = () => {
 
     if (result.isConfirmed) {
       try {
-        const token = localStorage.getItem("access_token") || localStorage.getItem("admin_access_token");
+        const token = localStorage.getItem("admin_access_token");
         const res = await axios.delete(`${API}/admin/vouchers/${id}`, {
           headers: { Authorization: `Bearer ${token}` }
         });
@@ -349,13 +361,20 @@ const VoucherManagement = () => {
     }
   };
 
-  const renderStatusBadge = (v) => {
+  // Hàm tính trạng thái voucher (dùng chung cho badge và filter)
+  const getStatus = (v) => {
     const now = new Date();
     const start = new Date(v.ngaybdchuongtrinh);
     const end = new Date(v.ngayketthucchuongtrinh);
     const remaining = v.soluongma - (v.dasudung || 0);
+    if (now > end || remaining <= 0) return 'expired';
+    if (now < start) return 'upcoming';
+    return 'active';
+  };
 
-    if (now > end || remaining <= 0) {
+  const renderStatusBadge = (v) => {
+    const status = getStatus(v);
+    if (status === 'expired') {
       return (
         <span className="inline-flex items-center gap-1.5 bg-red-50 text-red-700 px-2.5 py-1 rounded-full text-xs font-semibold border border-red-200 whitespace-nowrap">
           <span className="w-1.5 h-1.5 rounded-full bg-red-600"></span>
@@ -363,8 +382,7 @@ const VoucherManagement = () => {
         </span>
       );
     }
-
-    if (now < start) {
+    if (status === 'upcoming') {
       return (
         <span className="inline-flex items-center gap-1.5 bg-yellow-50 text-yellow-700 px-2.5 py-1 rounded-full text-xs font-semibold border border-yellow-200 whitespace-nowrap">
           <span className="w-1.5 h-1.5 rounded-full bg-yellow-500"></span>
@@ -372,7 +390,6 @@ const VoucherManagement = () => {
         </span>
       );
     }
-
     return (
       <span className="inline-flex items-center gap-1.5 bg-green-50 text-green-700 px-2.5 py-1 rounded-full text-xs font-semibold border border-green-200 whitespace-nowrap">
         <span className="w-1.5 h-1.5 rounded-full bg-green-600"></span>
@@ -381,11 +398,21 @@ const VoucherManagement = () => {
     );
   };
 
+  // Đếm số lượng theo từng trạng thái để hiển thị trên tab
+  const countByStatus = {
+    all: vouchers.length,
+    active: vouchers.filter(v => getStatus(v) === 'active').length,
+    upcoming: vouchers.filter(v => getStatus(v) === 'upcoming').length,
+    expired: vouchers.filter(v => getStatus(v) === 'expired').length,
+  };
+
   const filtered = vouchers.filter(v => {
     const q = search.toLowerCase();
-    return !q || 
-           (v.tenkhuyenmai && v.tenkhuyenmai.toLowerCase().includes(q)) || 
-           (v.ma_voucher && v.ma_voucher.toLowerCase().includes(q));
+    const matchSearch = !q ||
+      (v.tenkhuyenmai && v.tenkhuyenmai.toLowerCase().includes(q)) ||
+      (v.ma_voucher && v.ma_voucher.toLowerCase().includes(q));
+    const matchStatus = filterStatus === 'all' || getStatus(v) === filterStatus;
+    return matchSearch && matchStatus;
   });
 
   const endOffset = itemOffset + itemsPerPage;
@@ -396,7 +423,7 @@ const VoucherManagement = () => {
     setItemOffset((event.selected * itemsPerPage) % filtered.length);
   };
 
-  useEffect(() => { setItemOffset(0); }, [search]);
+  useEffect(() => { setItemOffset(0); }, [search, filterStatus]);
 
   return (
     <AdminMasterLayout title="Quản lý Khuyến mãi – Admin">
@@ -406,9 +433,22 @@ const VoucherManagement = () => {
 
       <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
         <div className="flex flex-wrap items-center justify-between p-4 border-b border-slate-100 gap-3">
-          <div className="relative flex-1 min-w-[200px] max-w-[340px]">
-            <svg className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="11" cy="11" r="8" /><line x1="21" y1="21" x2="16.65" y2="16.65" /></svg>
-            <input type="text" value={search} onChange={e => setSearch(e.target.value)} placeholder="Tìm tên chương trình, mã voucher..." className="w-full py-2 pl-9 pr-3 rounded-lg border border-slate-200 text-sm outline-none bg-slate-50 focus:border-red-500 transition-colors" />
+          <div className="flex items-center gap-2 flex-1 flex-wrap">
+            <div className="relative min-w-[220px] max-w-[320px] flex-1">
+              <svg className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="11" cy="11" r="8" /><line x1="21" y1="21" x2="16.65" y2="16.65" /></svg>
+              <input type="text" value={search} onChange={e => setSearch(e.target.value)} placeholder="Tìm tên chương trình, mã voucher..." className="w-full py-2 pl-9 pr-3 rounded-lg border border-slate-200 text-sm outline-none bg-slate-50 focus:border-red-500 transition-colors" />
+            </div>
+            <select
+              value={filterStatus}
+              onChange={e => setFilterStatus(e.target.value)}
+              className="py-2 pl-3 pr-8 rounded-lg border border-slate-200 text-sm outline-none bg-slate-50 focus:border-red-500 transition-colors text-slate-600 cursor-pointer appearance-none"
+              style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 10px center' }}
+            >
+              <option value="all">-- Lọc theo trạng thái --</option>
+              <option value="active">Đang hoạt động ({countByStatus.active})</option>
+              <option value="upcoming"> Chưa diễn ra ({countByStatus.upcoming})</option>
+              <option value="expired">Hết hạn / Hết lượt ({countByStatus.expired})</option>
+            </select>
           </div>
 
           <div className="flex flex-wrap gap-2.5 items-center">
@@ -420,6 +460,7 @@ const VoucherManagement = () => {
             </button>
           </div>
         </div>
+
 
         {error ? (
           <div className="p-12 text-center text-red-600"><div className="text-4xl mb-3">⚠️</div><p className="font-semibold">{error}</p><button onClick={fetchVouchers} className="mt-3 py-2 px-5 rounded-lg bg-red-600 hover:bg-red-700 text-white font-semibold transition-colors">Thử lại</button></div>
@@ -449,7 +490,7 @@ const VoucherManagement = () => {
 
                     <td className="p-3.5 px-4">
                       <div className="font-bold text-slate-800">
-                        {v.Loai_giamgia === 'Phần trăm' ? `${v.gia_trigiam}%` : `${new Intl.NumberFormat('vi-VN').format(v.gia_trigiam)} đ`}
+                        {v.loai_giamgia === 'Phần trăm' ? `${v.gia_trigiam}%` : `${new Intl.NumberFormat('vi-VN').format(v.gia_trigiam)} đ`}
                       </div>
                       {v.don_toithieu > 0 && <div className="text-[10px] text-gray-500 mt-1">Đơn tối thiểu: {new Intl.NumberFormat('vi-VN').format(v.don_toithieu)} đ</div>}
                       {v.giam_toida > 0 && <div className="text-[10px] text-gray-500">Giảm tối đa: {new Intl.NumberFormat('vi-VN').format(v.giam_toida)} đ</div>}
@@ -469,7 +510,7 @@ const VoucherManagement = () => {
                     </td>
 
                     <td className="p-3.5 px-4 text-center">
-                       <span className="font-bold text-slate-700">{v.dasudung || 0}</span> / <span className="font-semibold text-slate-500">{v.soluongma}</span>
+                      <span className="font-bold text-slate-700">{v.dasudung || 0}</span> / <span className="font-semibold text-slate-500">{v.soluongma}</span>
                     </td>
 
                     <td className="p-3.5 px-4">

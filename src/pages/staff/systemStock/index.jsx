@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback } from "react";
 import StaffMasterLayout from "../theme/masterLayout";
 import axios from "axios";
 
-const staffApi = axios.create({ baseURL: "http://127.0.0.1:8000/api" });
+const staffApi = axios.create({ baseURL: "https://webistetoiyeupc-backend-laravel.onrender.com/api" });
 staffApi.interceptors.request.use(cfg => {
   const token = localStorage.getItem("staff_access_token");
   if (token) cfg.headers.Authorization = `Bearer ${token}`;
@@ -47,7 +47,7 @@ const BranchCard = ({ branch, search }) => {
   const [open, setOpen] = useState(false);
 
   const filtered = branch.san_phams.filter(item =>
-    (item.san_pham?.tensp || "").toLowerCase().includes(search.toLowerCase())
+    (item.san_pham?.tensp || "").toLowerCase().includes(search.trim().toLowerCase())
   );
 
   const lowCount = branch.san_phams.filter(s => s.soluongtonkho > 0 && s.soluongtonkho <= (s.soluongkhothap ?? 5)).length;
@@ -185,11 +185,8 @@ const SystemStockPage = () => {
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", flexWrap: "wrap", gap: 12 }}>
           <div>
             <h2 style={{ margin: 0, fontSize: 22, fontWeight: 800, color: "#0f172a" }}>
-              🏪 Xem tồn kho hệ thống
+              Xem tồn kho hệ thống
             </h2>
-            <p style={{ margin: "6px 0 0", fontSize: 14, color: "#64748b" }}>
-              Tổng quan tồn kho tất cả chi nhánh — chỉ xem, không chỉnh sửa
-            </p>
           </div>
           <button
             onClick={fetchData}

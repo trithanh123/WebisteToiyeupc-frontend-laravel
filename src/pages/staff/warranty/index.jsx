@@ -2,31 +2,26 @@ import React, { useState, useEffect, useCallback } from "react";
 import StaffMasterLayout from "../theme/masterLayout";
 import axios from "axios";
 
-// ─── Staff API ──────────────────────────────────────────────────────────────
-const staffApi = axios.create({ baseURL: "http://127.0.0.1:8000/api" });
+const staffApi = axios.create({ baseURL: "https://webistetoiyeupc-backend-laravel.onrender.com/api" });
 staffApi.interceptors.request.use((cfg) => {
   const token = localStorage.getItem("staff_access_token");
   if (token) cfg.headers.Authorization = `Bearer ${token}`;
   return cfg;
 });
-
-// ─── Constants ──────────────────────────────────────────────────────────────
 const LOAI_YEU_CAU = ["Bảo hành", "Hỗ trợ kỹ thuật", "Đổi trả"];
 const TRANG_THAI_LIST = ["all", "Chờ tiếp nhận", "Đang xử lý", "Hoàn thành", "Từ chối"];
 const TRANG_THAI_NEXT = {
   "Chờ tiếp nhận": ["Đang xử lý", "Từ chối"],
-  "Đang xử lý":   ["Hoàn thành", "Từ chối"],
+  "Đang xử lý": ["Hoàn thành", "Từ chối"],
 };
 const TRANG_THAI_STYLE = {
   "Chờ tiếp nhận": { bg: "#fffbeb", color: "#d97706", border: "#fde68a" },
-  "Đang xử lý":   { bg: "#eff6ff", color: "#2563eb", border: "#bfdbfe" },
-  "Hoàn thành":   { bg: "#f0fdf4", color: "#16a34a", border: "#bbf7d0" },
-  "Từ chối":      { bg: "#fef2f2", color: "#dc2626", border: "#fecaca" },
+  "Đang xử lý": { bg: "#eff6ff", color: "#2563eb", border: "#bfdbfe" },
+  "Hoàn thành": { bg: "#f0fdf4", color: "#16a34a", border: "#bbf7d0" },
+  "Từ chối": { bg: "#fef2f2", color: "#dc2626", border: "#fecaca" },
 };
 
 const fmt = (d) => (d ? new Date(d).toLocaleDateString("vi-VN") : "—");
-
-// ─── Badge ──────────────────────────────────────────────────────────────────
 const Badge = ({ status }) => {
   const s = TRANG_THAI_STYLE[status] || { bg: "#f1f5f9", color: "#64748b", border: "#e2e8f0" };
   return (
@@ -36,7 +31,6 @@ const Badge = ({ status }) => {
   );
 };
 
-// ─── Toast ──────────────────────────────────────────────────────────────────
 const Toast = ({ toast }) => {
   if (!toast) return null;
   const bg = toast.type === "success" ? "#22c55e" : "#ef4444";
@@ -47,7 +41,6 @@ const Toast = ({ toast }) => {
   );
 };
 
-// ─── Modal Tạo Phiếu ────────────────────────────────────────────────────────
 const CreateModal = ({ onClose, onCreated }) => {
   const [form, setForm] = useState({ ma_nguoidung: "", loai_yeu_cau: "Bảo hành", mo_ta_loi: "", ma_donhang: "", ma_serial: "" });
   const [serialSearch, setSerialSearch] = useState("");
@@ -88,7 +81,6 @@ const CreateModal = ({ onClose, onCreated }) => {
     e.preventDefault();
     if (!form.ma_nguoidung || !form.mo_ta_loi) return showToast("Vui lòng điền đầy đủ thông tin bắt buộc.", "error");
 
-    // Nếu là Bảo hành / Đổi trả thì bắt buộc phải có serial
     if (["Bảo hành", "Đổi trả"].includes(form.loai_yeu_cau) && !selectedSerial) {
       return showToast("Vui lòng BẤM CHỌN một Serial từ kết quả tìm kiếm!", "error");
     }
@@ -112,17 +104,114 @@ const CreateModal = ({ onClose, onCreated }) => {
           <button onClick={onClose} style={styles.closeBtn}>✕</button>
         </div>
         <form onSubmit={handleSubmit} style={{ padding: "20px 24px", display: "flex", flexDirection: "column", gap: 14 }}>
-          <div style={styles.formGroup}>
-            <label style={styles.label}>ID Khách hàng *</label>
-            <input style={styles.input} type="number" placeholder="Nhập ID khách hàng" value={form.ma_nguoidung}
-              onChange={e => { setForm(f => ({ ...f, ma_nguoidung: e.target.value })); loadOrders(e.target.value); }} />
-          </div>
 
           <div style={styles.formGroup}>
-            <label style={styles.label}>Loại yêu cầu *</label>
-            <select style={styles.input} value={form.loai_yeu_cau} onChange={e => setForm(f => ({ ...f, loai_yeu_cau: e.target.value }))}>
-              {LOAI_YEU_CAU.map(l => <option key={l}>{l}</option>)}
-            </select>
+            <label style={styles.label}>Tìm Serial sản phẩm (Khuyên dùng)</label>
+            <div style={{ display: "flex", gap: 8 }}>
+              <input
+                style={{ ...styles.input, flex: 1 }}
+                placeholder="Nhập mã Serial rồi nhấn Tìm, hệ thống sẽ tự điền Khách hàng & Đơn hàng"
+                value={serialSearch}
+                onChange={e => { setSerialSearch(e.target.value); setSerialSearched(false); setSerialResults([]); }}
+                onKeyDown={e => e.key === "Enter" && (e.preventDefault(), searchSerial())}
+              />
+              <button type="button" onClick={searchSerial} disabled={serialLoading} style={{ ...styles.btnSecondary, minWidth: 60, background: "#1d4ed8", color: "#fff", border: "none" }}>
+                {serialLoading ? "⏳" : "🔍 Tìm"}
+              </button>
+            </div>
+
+
+            {serialLoading && (
+              <div style={{ fontSize: 13, color: "#2563eb", marginTop: 6, padding: "6px 10px", background: "#eff6ff", borderRadius: 8 }}>
+                Đang tìm serial…
+              </div>
+            )}
+
+
+            {serialSearched && !serialLoading && serialResults.length === 0 && (
+              <div style={{ fontSize: 13, color: "#dc2626", marginTop: 6, padding: "8px 12px", background: "#fef2f2", borderRadius: 8, border: "1px solid #fecaca" }}>
+                Không tìm thấy serial <strong>"{serialSearch}"</strong>. Kiểm tra lại mã serial.
+              </div>
+            )}
+
+
+            {serialResults.length > 0 && (
+              <div style={{ border: "1px solid #e2e8f0", borderRadius: 8, marginTop: 6, overflow: "hidden", maxHeight: 200, overflowY: "auto", boxShadow: "0 2px 8px rgba(0,0,0,0.08)" }}>
+                <div style={{ padding: "6px 12px", background: "#f8fafc", fontSize: 11, color: "#94a3b8", fontWeight: 600 }}>
+                  Tìm thấy {serialResults.length} kết quả — click để chọn
+                </div>
+                {serialResults.map(s => (
+                  <div key={s.id_serial}
+                    onClick={() => {
+                      setSelectedSerial(s);
+                      setSerialResults([]);
+                      setSerialSearched(false);
+                      setSerialSearch(s.serial_code);
+                      if (s.id_nguoidung) {
+                        setForm(f => ({ ...f, ma_nguoidung: s.id_nguoidung, ma_donhang: s.id_donhang }));
+                        loadOrders(s.id_nguoidung);
+                      }
+                    }}
+                    style={{
+                      padding: "10px 12px", cursor: "pointer", display: "flex", gap: 10, alignItems: "center", borderBottom: "1px solid #f1f5f9",
+                      background: selectedSerial?.id_serial === s.id_serial ? "#eff6ff" : "#fff"
+                    }}>
+                    {s.thumbail
+                      ? <img src={`https://webistetoiyeupc-backend-laravel.onrender.com/storage/${s.thumbail}`} alt="" style={{ width: 38, height: 38, objectFit: "cover", borderRadius: 6, flexShrink: 0 }} />
+                      : <div style={{ width: 38, height: 38, borderRadius: 6, background: "#f1f5f9", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18, flexShrink: 0 }}>📦</div>
+                    }
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
+                        <div>
+                          <div style={{ fontWeight: 700, fontSize: 13, fontFamily: "monospace", color: "#1d4ed8" }}>{s.serial_code}</div>
+                          <div style={{ fontSize: 12, color: "#374151", marginTop: 1 }}>{s.tensp}</div>
+                        </div>
+                        {s.id_donhang && (
+                          <div style={{ textAlign: "right", fontSize: 11, color: "#64748b" }}>
+                            <div style={{ fontWeight: 600, color: "#16a34a" }}>Đơn #{s.id_donhang}</div>
+                            <div>Khách: {s.ten_khachhang}</div>
+                          </div>
+                        )}
+                      </div>
+                      <span style={{
+                        fontSize: 11, fontWeight: 600, padding: "1px 7px", borderRadius: 99, display: "inline-block", marginTop: 4,
+                        background: s.tinhtrang === "đã bán" ? "#fef3c7" : s.tinhtrang === "nằm trong kho" ? "#f0fdf4" : "#f1f5f9",
+                        color: s.tinhtrang === "đã bán" ? "#d97706" : s.tinhtrang === "nằm trong kho" ? "#16a34a" : "#64748b"
+                      }}>
+                        {s.tinhtrang}
+                      </span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {selectedSerial && (
+              <div style={{ background: "#f0fdf4", border: "1px solid #bbf7d0", borderRadius: 8, padding: "8px 12px", fontSize: 13, color: "#15803d", display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 4 }}>
+                <span>✅ Đã chọn: <strong>{selectedSerial.serial_code}</strong> – {selectedSerial.tensp}</span>
+                <button type="button" onClick={() => { setSelectedSerial(null); setSerialSearch(""); }} style={{ background: "none", border: "none", cursor: "pointer", color: "#dc2626", fontSize: 16 }}>✕</button>
+              </div>
+            )}
+          </div>
+
+          <div style={{ display: "flex", gap: 10 }}>
+            <div style={{ ...styles.formGroup, flex: 1 }}>
+              <label style={styles.label}>ID Khách hàng *</label>
+              <input style={styles.input} type="number" placeholder="Nhập ID khách hàng" value={form.ma_nguoidung}
+                onChange={e => { setForm(f => ({ ...f, ma_nguoidung: e.target.value })); loadOrders(e.target.value); }} />
+              {selectedSerial?.id_nguoidung && form.ma_nguoidung == selectedSerial.id_nguoidung && (
+                <div style={{ fontSize: 12, color: "#16a34a", fontWeight: 600, marginTop: 4 }}>
+                  Đã tự động nhận diện từ Serial
+                </div>
+              )}
+            </div>
+
+            <div style={{ ...styles.formGroup, flex: 1 }}>
+              <label style={styles.label}>Loại yêu cầu *</label>
+              <select style={styles.input} value={form.loai_yeu_cau} onChange={e => setForm(f => ({ ...f, loai_yeu_cau: e.target.value }))}>
+                {LOAI_YEU_CAU.map(l => <option key={l}>{l}</option>)}
+              </select>
+            </div>
           </div>
 
           {userOrders.length > 0 && (
@@ -134,74 +223,6 @@ const CreateModal = ({ onClose, onCreated }) => {
               </select>
             </div>
           )}
-
-          {/* Tìm kiếm Serial */}
-          <div style={styles.formGroup}>
-            <label style={styles.label}>Tìm Serial sản phẩm</label>
-            <div style={{ display: "flex", gap: 8 }}>
-              <input
-                style={{ ...styles.input, flex: 1 }}
-                placeholder="Nhập serial code rồi nhấn Tìm…"
-                value={serialSearch}
-                onChange={e => { setSerialSearch(e.target.value); setSerialSearched(false); setSerialResults([]); }}
-                onKeyDown={e => e.key === "Enter" && (e.preventDefault(), searchSerial())}
-              />
-              <button type="button" onClick={searchSerial} disabled={serialLoading} style={{ ...styles.btnSecondary, minWidth: 60 }}>
-                {serialLoading ? "⏳" : "🔍 Tìm"}
-              </button>
-            </div>
-
-            {/* Đang tìm */}
-            {serialLoading && (
-              <div style={{ fontSize: 13, color: "#2563eb", marginTop: 6, padding: "6px 10px", background: "#eff6ff", borderRadius: 8 }}>
-                🔍 Đang tìm serial…
-              </div>
-            )}
-
-            {/* Không tìm thấy */}
-            {serialSearched && !serialLoading && serialResults.length === 0 && (
-              <div style={{ fontSize: 13, color: "#dc2626", marginTop: 6, padding: "8px 12px", background: "#fef2f2", borderRadius: 8, border: "1px solid #fecaca" }}>
-                ❌ Không tìm thấy serial <strong>"{serialSearch}"</strong>. Kiểm tra lại mã serial.
-              </div>
-            )}
-
-            {/* Kết quả tìm */}
-            {serialResults.length > 0 && (
-              <div style={{ border: "1px solid #e2e8f0", borderRadius: 8, marginTop: 6, overflow: "hidden", maxHeight: 200, overflowY: "auto", boxShadow: "0 2px 8px rgba(0,0,0,0.08)" }}>
-                <div style={{ padding: "6px 12px", background: "#f8fafc", fontSize: 11, color: "#94a3b8", fontWeight: 600 }}>
-                  Tìm thấy {serialResults.length} kết quả — click để chọn
-                </div>
-                {serialResults.map(s => (
-                  <div key={s.id_serial}
-                    onClick={() => { setSelectedSerial(s); setSerialResults([]); setSerialSearched(false); setSerialSearch(s.serial_code); }}
-                    style={{ padding: "10px 12px", cursor: "pointer", display: "flex", gap: 10, alignItems: "center", borderBottom: "1px solid #f1f5f9",
-                      background: selectedSerial?.id_serial === s.id_serial ? "#eff6ff" : "#fff" }}>
-                    {s.thumbail
-                      ? <img src={`http://127.0.0.1:8000/storage/${s.thumbail}`} alt="" style={{ width: 38, height: 38, objectFit: "cover", borderRadius: 6, flexShrink: 0 }} />
-                      : <div style={{ width: 38, height: 38, borderRadius: 6, background: "#f1f5f9", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18, flexShrink: 0 }}>📦</div>
-                    }
-                    <div style={{ flex: 1, minWidth: 0 }}>
-                      <div style={{ fontWeight: 700, fontSize: 13, fontFamily: "monospace", color: "#1d4ed8" }}>{s.serial_code}</div>
-                      <div style={{ fontSize: 12, color: "#374151", marginTop: 1 }}>{s.tensp}</div>
-                      <span style={{ fontSize: 11, fontWeight: 600, padding: "1px 7px", borderRadius: 99,
-                        background: s.tinhtrang === "đã bán" ? "#fef3c7" : s.tinhtrang === "nằm trong kho" ? "#f0fdf4" : "#f1f5f9",
-                        color: s.tinhtrang === "đã bán" ? "#d97706" : s.tinhtrang === "nằm trong kho" ? "#16a34a" : "#64748b" }}>
-                        {s.tinhtrang}
-                      </span>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-
-            {/* Serial đã chọn */}
-            {selectedSerial && (
-              <div style={{ background: "#f0fdf4", border: "1px solid #bbf7d0", borderRadius: 8, padding: "8px 12px", fontSize: 13, color: "#15803d", display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 4 }}>
-                <span>✅ Đã chọn: <strong>{selectedSerial.serial_code}</strong> – {selectedSerial.tensp}</span>
-                <button type="button" onClick={() => { setSelectedSerial(null); setSerialSearch(""); }} style={{ background: "none", border: "none", cursor: "pointer", color: "#dc2626", fontSize: 16 }}>✕</button>
-              </div>
-            )}
-          </div>
 
           <div style={styles.formGroup}>
             <label style={styles.label}>Mô tả lỗi / yêu cầu *</label>
@@ -374,18 +395,14 @@ const StaffWarrantyPage = () => {
         @keyframes fadeIn { from { opacity: 0; transform: translateY(-8px); } to { opacity: 1; transform: none; } }
         .sw-row:hover { background: #f8fafc !important; }
       `}</style>
-
       <div style={{ padding: "24px 28px", fontFamily: "'Inter', sans-serif" }}>
-        {/* Header */}
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 24 }}>
           <div>
-            <h1 style={{ margin: 0, fontSize: 22, fontWeight: 800, color: "#0f172a" }}>🛠️ Hỗ Trợ & Bảo Hành</h1>
-            <p style={{ margin: "4px 0 0", color: "#64748b", fontSize: 14 }}>Quản lý phiếu hỗ trợ kỹ thuật và bảo hành sản phẩm</p>
+            <h1 style={{ margin: 0, fontSize: 22, fontWeight: 800, color: "#0f172a" }}> Hỗ Trợ & Bảo Hành</h1>
+
           </div>
           <button onClick={() => setShowCreate(true)} style={styles.btnPrimary}>+ Tạo phiếu mới</button>
         </div>
-
-        {/* Filters */}
         <div style={{ display: "flex", gap: 10, marginBottom: 20, flexWrap: "wrap", alignItems: "center" }}>
           <div style={{ position: "relative" }}>
             <select
@@ -400,20 +417,18 @@ const StaffWarrantyPage = () => {
             <span style={{ position: "absolute", right: 12, top: "50%", transform: "translateY(-50%)", pointerEvents: "none", color: "#64748b", fontSize: 12 }}>▼</span>
           </div>
           <div style={{ display: "flex", alignItems: "center", background: "#fff", border: "1px solid #e2e8f0", borderRadius: 10, padding: "6px 12px", gap: 8, flex: 1, maxWidth: 320 }}>
-            <span style={{ color: "#94a3b8" }}>🔍</span>
+            <span style={{ color: "#94a3b8" }}></span>
             <input style={{ border: "none", outline: "none", fontSize: 14, width: "100%", background: "transparent" }}
               placeholder="Tìm theo tên, SĐT, serial…" value={search}
               onChange={e => { setSearch(e.target.value); setPage(1); }} />
           </div>
         </div>
-
-        {/* Table */}
         <div style={{ background: "#fff", borderRadius: 14, boxShadow: "0 1px 8px rgba(0,0,0,0.07)", overflow: "hidden" }}>
           <table style={{ width: "100%", borderCollapse: "collapse" }}>
             <thead>
-              <tr style={{ background: "linear-gradient(135deg,#1e3a8a,#2563eb)", color: "#fff" }}>
+              <tr style={{ background: "#f8fafc", color: "#1e3a8a", borderBottom: "1px solid #e2e8f0" }}>
                 {["#", "Khách hàng", "Loại YC", "Serial", "Sản phẩm", "Trạng thái", "Ngày tiếp nhận", ""].map(h => (
-                  <th key={h} style={{ padding: "13px 14px", textAlign: "left", fontSize: 12, fontWeight: 700, letterSpacing: .4, whiteSpace: "nowrap" }}>{h}</th>
+                  <th key={h} style={{ padding: "13px 14px", textAlign: "left", fontSize: 12, fontWeight: 700, letterSpacing: 0.5, textTransform: "uppercase", whiteSpace: "nowrap" }}>{h}</th>
                 ))}
               </tr>
             </thead>
@@ -453,8 +468,10 @@ const StaffWarrantyPage = () => {
             <div style={{ display: "flex", justifyContent: "center", gap: 8, padding: 16 }}>
               {Array.from({ length: data.last_page }, (_, i) => i + 1).map(p => (
                 <button key={p} onClick={() => setPage(p)}
-                  style={{ width: 34, height: 34, borderRadius: 8, border: "none", cursor: "pointer", fontWeight: 700, fontSize: 13,
-                    background: p === page ? "#1d4ed8" : "#f1f5f9", color: p === page ? "#fff" : "#64748b" }}>
+                  style={{
+                    width: 34, height: 34, borderRadius: 8, border: "none", cursor: "pointer", fontWeight: 700, fontSize: 13,
+                    background: p === page ? "#1d4ed8" : "#f1f5f9", color: p === page ? "#fff" : "#64748b"
+                  }}>
                   {p}
                 </button>
               ))}

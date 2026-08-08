@@ -14,7 +14,7 @@ const StaffTransferTickets = () => {
     setIsLoading(true);
     try {
       const token = localStorage.getItem("staff_access_token");
-      const res = await fetch('http://127.0.0.1:8000/api/staff/transfers', {
+      const res = await fetch('https://webistetoiyeupc-backend-laravel.onrender.com/api/staff/transfers', {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       const result = await res.json();

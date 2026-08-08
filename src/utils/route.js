@@ -10,6 +10,7 @@ export const ROUTERS = {
     LOGIN: "/dang-nhap",
     REGISTER: "/dang-ky",
     PROMOTION: "/khuyen-mai",
+    BUILD_PC: "/ai-build-pc",
 
     PROFILE:        "/tai-khoan",
     PROFILE_ORDERS: "/tai-khoan/don-hang",

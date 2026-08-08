@@ -8,6 +8,7 @@ import ProductDetailPage from "./pages/clients/productDetailPage";
 import CartPage from "./pages/clients/cart";
 import CheckoutPage from "./pages/clients/checkout";
 import OAuthCallback from "./pages/clients/OAuthCallback"; 
+import AiPcBuilder from "./pages/clients/AiPcBuilder";
 
 import AccountInfo      from "./pages/clients/profilePage/AccountInfo";
 import OrderManagement  from "./pages/clients/profilePage/OrderManagement";
@@ -62,6 +63,7 @@ const RouterCustom = () => {
         <Route path={ROUTERS.CLIENT.PRODUCT_DETAIL} element={<ProductDetailPage />} />
         <Route path={ROUTERS.CLIENT.CART} element={<CartPage />} />
         <Route path={ROUTERS.CLIENT.CHECKOUT} element={<CheckoutPage />} />
+        <Route path={ROUTERS.CLIENT.BUILD_PC} element={<AiPcBuilder />} />
         {}
         <Route path="/oauth/callback" element={<OAuthCallback />} />
 
@@ -84,6 +86,7 @@ const RouterCustom = () => {
         <Route path={ROUTERS.ADMIN.STATISTICS} element={<AdminDashboard />} />
         <Route path={ROUTERS.ADMIN.MONITOR}    element={<AdminDashboard />} />
         <Route path={ROUTERS.ADMIN.ORDERS}     element={<OrderSupervise />} />
+        <Route path={`${ROUTERS.ADMIN.ORDERS}/:id`} element={<OrderSupervise />} />
         <Route path={ROUTERS.ADMIN.WARRANTY}   element={<AdminWarrantyPage />} />
         <Route path={ROUTERS.ADMIN.TRANSFER}   element={<TransferTickets />} />
 

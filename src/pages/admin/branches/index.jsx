@@ -4,13 +4,13 @@ import axios from 'axios';
 import Swal from 'sweetalert2';
 import ReactPaginate from 'react-paginate';
 
-import BranchModal from './BranchModal'; 
+import BranchModal from './BranchModal';
 
 import iconReload from '../../../assets/icons/icons8-reload-50.png';
 import iconEdit from '../../../assets/icons/icons8-pencil-50.png';
 import iconDelete from '../../../assets/icons/icons8-remove-24.png';
 
-const API = 'http://127.0.0.1:8000/api';
+const API = 'https://webistetoiyeupc-backend-laravel.onrender.com/api';
 
 const SkeletonRow = () => (
   <tr>
@@ -41,7 +41,7 @@ const BranchManagement = () => {
     setLoading(true);
     setError('');
     try {
-      const token = localStorage.getItem("access_token") || localStorage.getItem("admin_access_token");
+      const token = localStorage.getItem("admin_access_token");
       const res = await axios.get(`${API}/admin/branches`, {
         headers: { Authorization: `Bearer ${token}` }
       });
@@ -59,24 +59,52 @@ const BranchManagement = () => {
 
   const handleDelete = async (id, name) => {
     const result = await Swal.fire({
-      title: 'Xóa chi nhánh?',
-      text: `Chắc chắn muốn xóa chi nhánh "${name}"?`,
+      title: 'Ẩn chi nhánh?',
+      text: `Chắc chắn muốn ẩn chi nhánh "${name}"?`,
       icon: 'warning',
       showCancelButton: true,
       confirmButtonColor: '#d33',
       cancelButtonColor: '#3085d6',
-      confirmButtonText: 'Xóa ngay',
+      confirmButtonText: 'Ẩn ngay',
       cancelButtonText: 'Hủy'
     });
 
     if (result.isConfirmed) {
       try {
-        const token = localStorage.getItem("access_token") || localStorage.getItem("admin_access_token");
+        const token = localStorage.getItem("admin_access_token");
         const res = await axios.delete(`${API}/admin/branches/${id}`, {
           headers: { Authorization: `Bearer ${token}` }
         });
         if (res.data.status === 'success') {
           Swal.fire({ icon: 'success', title: 'Đã xóa!', toast: true, position: 'top-end', showConfirmButton: false, timer: 3000 });
+          fetchBranches();
+        }
+      } catch (err) {
+        Swal.fire({ icon: 'error', title: 'Thất bại!', text: err.response?.data?.message || 'Có lỗi xảy ra!', toast: true, position: 'top-end', showConfirmButton: false, timer: 3000 });
+      }
+    }
+  };
+
+  const handleRestore = async (id, name) => {
+    const result = await Swal.fire({
+      title: 'Khôi phục chi nhánh?',
+      text: `Bạn muốn khôi phục hoạt động cho chi nhánh "${name}"?`,
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonColor: '#28a745',
+      cancelButtonColor: '#6c757d',
+      confirmButtonText: 'Khôi phục',
+      cancelButtonText: 'Hủy'
+    });
+
+    if (result.isConfirmed) {
+      try {
+        const token = localStorage.getItem("admin_access_token");
+        const res = await axios.put(`${API}/admin/branches/${id}/restore`, {}, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        if (res.data.status === 'success') {
+          Swal.fire({ icon: 'success', title: 'Đã khôi phục!', toast: true, position: 'top-end', showConfirmButton: false, timer: 3000 });
           fetchBranches();
         }
       } catch (err) {
@@ -149,8 +177,13 @@ const BranchManagement = () => {
                     </td>
 
                     <td className="p-3.5 px-4">
-                      <div className="font-bold text-slate-800 text-sm">
+                      <div className="font-bold text-slate-800 text-sm flex items-center gap-2">
                         {b.ten_chinhanh}
+                        {b.deleted_at && (
+                          <span className="bg-red-100 text-red-600 text-[10px] font-bold px-2 py-0.5 rounded-full border border-red-200">
+                            🔴 Đã ẩn
+                          </span>
+                        )}
                       </div>
                     </td>
 
@@ -174,8 +207,16 @@ const BranchManagement = () => {
                             📍 Map
                           </a>
                         )}
-                        <button onClick={() => { setEditingBranch(b); setIsModalOpen(true); }} className="py-1.5 px-3 rounded-md border border-blue-600 bg-blue-50 text-blue-600 hover:bg-blue-600 hover:text-white text-xs font-semibold flex items-center gap-1.5 transition-colors"><img src={iconEdit} alt="Sửa" className="w-3.5 h-3.5 object-contain" style={{ filter: 'currentColor' }} /> Sửa</button>
-                        <button onClick={() => handleDelete(b.id_chinhanh, b.ten_chinhanh)} className="py-1.5 px-2.5 rounded-md border border-red-300 bg-red-50 text-red-600 hover:bg-red-600 hover:text-white text-xs font-semibold flex items-center gap-1.5 transition-colors"><img src={iconDelete} alt="Xóa" className="w-3.5 h-3.5 object-contain" style={{ filter: 'currentColor' }} /> Xóa</button>
+                        {b.deleted_at ? (
+                          <button onClick={() => handleRestore(b.id_chinhanh, b.ten_chinhanh)} className="py-1.5 px-2.5 rounded-md border border-green-300 bg-green-50 text-green-700 hover:bg-green-600 hover:text-white text-xs font-semibold flex items-center gap-1.5 transition-colors">
+                            Khôi phục
+                          </button>
+                        ) : (
+                          <>
+                            <button onClick={() => { setEditingBranch(b); setIsModalOpen(true); }} className="py-1.5 px-3 rounded-md border border-blue-600 bg-blue-50 text-blue-600 hover:bg-blue-600 hover:text-white text-xs font-semibold flex items-center gap-1.5 transition-colors"><img src={iconEdit} alt="Sửa" className="w-3.5 h-3.5 object-contain" style={{ filter: 'currentColor' }} /> Sửa</button>
+                            <button onClick={() => handleDelete(b.id_chinhanh, b.ten_chinhanh)} className="py-1.5 px-2.5 rounded-md border border-red-300 bg-red-50 text-red-600 hover:bg-red-600 hover:text-white text-xs font-semibold flex items-center gap-1.5 transition-colors"><img src={iconDelete} alt="Xóa" className="w-3.5 h-3.5 object-contain" style={{ filter: 'currentColor' }} /> Ẩn</button>
+                          </>
+                        )}
                       </div>
                     </td>
                   </tr>

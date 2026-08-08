@@ -12,6 +12,8 @@ import iconStaff from "../../../../assets/icons/icons8-employee-50.png";
 import iconWarehouse from "../../../../assets/icons/icons8-warehouse-50.png";
 import iconStats from "../../../../assets/icons/icons8-circle-chart-50.png";
 import iconMonitor from "../../../../assets/icons/icons8-mobile-order-50.png";
+import iconWarranty from "../../../../assets/icons/icons8-warranty-50.png";
+import iconTransfer from "../../../../assets/icons/icons8-transfer-50.png";
 
 const navItems = [
   { label: "BẢNG ĐIỀU KHIỂN",    path: ROUTERS.ADMIN.HOME, icon: iconHome },
@@ -23,8 +25,8 @@ const navItems = [
   { label: "Quản lý kho tổng",    path: ROUTERS.ADMIN.WAREHOUSE, icon: iconWarehouse },
   { label: "Quản lý thống kê",    path: ROUTERS.ADMIN.STATISTICS, icon: iconStats },
   { label: "Quản lý giám sát đơn hàng", path: ROUTERS.ADMIN.ORDERS, icon: iconMonitor },
-  { label: "Hỗ Trợ & Bảo Hành",         path: ROUTERS.ADMIN.WARRANTY, icon: iconWarehouse },
-  { label: "Phiếu Điều Chuyển",         path: ROUTERS.ADMIN.TRANSFER, icon: iconWarehouse },
+  { label: "Hỗ Trợ & Bảo Hành",         path: ROUTERS.ADMIN.WARRANTY, icon: iconWarranty },
+  { label: "Phiếu Điều Chuyển",         path: ROUTERS.ADMIN.TRANSFER, icon: iconTransfer },
 ];
 
 const AdminSidebar = () => {

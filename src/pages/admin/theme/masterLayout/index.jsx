@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import AdminSidebar from "../sidebar";
 import axios from "axios";
 
-const API = "http://127.0.0.1:8000/api";
+const API = "https://webistetoiyeupc-backend-laravel.onrender.com/api";
 
 const BellIcon = () => (
   <svg width="20" height="20" viewBox="0 0 24 24" fill="none"

@@ -10,7 +10,7 @@ import iconDelete from '../../../assets/icons/icons8-remove-24.png';
 
 import { CategoryModal } from '../categories/index';
 
-const API = 'http://127.0.0.1:8000/api';
+const API = 'https://webistetoiyeupc-backend-laravel.onrender.com/api';
 
 const SkeletonRow = () => (
   <tr>
@@ -34,19 +34,16 @@ const ProductModal = ({ isOpen, onClose, product, onSaveSuccess }) => {
     thumbail: '',
     motasanpham: '',
     specifications: {},
+    weight: '',
   });
   const [loading, setLoading] = useState(false);
   const [categoriesList, setCategoriesList] = useState([]);
-
-  // Trạng thái cho Modal thêm danh mục
   const [isCategoryModalOpen, setIsCategoryModalOpen] = useState(false);
-
-  // State phục vụ cho việc nhập Thông số kỹ thuật (Form Động Key-Value)
   const [specList, setSpecList] = useState([]);
 
   const fetchCategories = async () => {
     try {
-      const token = localStorage.getItem("access_token") || localStorage.getItem("admin_access_token");
+      const token = localStorage.getItem("admin_access_token");
       const res = await axios.get(`${API}/categories/all`, {
         headers: { Authorization: `Bearer ${token}` }
       });
@@ -94,8 +91,6 @@ const ProductModal = ({ isOpen, onClose, product, onSaveSuccess }) => {
           motasanpham: product.Motasanpham || product.motasanpham || '',
           specifications: product.specifications || {},
         });
-
-        // Chuyển object specifications thành mảng [{key, value}] để render form
         const initialSpecs = product.specifications || {};
         const specsArray = Object.keys(initialSpecs).map(k => ({ key: k, value: initialSpecs[k] }));
         setSpecList(specsArray);
@@ -113,8 +108,6 @@ const ProductModal = ({ isOpen, onClose, product, onSaveSuccess }) => {
       }
     }
   }, [product, isOpen]);
-
-  // Đồng bộ từ mảng specList về lại object formData.specifications
   useEffect(() => {
     const newSpecs = {};
     specList.forEach(item => {
@@ -125,7 +118,6 @@ const ProductModal = ({ isOpen, onClose, product, onSaveSuccess }) => {
     setFormData(prev => ({ ...prev, specifications: newSpecs }));
   }, [specList]);
 
-  // Các hàm thao tác với specList
   const handleAddSpecRow = () => {
     setSpecList([...specList, { key: '', value: '' }]);
   };
@@ -149,9 +141,7 @@ const ProductModal = ({ isOpen, onClose, product, onSaveSuccess }) => {
     setLoading(true);
 
     try {
-      const token = localStorage.getItem("access_token") || localStorage.getItem("admin_access_token");
-
-      // Ép kiểu số nguyên cho các field Laravel yêu cầu integer
+      const token = localStorage.getItem("admin_access_token");
       const payload = {
         ...formData,
         ma_danhmuc: parseInt(formData.ma_danhmuc) || '',
@@ -159,7 +149,6 @@ const ProductModal = ({ isOpen, onClose, product, onSaveSuccess }) => {
       };
 
       if (product) {
-        // Cập nhật (PUT)
         const res = await axios.put(`${API}/admin/products/${product.id_sanpham}`, payload, {
           headers: { Authorization: `Bearer ${token}` }
         });
@@ -188,7 +177,6 @@ const ProductModal = ({ isOpen, onClose, product, onSaveSuccess }) => {
     } catch (error) {
       const errors = error.response?.data?.errors;
       const msg = error.response?.data?.message || 'Có lỗi xảy ra, vui lòng kiểm tra lại!';
-      // Hiển thị chi tiết lỗi validation nếu có
       const detail = errors ? Object.values(errors).flat().join('\n') : '';
       Swal.fire({
         icon: 'error', title: 'Lỗi!',
@@ -201,7 +189,7 @@ const ProductModal = ({ isOpen, onClose, product, onSaveSuccess }) => {
   };
 
   const handleCategoryAdded = () => {
-    fetchCategories(); 
+    fetchCategories();
   };
 
   return (
@@ -218,7 +206,7 @@ const ProductModal = ({ isOpen, onClose, product, onSaveSuccess }) => {
           </div>
 
           <form onSubmit={handleSubmit} className="p-6 space-y-4 max-h-[75vh] overflow-y-auto">
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 gap-1">
               <div>
                 <label className="block text-sm font-semibold text-gray-700 mb-1">
                   Mã SP <span className="text-red-500">*</span>
@@ -227,7 +215,6 @@ const ProductModal = ({ isOpen, onClose, product, onSaveSuccess }) => {
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 outline-none transition-all"
                   placeholder="SP001..." disabled={!!product} />
               </div>
-
               <div>
                 <label className="block text-sm font-semibold text-gray-700 mb-1">
                   Danh mục <span className="text-red-500">*</span>
@@ -279,9 +266,43 @@ const ProductModal = ({ isOpen, onClose, product, onSaveSuccess }) => {
 
             <div>
               <label className="block text-sm font-semibold text-gray-700 mb-1">URL Hình ảnh (Thumbnail)</label>
-              <input type="text" value={formData.thumbail} onChange={e => setFormData({ ...formData, thumbail: e.target.value })}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 outline-none transition-all"
-                placeholder="https://..." />
+              <div className="flex gap-2">
+                <input type="text" value={formData.thumbail} onChange={e => setFormData({ ...formData, thumbail: e.target.value })}
+                  className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 outline-none transition-all"
+                  placeholder="https://..." />
+                
+                <input type="file" id="upload-thumb" className="hidden" accept="image/*" onChange={async (e) => {
+                  const file = e.target.files[0];
+                  if (!file) return;
+                  
+                  const formDataPayload = new FormData();
+                  formDataPayload.append("image", file);
+                  
+                  try {
+                    Swal.fire({ title: 'Đang tải ảnh...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+                    const token = localStorage.getItem("admin_access_token");
+                    const res = await axios.post(`${API}/admin/products/upload-image`, formDataPayload, {
+                      headers: { Authorization: `Bearer ${token}`, "Content-Type": "multipart/form-data" }
+                    });
+                    if (res.data.status === 'success') {
+                      setFormData(prev => ({ ...prev, thumbail: res.data.url }));
+                      Swal.close();
+                    }
+                  } catch (error) {
+                    Swal.fire('Lỗi', 'Không thể tải ảnh. Vui lòng kiểm tra lại cấu hình.', 'error');
+                  }
+                }} />
+                
+                <button type="button" onClick={() => document.getElementById('upload-thumb').click()}
+                  className="px-4 py-2 bg-slate-100 text-slate-700 font-semibold rounded-lg hover:bg-slate-200 transition border border-slate-300">
+                  Tải lên
+                </button>
+              </div>
+              {formData.thumbail && (
+                <div className="mt-2">
+                  <img src={formData.thumbail} alt="Thumbnail preview" className="h-20 w-20 object-cover rounded-lg border border-gray-200" />
+                </div>
+              )}
             </div>
 
             <div>
@@ -291,7 +312,7 @@ const ProductModal = ({ isOpen, onClose, product, onSaveSuccess }) => {
                 placeholder="Nhập mô tả..." />
             </div>
 
-            {}
+            { }
             <div className="bg-slate-50 p-4 rounded-lg border border-slate-200">
               <div className="flex justify-between items-center mb-3">
                 <label className="block text-sm font-semibold text-slate-700">Thông số kỹ thuật (Tùy chọn)</label>
@@ -341,23 +362,25 @@ const ProductModal = ({ isOpen, onClose, product, onSaveSuccess }) => {
             </div>
           </form>
         </div>
-      </div>
+      </div >
 
-      {}
-      {isCategoryModalOpen && (
-        <div className="relative z-[60]">
-          <CategoryModal 
-            isOpen={isCategoryModalOpen} 
-            onClose={() => setIsCategoryModalOpen(false)} 
-            category={null} 
-            onSaveSuccess={() => {
-              handleCategoryAdded();
-              setIsCategoryModalOpen(false);
-            }} 
-            categoriesList={categoriesList} 
-          />
-        </div>
-      )}
+      { }
+      {
+        isCategoryModalOpen && (
+          <div className="relative z-[60]">
+            <CategoryModal
+              isOpen={isCategoryModalOpen}
+              onClose={() => setIsCategoryModalOpen(false)}
+              category={null}
+              onSaveSuccess={() => {
+                handleCategoryAdded();
+                setIsCategoryModalOpen(false);
+              }}
+              categoriesList={categoriesList}
+            />
+          </div>
+        )
+      }
     </>
   );
 };
@@ -368,7 +391,8 @@ const ProductManagement = () => {
   const [error, setError] = useState('');
   const [search, setSearch] = useState('');
   const [filterCategory, setFilterCategory] = useState('');
-
+  const [minPrice, setMinPrice] = useState('');
+  const [maxPrice, setMaxPrice] = useState('');
   const [itemOffset, setItemOffset] = useState(0);
   const itemsPerPage = 10;
 
@@ -379,8 +403,12 @@ const ProductManagement = () => {
     setLoading(true);
     setError('');
     try {
-      const token = localStorage.getItem("access_token") || localStorage.getItem("admin_access_token");
+      const token = localStorage.getItem("admin_access_token");
       const res = await axios.get(`${API}/admin/products`, {
+        params: {
+          min_price: minPrice || undefined,
+          max_price: maxPrice || undefined,
+        },
         headers: { Authorization: `Bearer ${token}` }
       });
       if (res.data.status === 'success') {
@@ -409,7 +437,7 @@ const ProductManagement = () => {
 
     if (result.isConfirmed) {
       try {
-        const token = localStorage.getItem("access_token") || localStorage.getItem("admin_access_token");
+        const token = localStorage.getItem("admin_access_token");
         const res = await axios.delete(`${API}/admin/products/${id}`, {
           headers: { Authorization: `Bearer ${token}` }
         });
@@ -427,10 +455,10 @@ const ProductManagement = () => {
 
   const filtered = products.filter(p => {
     const q = search.toLowerCase();
-    const matchSearch = !q || 
-           (p.tensp && p.tensp.toLowerCase().includes(q)) || 
-           (p.masp && p.masp.toLowerCase().includes(q)) ||
-           (p.ten_danhmuc && p.ten_danhmuc.toLowerCase().includes(q));
+    const matchSearch = !q ||
+      (p.tensp && p.tensp.toLowerCase().includes(q)) ||
+      (p.masp && p.masp.toLowerCase().includes(q)) ||
+      (p.ten_danhmuc && p.ten_danhmuc.toLowerCase().includes(q));
 
     const matchCategory = !filterCategory || p.ten_danhmuc === filterCategory;
 
@@ -461,8 +489,8 @@ const ProductManagement = () => {
               <input type="text" value={search} onChange={e => setSearch(e.target.value)} placeholder="Tìm mã, tên..." className="w-full py-2 pl-9 pr-3 rounded-lg border border-slate-200 text-sm outline-none bg-slate-50 focus:border-red-500 transition-colors" />
             </div>
 
-            <select 
-              value={filterCategory} 
+            <select
+              value={filterCategory}
               onChange={e => setFilterCategory(e.target.value)}
               className="py-2 px-3 rounded-lg border border-slate-200 text-sm outline-none bg-slate-50 focus:border-red-500 transition-colors text-slate-600 font-semibold cursor-pointer max-w-[200px] truncate"
             >
@@ -491,6 +519,7 @@ const ProductManagement = () => {
               <thead>
                 <tr className="bg-slate-50 border-b-2 border-slate-200">
                   <th className="p-3 px-4 font-bold text-slate-600 text-xs uppercase tracking-wider">Mã SP</th>
+                  <th className="p-3 px-4 font-bold text-slate-600 text-xs uppercase tracking-wider w-16">Hình</th>
                   <th className="p-3 px-4 font-bold text-slate-600 text-xs uppercase tracking-wider">Tên Sản Phẩm</th>
                   <th className="p-3 px-4 font-bold text-slate-600 text-xs uppercase tracking-wider">Danh mục</th>
                   <th className="p-3 px-4 font-bold text-slate-600 text-xs uppercase tracking-wider text-right">Giá</th>
@@ -498,9 +527,16 @@ const ProductManagement = () => {
                 </tr>
               </thead>
               <tbody>
-                {loading ? Array.from({ length: itemsPerPage }).map((_, i) => <SkeletonRow key={i} />) : currentItems.length === 0 ? <tr><td colSpan={5} className="p-12 text-center text-slate-400">Không có dữ liệu</td></tr> : currentItems.map((p, idx) => (
+                {loading ? Array.from({ length: itemsPerPage }).map((_, i) => <SkeletonRow key={i} />) : currentItems.length === 0 ? <tr><td colSpan={6} className="p-12 text-center text-slate-400">Không có dữ liệu</td></tr> : currentItems.map((p, idx) => (
                   <tr key={p.id_sanpham} className={`border-b border-slate-100 hover:bg-red-50/30 ${idx % 2 === 0 ? 'bg-white' : 'bg-slate-50/50'}`}>
                     <td className="p-3.5 px-4 font-bold text-slate-500">{p.masp}</td>
+                    <td className="p-3.5 px-4">
+                      {p.thumbail ? (
+                        <img src={p.thumbail} alt={p.tensp} className="w-10 h-10 object-cover rounded-md border border-gray-200" />
+                      ) : (
+                        <div className="w-10 h-10 bg-gray-100 rounded-md flex items-center justify-center text-xs text-gray-400 border border-gray-200">No Img</div>
+                      )}
+                    </td>
                     <td className="p-3.5 px-4 font-semibold text-slate-800">{p.tensp}</td>
                     <td className="p-3.5 px-4">
                       <span className="bg-blue-50 text-blue-700 py-0.5 px-2 rounded-md text-xs font-semibold">{p.ten_danhmuc}</span>

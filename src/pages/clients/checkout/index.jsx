@@ -5,6 +5,7 @@ import { ROUTERS } from '../../../utils/route';
 import { formatCurrency } from '../../../utils/formatter';
 import { getImageUrl } from '../../../utils/getImageUrl';
 import { CartContext } from '../../../context/CartContext';
+import { BranchContext } from '../../../context/BranchContext';
 import { useAddressBook, PROVINCES } from '../../../hooks/useAddressBook';
 import AddressModal from '../../../components/AddressModal';
 import VoucherModal from '../../../components/VoucherModal';
@@ -12,12 +13,13 @@ import Swal from 'sweetalert2';
 import emailjs from '@emailjs/browser';
 import axios from 'axios';
 
-const API = "http://127.0.0.1:8000/api";
+const API = "https://webistetoiyeupc-backend-laravel.onrender.com/api";
 
 const CheckoutPage = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const { cartItems, clearCart, removeFromCart } = useContext(CartContext);
+  const { cartItems, removeFromCart } = useContext(CartContext);
+  const { activeBranch } = useContext(BranchContext);
   const { addresses, addAddress } = useAddressBook();
 
   const selectedItemIds = location.state?.selectedItems || [];
@@ -58,6 +60,7 @@ const CheckoutPage = () => {
         }
       })
       .catch(err => console.error('Error fetching branches:', err));
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const defaultAddress = addresses.find(a => a.isDefault) || addresses[0];
@@ -65,6 +68,7 @@ const CheckoutPage = () => {
 
   React.useEffect(() => {
     if (addresses.length > 0 && !selectedHomeAddressId) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setSelectedHomeAddressId(defaultAddress?.id);
     }
   }, [addresses, defaultAddress, selectedHomeAddressId]);
@@ -77,7 +81,7 @@ const CheckoutPage = () => {
 
   const discount = useMemo(() => {
     if (!orderVoucher) return 0;
-    if (orderVoucher.Loai_giamgia === 'Phần trăm') {
+    if ((orderVoucher.loai_giamgia || orderVoucher.Loai_giamgia) === 'Phần trăm') {
       let d = subtotal * (orderVoucher.gia_trigiam / 100);
       if (orderVoucher.giam_toida) d = Math.min(d, orderVoucher.giam_toida);
       return d;
@@ -140,8 +144,12 @@ const CheckoutPage = () => {
         const selectedAddressObj = addresses.find(a => a.id === selectedHomeAddressId) || form;
         const fullAddress = [selectedAddressObj.detail, selectedAddressObj.ward, selectedAddressObj.district, selectedAddressObj.province].filter(Boolean).join(', ');
 
+        const finalBranchId = deliveryType === 'home' 
+          ? (activeBranch ? activeBranch.id_chinhanh : 1) 
+          : (selectedBranch ? (selectedBranch.id || selectedBranch.id_chinhanh) : 1);
+
         const payload = {
-          ma_chinhanh: selectedBranch ? (selectedBranch.id || selectedBranch.id_chinhanh) : 1, 
+          ma_chinhanh: finalBranchId, 
           ma_khuyenmai: orderVoucher ? (orderVoucher.id_khuyenmai || orderVoucher.ID_KhuyenMai || orderVoucher.id) : null,
           ma_diachinguoidung: selectedHomeAddressId, 
           addressData: {
@@ -496,8 +504,8 @@ const CheckoutPage = () => {
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="20 12 20 22 4 22 4 12"></polyline><rect x="2" y="7" width="20" height="5"></rect><line x1="12" y1="22" x2="12" y2="7"></line><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"></path><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"></path></svg>
                       </div>
                       <p className="text-[12.5px] text-gray-700 m-0">
-                        <span className="font-semibold">1x</span> {orderVoucher.Tenkhuyenmai ? `${orderVoucher.Tenkhuyenmai} - ` : ''} 
-                        Mã giảm thêm {orderVoucher.Loai_giamgia === 'Phần trăm' ? `${orderVoucher.gia_trigiam}%` : formatCurrency(orderVoucher.gia_trigiam)} ({orderVoucher.Ma_voucher})
+                        <span className="font-semibold">1x</span> {(orderVoucher.tenkhuyenmai || orderVoucher.Tenkhuyenmai) ? `${orderVoucher.tenkhuyenmai || orderVoucher.Tenkhuyenmai} - ` : ''} 
+                        Mã giảm thêm {(orderVoucher.loai_giamgia || orderVoucher.Loai_giamgia) === 'Phần trăm' ? `${orderVoucher.gia_trigiam}%` : formatCurrency(orderVoucher.gia_trigiam)} ({orderVoucher.ma_voucher || orderVoucher.Ma_voucher})
                       </p>
                     </div>
                   </div>
@@ -561,9 +569,9 @@ const CheckoutPage = () => {
                   <div className="flex justify-between items-center mb-3 text-[14px]">
                     <span className="text-gray-500 flex items-center gap-2">
                       Mã giảm giá 
-                      {orderVoucher?.Ma_voucher && (
+                      {(orderVoucher?.ma_voucher || orderVoucher?.Ma_voucher) && (
                         <span className="border border-blue-600 text-blue-600 text-[11px] px-2 py-0.5 font-medium uppercase rounded-sm">
-                          {orderVoucher.Ma_voucher}
+                          {orderVoucher.ma_voucher || orderVoucher.Ma_voucher}
                         </span>
                       )}
                     </span>
