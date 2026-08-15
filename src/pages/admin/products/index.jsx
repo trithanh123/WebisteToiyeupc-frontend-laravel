@@ -390,11 +390,38 @@ const ProductManagement = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [search, setSearch] = useState('');
-  const [filterCategory, setFilterCategory] = useState('');
+  const [filterCategory, setFilterCategory] = useState(''); // lưu id_danhmuc
   const [minPrice, setMinPrice] = useState('');
   const [maxPrice, setMaxPrice] = useState('');
   const [itemOffset, setItemOffset] = useState(0);
   const itemsPerPage = 10;
+
+  // Danh mục cây để hiển thị dropdown lọc
+  const [categoriesTree, setCategoriesTree] = useState([]);
+
+  // Hàm build cây danh mục phẳng có prefix indent
+  const buildCategoryTree = (categories) => {
+    const roots = categories.filter(c => !c.danhmuc_cha);
+    const childrenOf = {};
+    categories.forEach(c => {
+      if (c.danhmuc_cha) {
+        if (!childrenOf[c.danhmuc_cha]) childrenOf[c.danhmuc_cha] = [];
+        childrenOf[c.danhmuc_cha].push(c);
+      }
+    });
+    const result = [];
+    const addNodes = (nodes, level) => {
+      nodes.forEach(node => {
+        const prefix = level === 0 ? '' : level === 1 ? '— ' : '—— ';
+        result.push({ ...node, displayName: prefix + node.ten_danhmuc, level });
+        if (childrenOf[node.id_danhmuc]) {
+          addNodes(childrenOf[node.id_danhmuc], level + 1);
+        }
+      });
+    };
+    addNodes(roots, 0);
+    return result;
+  };
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState(null);
@@ -421,7 +448,18 @@ const ProductManagement = () => {
     }
   };
 
-  useEffect(() => { fetchProducts(); }, []);
+  useEffect(() => {
+    fetchProducts();
+    // Fetch danh mục để build cây dropdown
+    const token = localStorage.getItem("admin_access_token");
+    axios.get(`${API}/categories/all`, {
+      headers: { Authorization: `Bearer ${token}` }
+    }).then(res => {
+      if (res.data.status === 'success') {
+        setCategoriesTree(buildCategoryTree(res.data.data || []));
+      }
+    }).catch(() => {});
+  }, []);
 
   const handleDelete = async (id, name) => {
     const result = await Swal.fire({
@@ -451,7 +489,19 @@ const ProductManagement = () => {
     }
   };
 
-  const uniqueCategories = [...new Set(products.map(p => p.ten_danhmuc).filter(Boolean))];
+  // Lấy tất cả id con cháu của một danh mục (để lọc bao gồm sản phẩm thuộc danh mục con)
+  const getDescendantIds = (rootId) => {
+    const ids = new Set();
+    const stack = [parseInt(rootId)];
+    while (stack.length > 0) {
+      const current = stack.pop();
+      ids.add(current);
+      categoriesTree.forEach(c => {
+        if (c.danhmuc_cha === current) stack.push(c.id_danhmuc);
+      });
+    }
+    return ids;
+  };
 
   const filtered = products.filter(p => {
     const q = search.toLowerCase();
@@ -460,7 +510,9 @@ const ProductManagement = () => {
       (p.masp && p.masp.toLowerCase().includes(q)) ||
       (p.ten_danhmuc && p.ten_danhmuc.toLowerCase().includes(q));
 
-    const matchCategory = !filterCategory || p.ten_danhmuc === filterCategory;
+    const matchCategory = !filterCategory ||
+      String(p.ma_danhmuc) === String(filterCategory) ||
+      getDescendantIds(filterCategory).has(parseInt(p.ma_danhmuc));
 
     return matchSearch && matchCategory;
   });
@@ -491,12 +543,21 @@ const ProductManagement = () => {
 
             <select
               value={filterCategory}
-              onChange={e => setFilterCategory(e.target.value)}
-              className="py-2 px-3 rounded-lg border border-slate-200 text-sm outline-none bg-slate-50 focus:border-red-500 transition-colors text-slate-600 font-semibold cursor-pointer max-w-[200px] truncate"
+              onChange={e => { setFilterCategory(e.target.value); setItemOffset(0); }}
+              className="py-2 px-3 rounded-lg border border-slate-200 text-sm outline-none bg-slate-50 focus:border-red-500 transition-colors text-slate-600 cursor-pointer max-w-[240px] truncate"
             >
               <option value="">-- Lọc theo danh mục --</option>
-              {uniqueCategories.map(cat => (
-                <option key={cat} value={cat}>{cat}</option>
+              {categoriesTree.map(cat => (
+                <option
+                  key={cat.id_danhmuc}
+                  value={cat.id_danhmuc}
+                  style={{
+                    fontWeight: cat.level === 0 ? 'bold' : 'normal',
+                    color: cat.level === 0 ? '#dc2626' : cat.level === 1 ? '#374151' : '#6b7280',
+                  }}
+                >
+                  {cat.displayName}
+                </option>
               ))}
             </select>
           </div>
