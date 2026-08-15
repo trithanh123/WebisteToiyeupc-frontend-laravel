@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import AdminSidebar from "../sidebar";
 import axios from "axios";
 
@@ -271,6 +271,8 @@ const AdminMasterLayout = ({ children, title = "Admin – ToiYeuPC" }) => {
   const [notifications, setNotifications] = useState([]);
   const [unreadCount, setUnreadCount] = useState(0);
   const [showNotif, setShowNotif] = useState(false);
+  // Flag để hủy các stale retry của verifyToken khi đăng nhập mới
+  const cancelVerifyRef = useRef(false);
 
   useEffect(() => {
     const fetchNotifications = async () => {
@@ -347,22 +349,24 @@ const AdminMasterLayout = ({ children, title = "Admin – ToiYeuPC" }) => {
   }, [title]);
 
   useEffect(() => {
+    cancelVerifyRef.current = false; // reset khi mount
     const token = localStorage.getItem("admin_access_token");
     if (!token) { setAuthState("login"); return; }
 
     const verifyToken = (retryCount = 0) => {
+      // Nếu đã đăng nhập mới (handleLoginSuccess gọi) → hủy stale retry này
+      if (cancelVerifyRef.current) return;
+
       fetch(`${API}/me`, {
         headers: { Authorization: `Bearer ${token}`, Accept: "application/json" },
       })
         .then(r => {
-          // Nếu backend trả về non-JSON (HTML 503/502 khi cold start) thì retry
           const contentType = r.headers.get("content-type") || "";
-          if (!contentType.includes("application/json")) {
-            throw new Error("non-json");
-          }
+          if (!contentType.includes("application/json")) throw new Error("non-json");
           return r.json();
         })
         .then(data => {
+          if (cancelVerifyRef.current) return; // đã đăng nhập mới → bỏ qua
           if (data.status === "success" && Number(data.user.phanquyen) === 1) {
             setAdminUser(data.user);
             localStorage.setItem("admin_user", JSON.stringify(data.user));
@@ -372,16 +376,19 @@ const AdminMasterLayout = ({ children, title = "Admin – ToiYeuPC" }) => {
             localStorage.removeItem("admin_access_token");
             setAuthState("login");
           } else if (retryCount < 4) {
-            // Unauthenticated hoặc lỗi khác → backend cold start → thử lại sau 2s
+            // Unauthenticated / cold start → thử lại sau 2s
             setTimeout(() => verifyToken(retryCount + 1), 2000);
           } else {
-            localStorage.removeItem("admin_access_token");
+            // Hết retry: chỉ xóa token nếu nó vẫn là token cũ (chưa đăng nhập lại)
+            if (localStorage.getItem("admin_access_token") === token) {
+              localStorage.removeItem("admin_access_token");
+            }
             setAuthState("login");
           }
         })
         .catch(() => {
+          if (cancelVerifyRef.current) return;
           if (retryCount < 4) {
-            // Lỗi network / non-JSON → thử lại, KHÔNG xóa token
             setTimeout(() => verifyToken(retryCount + 1), 2000);
           } else {
             setAuthState("login");
@@ -390,9 +397,12 @@ const AdminMasterLayout = ({ children, title = "Admin – ToiYeuPC" }) => {
     };
 
     verifyToken();
+
+    return () => { cancelVerifyRef.current = true; }; // cleanup khi unmount
   }, []);
 
   const handleLoginSuccess = (user) => {
+    cancelVerifyRef.current = true; // hủy mọi stale retry còn đang chửd
     setAdminUser(user);
     setAuthState("ok");
   };
