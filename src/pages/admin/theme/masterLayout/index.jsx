@@ -350,24 +350,34 @@ const AdminMasterLayout = ({ children, title = "Admin – ToiYeuPC" }) => {
     const token = localStorage.getItem("admin_access_token");
     if (!token) { setAuthState("login"); return; }
 
-    fetch(`${API}/me`, {
-      headers: { Authorization: `Bearer ${token}`, Accept: "application/json" },
-    })
-      .then(r => r.json())
-      .then(data => {
-        if (data.status === "success" && Number(data.user.phanquyen) === 1) {
-          setAdminUser(data.user);
-          localStorage.setItem("admin_user", JSON.stringify(data.user));
-          setAuthState("ok");
-        } else {
-
-          localStorage.removeItem("admin_access_token");
-          setAuthState("login");
-        }
+    const verifyToken = (retryCount = 0) => {
+      fetch(`${API}/me`, {
+        headers: { Authorization: `Bearer ${token}`, Accept: "application/json" },
       })
-      .catch(() => {
-        setAuthState("login");
-      });
+        .then(r => r.json())
+        .then(data => {
+          if (data.status === "success" && Number(data.user.phanquyen) === 1) {
+            setAdminUser(data.user);
+            localStorage.setItem("admin_user", JSON.stringify(data.user));
+            setAuthState("ok");
+          } else if (data.message === "Unauthenticated." && retryCount < 3) {
+            // Backend cold start (Render.com) chưa kịp nhận diện token → thử lại sau 2s
+            setTimeout(() => verifyToken(retryCount + 1), 2000);
+          } else {
+            localStorage.removeItem("admin_access_token");
+            setAuthState("login");
+          }
+        })
+        .catch(() => {
+          if (retryCount < 3) {
+            setTimeout(() => verifyToken(retryCount + 1), 2000);
+          } else {
+            setAuthState("login");
+          }
+        });
+    };
+
+    verifyToken();
   }, []);
 
   const handleLoginSuccess = (user) => {

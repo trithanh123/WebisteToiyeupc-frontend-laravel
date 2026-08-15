@@ -19,11 +19,16 @@ const AdminDashboard = () => {
   const [month, setMonth] = useState(currentMonth);
   const [year, setYear] = useState(currentYear);
 
-  const fetchDashboardData = async () => {
+  const fetchDashboardData = async (retryCount = 0) => {
     setIsLoading(true);
     setError(null);
     try {
       const token = localStorage.getItem("admin_access_token");
+      if (!token) {
+        setError("Phiên đăng nhập không hợp lệ. Vui lòng đăng nhập lại.");
+        setIsLoading(false);
+        return;
+      }
       const response = await fetch(`https://webistetoiyeupc-backend-laravel.onrender.com/api/admin/dashboard?month=${month}&year=${year}`, {
         headers: {
           'Accept': 'application/json',
@@ -33,6 +38,10 @@ const AdminDashboard = () => {
       const result = await response.json();
       if (response.ok && result.status === 'success') {
         setData(result.data);
+      } else if (response.status === 401 && retryCount < 3) {
+        // Token chưa được nhận diện (race condition / cold start) → thử lại sau 1.5s
+        setTimeout(() => fetchDashboardData(retryCount + 1), 1500);
+        return;
       } else {
         setError(result.message || "Lỗi khi lấy dữ liệu thống kê");
       }
@@ -46,6 +55,7 @@ const AdminDashboard = () => {
 
   useEffect(() => {
     fetchDashboardData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [month, year]);
 
   const formatCurrency = (amount) => {
