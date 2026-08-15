@@ -354,14 +354,25 @@ const AdminMasterLayout = ({ children, title = "Admin – ToiYeuPC" }) => {
       fetch(`${API}/me`, {
         headers: { Authorization: `Bearer ${token}`, Accept: "application/json" },
       })
-        .then(r => r.json())
+        .then(r => {
+          // Nếu backend trả về non-JSON (HTML 503/502 khi cold start) thì retry
+          const contentType = r.headers.get("content-type") || "";
+          if (!contentType.includes("application/json")) {
+            throw new Error("non-json");
+          }
+          return r.json();
+        })
         .then(data => {
           if (data.status === "success" && Number(data.user.phanquyen) === 1) {
             setAdminUser(data.user);
             localStorage.setItem("admin_user", JSON.stringify(data.user));
             setAuthState("ok");
-          } else if (data.message === "Unauthenticated." && retryCount < 3) {
-            // Backend cold start (Render.com) chưa kịp nhận diện token → thử lại sau 2s
+          } else if (data.status === "success" && Number(data.user.phanquyen) !== 1) {
+            // Tài khoản không phải admin → xóa token, về login
+            localStorage.removeItem("admin_access_token");
+            setAuthState("login");
+          } else if (retryCount < 4) {
+            // Unauthenticated hoặc lỗi khác → backend cold start → thử lại sau 2s
             setTimeout(() => verifyToken(retryCount + 1), 2000);
           } else {
             localStorage.removeItem("admin_access_token");
@@ -369,7 +380,8 @@ const AdminMasterLayout = ({ children, title = "Admin – ToiYeuPC" }) => {
           }
         })
         .catch(() => {
-          if (retryCount < 3) {
+          if (retryCount < 4) {
+            // Lỗi network / non-JSON → thử lại, KHÔNG xóa token
             setTimeout(() => verifyToken(retryCount + 1), 2000);
           } else {
             setAuthState("login");

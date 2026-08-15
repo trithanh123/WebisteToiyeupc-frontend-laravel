@@ -25,6 +25,11 @@ const AdminDashboard = () => {
     try {
       const token = localStorage.getItem("admin_access_token");
       if (!token) {
+        if (retryCount < 5) {
+          // Chưa có token (MasterLayout chưa xác thực xong) → thử lại sau 500ms
+          setTimeout(() => fetchDashboardData(retryCount + 1), 500);
+          return;
+        }
         setError("Phiên đăng nhập không hợp lệ. Vui lòng đăng nhập lại.");
         setIsLoading(false);
         return;
@@ -38,8 +43,8 @@ const AdminDashboard = () => {
       const result = await response.json();
       if (response.ok && result.status === 'success') {
         setData(result.data);
-      } else if (response.status === 401 && retryCount < 3) {
-        // Token chưa được nhận diện (race condition / cold start) → thử lại sau 1.5s
+      } else if (response.status === 401 && retryCount < 5) {
+        // Token chưa được nhận diện (cold start / race condition) → thử lại sau 1.5s
         setTimeout(() => fetchDashboardData(retryCount + 1), 1500);
         return;
       } else {
