@@ -508,6 +508,35 @@ const ProductManagement = () => {
     }
   };
 
+  const handleToggleStatus = async (id, currentStatus, name) => {
+    const actionText = currentStatus ? "Ngừng kinh doanh" : "Kinh doanh lại";
+    const result = await Swal.fire({
+      title: 'Xác nhận',
+      text: `Chắc chắn muốn ${actionText} sản phẩm "${name}"?`,
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonColor: currentStatus ? '#f59e0b' : '#10b981',
+      cancelButtonColor: '#d1d5db',
+      confirmButtonText: 'Đồng ý',
+      cancelButtonText: 'Hủy'
+    });
+
+    if (result.isConfirmed) {
+      try {
+        const token = localStorage.getItem("admin_access_token");
+        const res = await axios.patch(`${API}/admin/products/${id}/toggle`, {}, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        if (res.data.status === 'success') {
+          Swal.fire({ icon: 'success', title: 'Thành công!', text: res.data.message, toast: true, position: 'top-end', showConfirmButton: false, timer: 3000 });
+          fetchProducts();
+        }
+      } catch (err) {
+        Swal.fire({ icon: 'error', title: 'Thất bại!', text: err.response?.data?.message || 'Có lỗi xảy ra!', toast: true, position: 'top-end', showConfirmButton: false, timer: 3000 });
+      }
+    }
+  };
+
   // Lấy tất cả id con cháu của một danh mục (để lọc bao gồm sản phẩm thuộc danh mục con)
   const getDescendantIds = (rootId) => {
     const ids = new Set();
@@ -603,6 +632,7 @@ const ProductManagement = () => {
                   <th className="p-3 px-4 font-bold text-slate-600 text-xs uppercase tracking-wider">Tên Sản Phẩm</th>
                   <th className="p-3 px-4 font-bold text-slate-600 text-xs uppercase tracking-wider">Danh mục</th>
                   <th className="p-3 px-4 font-bold text-slate-600 text-xs uppercase tracking-wider text-right">Giá</th>
+                  <th className="p-3 px-4 font-bold text-slate-600 text-xs uppercase tracking-wider text-center">Trạng thái</th>
                   <th className="p-3 px-4 font-bold text-slate-600 text-xs uppercase tracking-wider">Thao tác</th>
                 </tr>
               </thead>
@@ -622,9 +652,17 @@ const ProductManagement = () => {
                       <span className="bg-blue-50 text-blue-700 py-0.5 px-2 rounded-md text-xs font-semibold">{p.ten_danhmuc}</span>
                     </td>
                     <td className="p-3.5 px-4 text-right font-mono font-bold text-red-600">{new Intl.NumberFormat('vi-VN').format(p.gia)} đ</td>
+                    <td className="p-3.5 px-4 text-center">
+                      <span className={`py-1 px-2.5 rounded-full text-xs font-semibold ${p.trangthai ? 'bg-emerald-50 text-emerald-600 border border-emerald-200' : 'bg-orange-50 text-orange-600 border border-orange-200'}`}>
+                        {p.trangthai ? 'Đang bán' : 'Đã ẩn'}
+                      </span>
+                    </td>
                     <td className="p-3.5 px-4">
-                      <div className="flex gap-1.5">
+                      <div className="flex gap-1.5 flex-wrap">
                         <button onClick={() => { setEditingProduct(p); setIsModalOpen(true); }} className="py-1.5 px-3 rounded-md border border-blue-600 bg-blue-50 text-blue-600 hover:bg-blue-600 hover:text-white text-xs font-semibold flex items-center gap-1.5"><img src={iconEdit} alt="Sửa" className="w-3.5 h-3.5 object-contain" style={{ filter: 'currentColor' }} /> Sửa</button>
+                        <button onClick={() => handleToggleStatus(p.id_sanpham, p.trangthai, p.tensp)} className={`py-1.5 px-2.5 rounded-md border ${p.trangthai ? 'border-amber-500 bg-amber-50 text-amber-600 hover:bg-amber-500 hover:text-white' : 'border-emerald-500 bg-emerald-50 text-emerald-600 hover:bg-emerald-500 hover:text-white'} text-xs font-semibold flex items-center gap-1.5`}>
+                          {p.trangthai ? 'Ẩn' : 'Hiện'}
+                        </button>
                         <button onClick={() => handleDelete(p.id_sanpham, p.tensp)} className="py-1.5 px-2.5 rounded-md border border-red-300 bg-red-50 text-red-600 hover:bg-red-600 hover:text-white text-xs font-semibold flex items-center gap-1.5"><img src={iconDelete} alt="Xóa" className="w-3.5 h-3.5 object-contain" style={{ filter: 'currentColor' }} /> Xóa</button>
                       </div>
                     </td>
