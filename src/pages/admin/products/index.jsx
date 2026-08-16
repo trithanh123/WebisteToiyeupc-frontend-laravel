@@ -255,12 +255,17 @@ const ProductModal = ({ isOpen, onClose, product, onSaveSuccess }) => {
                 placeholder="Nhập tên sản phẩm..." />
             </div>
 
-            <input
-              type="number"
-              min="0"
-              onInvalid={(e) => e.target.setCustomValidity("Giá sản phẩm phải lớn hơn hoặc bằng 0")}
-              onInput={(e) => e.target.setCustomValidity("")}
-            />
+            <div>
+              <label className="block text-sm font-semibold text-gray-700 mb-1">
+                Giá (VNĐ) <span className="text-red-500">*</span>
+              </label>
+              <input
+                type="number"
+                min="0"
+                onInvalid={(e) => e.target.setCustomValidity("Giá sản phẩm phải lớn hơn hoặc bằng 0")}
+                onInput={(e) => e.target.setCustomValidity("")}
+              />
+            </div>
 
             <div>
               <label className="block text-sm font-semibold text-gray-700 mb-1">URL Hình ảnh (Thumbnail)</label>
