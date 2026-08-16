@@ -259,12 +259,12 @@ const ProductModal = ({ isOpen, onClose, product, onSaveSuccess }) => {
               <label className="block text-sm font-semibold text-gray-700 mb-1">
                 Giá (VNĐ) <span className="text-red-500">*</span>
               </label>
-              <input
-                type="number"
-                min="0"
+              <input type="number" required min="0" value={formData.gia} 
+                onChange={e => setFormData({ ...formData, gia: e.target.value })}
                 onInvalid={(e) => e.target.setCustomValidity("Giá sản phẩm phải lớn hơn hoặc bằng 0")}
                 onInput={(e) => e.target.setCustomValidity("")}
-              />
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 outline-none transition-all"
+                placeholder="1500000..." />
             </div>
 
             <div>
