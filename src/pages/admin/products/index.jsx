@@ -255,14 +255,12 @@ const ProductModal = ({ isOpen, onClose, product, onSaveSuccess }) => {
                 placeholder="Nhập tên sản phẩm..." />
             </div>
 
-            <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-1">
-                Giá (VNĐ) <span className="text-red-500">*</span>
-              </label>
-              <input type="number" required min="0" value={formData.gia} onChange={e => setFormData({ ...formData, gia: e.target.value })}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 outline-none transition-all"
-                placeholder="1500000..." />
-            </div>
+            <input
+              type="number"
+              min="0"
+              onInvalid={(e) => e.target.setCustomValidity("Giá sản phẩm phải lớn hơn hoặc bằng 0")}
+              onInput={(e) => e.target.setCustomValidity("")}
+            />
 
             <div>
               <label className="block text-sm font-semibold text-gray-700 mb-1">URL Hình ảnh (Thumbnail)</label>
@@ -270,14 +268,14 @@ const ProductModal = ({ isOpen, onClose, product, onSaveSuccess }) => {
                 <input type="text" value={formData.thumbail} onChange={e => setFormData({ ...formData, thumbail: e.target.value })}
                   className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 outline-none transition-all"
                   placeholder="https://..." />
-                
+
                 <input type="file" id="upload-thumb" className="hidden" accept="image/*" onChange={async (e) => {
                   const file = e.target.files[0];
                   if (!file) return;
-                  
+
                   const formDataPayload = new FormData();
                   formDataPayload.append("image", file);
-                  
+
                   try {
                     Swal.fire({ title: 'Đang tải ảnh...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
                     const token = localStorage.getItem("admin_access_token");
@@ -292,7 +290,7 @@ const ProductModal = ({ isOpen, onClose, product, onSaveSuccess }) => {
                     Swal.fire('Lỗi', 'Không thể tải ảnh. Vui lòng kiểm tra lại cấu hình.', 'error');
                   }
                 }} />
-                
+
                 <button type="button" onClick={() => document.getElementById('upload-thumb').click()}
                   className="px-4 py-2 bg-slate-100 text-slate-700 font-semibold rounded-lg hover:bg-slate-200 transition border border-slate-300">
                   Tải lên
@@ -458,7 +456,7 @@ const ProductManagement = () => {
       if (res.data.status === 'success') {
         setCategoriesTree(buildCategoryTree(res.data.data || []));
       }
-    }).catch(() => {});
+    }).catch(() => { });
   }, []);
 
   const handleDelete = async (id, name) => {
