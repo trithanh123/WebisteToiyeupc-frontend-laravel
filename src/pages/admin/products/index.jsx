@@ -212,6 +212,8 @@ const ProductModal = ({ isOpen, onClose, product, onSaveSuccess }) => {
                   Mã SP <span className="text-red-500">*</span>
                 </label>
                 <input type="text" required value={formData.masp} onChange={e => setFormData({ ...formData, masp: e.target.value })}
+                  onInvalid={(e) => e.target.setCustomValidity("Vui lòng nhập mã sản phẩm.")}
+                  onInput={(e) => e.target.setCustomValidity("")}
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 outline-none transition-all"
                   placeholder="SP001..." disabled={!!product} />
               </div>
@@ -221,6 +223,8 @@ const ProductModal = ({ isOpen, onClose, product, onSaveSuccess }) => {
                 </label>
                 <div className="flex gap-2">
                   <select required value={formData.ma_danhmuc} onChange={e => setFormData({ ...formData, ma_danhmuc: e.target.value })}
+                    onInvalid={(e) => e.target.setCustomValidity("Vui lòng chọn danh mục.")}
+                    onInput={(e) => e.target.setCustomValidity("")}
                     className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 outline-none cursor-pointer">
                     <option value="">-- Chọn danh mục --</option>
                     {buildCategoryTree(categoriesList).map(cat => (
@@ -251,6 +255,8 @@ const ProductModal = ({ isOpen, onClose, product, onSaveSuccess }) => {
                 Tên Sản Phẩm <span className="text-red-500">*</span>
               </label>
               <input type="text" required value={formData.tensp} onChange={e => setFormData({ ...formData, tensp: e.target.value })}
+                onInvalid={(e) => e.target.setCustomValidity("Vui lòng nhập tên sản phẩm.")}
+                onInput={(e) => e.target.setCustomValidity("")}
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 outline-none transition-all"
                 placeholder="Nhập tên sản phẩm..." />
             </div>
@@ -261,7 +267,13 @@ const ProductModal = ({ isOpen, onClose, product, onSaveSuccess }) => {
               </label>
               <input type="number" required min="0" value={formData.gia} 
                 onChange={e => setFormData({ ...formData, gia: e.target.value })}
-                onInvalid={(e) => e.target.setCustomValidity("Giá sản phẩm phải lớn hơn hoặc bằng 0")}
+                onInvalid={(e) => {
+                  if (e.target.validity.valueMissing) {
+                    e.target.setCustomValidity("Vui lòng nhập giá sản phẩm.");
+                  } else {
+                    e.target.setCustomValidity("Giá sản phẩm phải lớn hơn hoặc bằng 0.");
+                  }
+                }}
                 onInput={(e) => e.target.setCustomValidity("")}
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 outline-none transition-all"
                 placeholder="1500000..." />
@@ -277,6 +289,10 @@ const ProductModal = ({ isOpen, onClose, product, onSaveSuccess }) => {
                 <input type="file" id="upload-thumb" className="hidden" accept="image/*" onChange={async (e) => {
                   const file = e.target.files[0];
                   if (!file) return;
+                  if (!file.type.startsWith('image/')) {
+                    Swal.fire('Lỗi', 'Định dạng file không hỗ trợ. Vui lòng chọn file ảnh.', 'error');
+                    return;
+                  }
 
                   const formDataPayload = new FormData();
                   formDataPayload.append("image", file);
