@@ -9,6 +9,7 @@ import CartPage from "./pages/clients/cart";
 import CheckoutPage from "./pages/clients/checkout";
 import OAuthCallback from "./pages/clients/OAuthCallback"; 
 import AiPcBuilder from "./pages/clients/AiPcBuilder";
+import PcBuilder from "./pages/clients/pcBuilder";
 
 import AccountInfo      from "./pages/clients/profilePage/AccountInfo";
 import OrderManagement  from "./pages/clients/profilePage/OrderManagement";
@@ -64,6 +65,7 @@ const RouterCustom = () => {
         <Route path={ROUTERS.CLIENT.CART} element={<CartPage />} />
         <Route path={ROUTERS.CLIENT.CHECKOUT} element={<CheckoutPage />} />
         <Route path={ROUTERS.CLIENT.BUILD_PC} element={<AiPcBuilder />} />
+        <Route path={ROUTERS.CLIENT.MANUAL_BUILD_PC} element={<PcBuilder />} />
         {}
         <Route path="/oauth/callback" element={<OAuthCallback />} />
 

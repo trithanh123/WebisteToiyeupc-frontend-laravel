@@ -293,6 +293,9 @@ const Header = () => {
         <Link to={ROUTERS.CLIENT.BUILD_PC} className="header__menu-btn ms-3" style={{ background: 'linear-gradient(45deg, #FF512F 0%, #F09819  51%, #FF512F  100%)', textDecoration: 'none' }}>
           ✨ AI Build PC
         </Link>
+        <Link to={ROUTERS.CLIENT.MANUAL_BUILD_PC} className="header__menu-btn ms-2" style={{ background: '#2563eb', color: '#fff', textDecoration: 'none' }}>
+          🔧 Tự Build PC
+        </Link>
 
         <div className="header__menu">
           {menuOpen && (
