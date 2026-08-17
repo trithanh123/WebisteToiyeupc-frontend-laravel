@@ -12,15 +12,18 @@ const API = 'https://webistetoiyeupc-backend-laravel.onrender.com/api';
 
 const formatDateForInput = (dateString) => {
   if (!dateString) return '';
-  const date = new Date(dateString);
-  if (isNaN(date.getTime())) return '';
-  const tzOffset = date.getTimezoneOffset() * 60000; // offset in milliseconds
-  return new Date(date.getTime() - tzOffset).toISOString().slice(0, 16);
+  // The backend sends '2026-08-17T20:11:00.000000Z'.
+  // By slicing the first 16 characters, we extract exactly 'YYYY-MM-DDThh:mm'
+  // which prevents JS Date from applying timezone shifts.
+  return dateString.substring(0, 16);
 };
 
 const formatDisplayDate = (dateString) => {
   if (!dateString) return '';
-  const date = new Date(dateString);
+  // Remove 'Z' so Javascript parses it as local time instead of UTC,
+  // preventing the +7 hour shift.
+  const localDateStr = dateString.endsWith('Z') ? dateString.slice(0, -1) : dateString;
+  const date = new Date(localDateStr);
   return new Intl.DateTimeFormat('vi-VN', {
     day: '2-digit', month: '2-digit', year: 'numeric',
     hour: '2-digit', minute: '2-digit'
