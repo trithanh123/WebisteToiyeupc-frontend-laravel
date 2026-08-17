@@ -35,6 +35,18 @@ const Header = () => {
   const [aiResults, setAiResults] = useState([]);
   const [isSearching, setIsSearching] = useState(false);
   const [hasSearched, setHasSearched] = useState(false);
+  const [searchError, setSearchError] = useState('');
+
+  // Kiểm tra query có ý nghĩa: phải có ít nhất 2 chữ/số liên tiếp, không toàn ký tự đặc biệt
+  const isValidQuery = (q) => {
+    const trimmed = q.trim();
+    if (trimmed.length < 2) return { valid: false, msg: 'Vui lòng nhập ít nhất 2 ký tự.' };
+    // Phải có ít nhất 2 chữ cái hoặc chữ số thực sự (unicode)
+    const meaningfulChars = trimmed.match(/[\p{L}\p{N}]/gu) || [];
+    if (meaningfulChars.length < 2)
+      return { valid: false, msg: 'Từ khóa không hợp lệ. Vui lòng nhập từ khóa có ý nghĩa.' };
+    return { valid: true, msg: '' };
+  };
   const [searchHistory, setSearchHistory] = useState(
     () => JSON.parse(localStorage.getItem('pv_search_history') || '[]')
   );
@@ -188,6 +200,18 @@ const Header = () => {
   const handleSearch = async (e) => {
     e.preventDefault();
     if (!searchQuery) return;
+
+    // Validate query trước khi gọi API
+    const { valid, msg } = isValidQuery(searchQuery);
+    if (!valid) {
+      setSearchError(msg);
+      setAiResults([]);
+      setHasSearched(true);
+      setIsSearchFocused(true);
+      return;
+    }
+
+    setSearchError('');
     addToHistory(searchQuery);
     setIsSearchFocused(true);
     setIsSearching(true);
@@ -200,6 +224,7 @@ const Header = () => {
       setAiResults(response.data.data || []);
     } catch (error) {
       console.log("Lỗi tìm kiếm AI:", error);
+      setSearchError('Có lỗi xảy ra, vui lòng thử lại.');
     }
     setIsSearching(false);
   };
@@ -396,11 +421,11 @@ const Header = () => {
               placeholder="Bạn muốn mua gì hôm nay..."
               value={searchQuery}
               onFocus={() => setIsSearchFocused(true)}
-              onChange={(e) => { setSearchQuery(e.target.value); setAiResults([]); setHasSearched(false); }}
+              onChange={(e) => { setSearchQuery(e.target.value); setAiResults([]); setHasSearched(false); setSearchError(''); }}
               autoComplete="off"
             />
             {searchQuery && (
-              <button type="button" className="pv-search__clear" onClick={() => { setSearchQuery(''); setAiResults([]); setHasSearched(false); }}>
+              <button type="button" className="pv-search__clear" onClick={() => { setSearchQuery(''); setAiResults([]); setHasSearched(false); setSearchError(''); }}>
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
                   <line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" />
                 </svg>
@@ -416,6 +441,17 @@ const Header = () => {
             <div className="pv-search__dropdown">
 
               { }
+              {/* Thông báo lỗi validation */}
+              {searchError && !isSearching && (
+                <div className="pv-search__not-found" style={{ color: '#dc2626' }}>
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#dc2626" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <circle cx="12" cy="12" r="10" />
+                    <line x1="12" y1="8" x2="12" y2="12" />
+                    <line x1="12" y1="16" x2="12.01" y2="16" />
+                  </svg>
+                  <span>{searchError}</span>
+                </div>
+              )}
               {isSearching && (
                 <div className="pv-search__loading">
                   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ animation: 'spin 1s linear infinite' }}>
