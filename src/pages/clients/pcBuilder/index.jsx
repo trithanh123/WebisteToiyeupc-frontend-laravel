@@ -58,6 +58,37 @@ const PcBuilder = () => {
 
     const totalPrice = Object.values(selectedComponents).reduce((sum, item) => sum + (item?.gia || 0), 0);
 
+    // Tính toán công suất
+    const psuWattMatch = selectedComponents['psu']?.tensp?.match(/(\d+)W/i);
+    const psuWatt = psuWattMatch ? parseInt(psuWattMatch[1]) : 0;
+    
+    let requiredPower = 0;
+    if (selectedComponents['vga'] && selectedComponents['vga'].specifications?.power) {
+        requiredPower = parseInt(selectedComponents['vga'].specifications.power.replace('W', '')) || 0;
+    } else if (selectedComponents['cpu']) {
+        requiredPower = 200; // Default minimum if no VGA
+    }
+
+    const isPowerInsufficient = selectedComponents['psu'] && psuWatt < requiredPower;
+
+    const missingEssentials = [];
+    if (!selectedComponents['cpu']) missingEssentials.push('CPU');
+    if (!selectedComponents['mainboard']) missingEssentials.push('Mainboard');
+    if (!selectedComponents['ram']) missingEssentials.push('RAM');
+    if (!selectedComponents['psu']) missingEssentials.push('Nguồn (PSU)');
+
+    const handleCompleteBuild = () => {
+        if (missingEssentials.length > 0) {
+            setErrorMsg(`Bạn chưa chọn đủ các linh kiện thiết yếu: ${missingEssentials.join(', ')}`);
+            return;
+        }
+        if (isPowerInsufficient) {
+            setErrorMsg('Nguồn không đủ công suất để hệ thống hoạt động ổn định! Vui lòng chọn nguồn cao hơn.');
+            return;
+        }
+        alert('Cấu hình hợp lệ! (Có thể chuyển tới trang thanh toán ở bước tiếp theo)');
+    };
+
     return (
         <MasterLayout title="Tự Build PC - ToiYeuPC">
             <div className="container mx-auto px-4 py-8" style={{ minHeight: '60vh' }}>
@@ -118,6 +149,23 @@ const PcBuilder = () => {
                             );
                         })}
                     </div>
+                </div>
+
+                {isPowerInsufficient && (
+                    <div className="bg-red-100 border border-red-500 text-red-700 px-4 py-3 rounded relative text-center max-w-4xl mx-auto mb-6 font-bold shadow-md">
+                        ⚠️ Nguồn không đủ công suất! (Tổng điện yêu cầu: {requiredPower}W, Nguồn: {psuWatt}W)
+                    </div>
+                )}
+
+                <div className="max-w-4xl mx-auto flex justify-end">
+                    <button 
+                        onClick={handleCompleteBuild}
+                        disabled={missingEssentials.length > 0}
+                        className={`px-8 py-3 rounded-lg font-bold text-lg text-white transition-all shadow-md ${missingEssentials.length > 0 ? 'bg-gray-400 cursor-not-allowed opacity-70' : 'bg-green-600 hover:bg-green-700'}`}
+                        title={missingEssentials.length > 0 ? `Thiếu: ${missingEssentials.join(', ')}` : ''}
+                    >
+                        Hoàn tất bộ máy
+                    </button>
                 </div>
             </div>
 
