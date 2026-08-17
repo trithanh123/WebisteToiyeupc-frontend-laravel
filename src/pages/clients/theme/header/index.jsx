@@ -509,7 +509,7 @@ const Header = () => {
                     <line x1="12" y1="8" x2="12" y2="12"></line>
                     <line x1="12" y1="16" x2="12.01" y2="16"></line>
                   </svg>
-                  <span>Không tìm thấy sản phẩm phù hợp. Hãy thử từ khóa khác!</span>
+                  <span>Không tìm thấy sản phẩm nào</span>
                 </div>
               )}
 
