@@ -367,8 +367,11 @@ const VoucherManagement = () => {
   // Hàm tính trạng thái voucher (dùng chung cho badge và filter)
   const getStatus = (v) => {
     const now = new Date();
-    const start = new Date(v.ngaybdchuongtrinh);
-    const end = new Date(v.ngayketthucchuongtrinh);
+    const localStartStr = v.ngaybdchuongtrinh?.endsWith('Z') ? v.ngaybdchuongtrinh.slice(0, -1) : v.ngaybdchuongtrinh;
+    const localEndStr = v.ngayketthucchuongtrinh?.endsWith('Z') ? v.ngayketthucchuongtrinh.slice(0, -1) : v.ngayketthucchuongtrinh;
+    
+    const start = new Date(localStartStr);
+    const end = new Date(localEndStr);
     const remaining = v.soluongma - (v.dasudung || 0);
     if (now > end || remaining <= 0) return 'expired';
     if (now < start) return 'upcoming';
