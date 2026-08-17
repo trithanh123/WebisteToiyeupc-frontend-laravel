@@ -37,14 +37,29 @@ const Header = () => {
   const [hasSearched, setHasSearched] = useState(false);
   const [searchError, setSearchError] = useState('');
 
-  // Kiểm tra query có ý nghĩa: phải có ít nhất 2 chữ/số liên tiếp, không toàn ký tự đặc biệt
+  // Kiểm tra query hợp lệ — 3 lớp bảo vệ
   const isValidQuery = (q) => {
     const trimmed = q.trim();
-    if (trimmed.length < 2) return { valid: false, msg: 'Vui lòng nhập ít nhất 2 ký tự.' };
-    // Phải có ít nhất 2 chữ cái hoặc chữ số thực sự (unicode)
-    const meaningfulChars = trimmed.match(/[\p{L}\p{N}]/gu) || [];
-    if (meaningfulChars.length < 2)
+
+    // Lớp 1: quá ngắn
+    if (trimmed.length < 2)
+      return { valid: false, msg: 'Vui lòng nhập ít nhất 2 ký tự.' };
+
+    // Lớp 2: chứa ký tự đặc biệt không hợp lệ (@, #, $, !, ^, &, *...)
+    if (/[@#$%^&*+=\[\]{};:"\\|<>?`~]/.test(trimmed))
+      return { valid: false, msg: 'Từ khóa chứa ký tự không hợp lệ. Vui lòng nhập lại.' };
+
+    // Lớp 3: tỉ lệ chữ/số phải ≥ 50% tổng ký tự
+    const total = trimmed.length;
+    const meaningful = (trimmed.match(/[\p{L}\p{N}]/gu) || []).length;
+    if (meaningful / total < 0.5)
       return { valid: false, msg: 'Từ khóa không hợp lệ. Vui lòng nhập từ khóa có ý nghĩa.' };
+
+    // Lớp 4: phải có ít nhất 1 "từ" liên tiếp ≥ 2 chữ cái
+    const words = trimmed.match(/\p{L}{2,}/gu) || [];
+    if (words.length === 0)
+      return { valid: false, msg: 'Vui lòng nhập ít nhất một từ có nghĩa.' };
+
     return { valid: true, msg: '' };
   };
   const [searchHistory, setSearchHistory] = useState(
