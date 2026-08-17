@@ -77,6 +77,19 @@ const PcBuilder = () => {
     if (!selectedComponents['ram']) missingEssentials.push('RAM');
     if (!selectedComponents['psu']) missingEssentials.push('Nguồn (PSU)');
 
+    const handleCompleteBuild = () => {
+        if (missingEssentials.length > 0) {
+            setErrorMsg(`Bạn chưa chọn đủ các linh kiện thiết yếu: ${missingEssentials.join(', ')}`);
+            return;
+        }
+        if (isPowerInsufficient) {
+            setErrorMsg('Nguồn không đủ công suất để hệ thống hoạt động ổn định! Vui lòng chọn nguồn cao hơn.');
+            return;
+        }
+        // Chỉ hiển thị thông báo alert thay vì chuyển qua trang thanh toán
+        alert('Cấu hình hợp lệ! Chức năng thanh toán đang được tạm ẩn để phục vụ việc test giao diện.');
+    };
+
     return (
         <MasterLayout title="Tự Build PC - ToiYeuPC">
             <div className="container mx-auto px-4 py-8" style={{ minHeight: '60vh' }}>
@@ -144,6 +157,17 @@ const PcBuilder = () => {
                         ⚠️ Nguồn không đủ công suất! (Tổng điện yêu cầu: {requiredPower}W, Nguồn: {psuWatt}W)
                     </div>
                 )}
+
+                <div className="max-w-4xl mx-auto flex justify-end">
+                    <button 
+                        onClick={handleCompleteBuild}
+                        disabled={missingEssentials.length > 0}
+                        className={`px-8 py-3 rounded-lg font-bold text-lg text-white transition-all shadow-md ${missingEssentials.length > 0 ? 'bg-gray-400 cursor-not-allowed opacity-70' : 'bg-green-600 hover:bg-green-700'}`}
+                        title={missingEssentials.length > 0 ? `Thiếu: ${missingEssentials.join(', ')}` : ''}
+                    >
+                        Hoàn tất bộ máy
+                    </button>
+                </div>
             </div>
 
             {modalOpen && activeSlot && (
