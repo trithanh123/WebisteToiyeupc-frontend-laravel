@@ -413,7 +413,7 @@ const StaffOrders = () => {
                     <td style={{ padding: "13px 16px", fontWeight: 700, color: "#2563eb", fontSize: 13 }}>#{o.id_donhang}</td>
                     <td style={{ padding: "13px 16px", fontSize: 13, color: "#64748b", whiteSpace: "nowrap" }}>{fmtDate(o.thoigiandathang)}</td>
                     <td style={{ padding: "13px 16px", fontSize: 13, fontWeight: 600, color: "#0f172a" }}>{o.tenkhachhang}</td>
-                    <td style={{ padding: "13px 16px", fontSize: 13, color: "#64748b" }}>{o.sdt_khach}</td>
+                    <td style={{ padding: "13px 16px", fontSize: 13, color: "#64748b" }}>{o.sdt_nguoinhan || o.sdt_khach || "Chưa có SĐT"}</td>
                     <td style={{ padding: "13px 16px", fontSize: 13, color: "#64748b", maxWidth: 160, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
                       {o.phuong_thuc_tt}
                     </td>

@@ -193,7 +193,7 @@ const OrderSupervise = () => {
                     </td>
                     <td className="px-5 py-4">
                       <p className="font-medium text-slate-800 text-sm">{order.tenkhachhang || 'Khách Vãng Lai'}</p>
-                      <p className="text-xs text-slate-500 mt-0.5">{order.sdt || 'Chưa có SĐT'}</p>
+                      <p className="text-xs text-slate-500 mt-0.5">{order.sdt_nguoinhan || order.sdt || 'Chưa có SĐT'}</p>
                     </td>
                     <td className="px-5 py-4">
                       <span className="font-semibold text-slate-800">{formatCurrency(order.tongtien)}</span>
