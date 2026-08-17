@@ -47,6 +47,7 @@ const OrderSupervise = () => {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
+          'Accept': 'application/json',
           'Authorization': `Bearer ${token}`
         },
         body: JSON.stringify({ trang_thai_dh: newStatus })
@@ -225,7 +226,7 @@ const OrderSupervise = () => {
                               if (order.trang_thai_dh === 'Đang chuẩn bị') {
                                 setSelectedDeliveryOrder(order.id_donhang);
                               } else {
-                                handleUpdateStatus(order.id_donhang, 'Đang giao');
+                                handleUpdateStatus(order.id_donhang, 'Đang chuẩn bị');
                               }
                             }} className="px-4 py-1.5 rounded bg-amber-50 text-amber-600 hover:bg-amber-600 hover:text-white text-sm font-medium transition-colors border border-amber-100 whitespace-nowrap">
                               {order.trang_thai_dh === 'Đang chuẩn bị' ? 'Giao hàng' : 'Xác nhận ĐH'}
