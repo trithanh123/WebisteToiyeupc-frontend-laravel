@@ -37,7 +37,7 @@ const Header = () => {
   const [hasSearched, setHasSearched] = useState(false);
   const [searchError, setSearchError] = useState('');
 
-  // Kiểm tra query hợp lệ — 3 lớp bảo vệ
+  // Kiểm tra query hợp lệ — nhiều lớp bảo vệ
   const isValidQuery = (q) => {
     const trimmed = q.trim();
 
@@ -53,12 +53,24 @@ const Header = () => {
     const total = trimmed.length;
     const meaningful = (trimmed.match(/[\p{L}\p{N}]/gu) || []).length;
     if (meaningful / total < 0.5)
-      return { valid: false, msg: 'Từ khóa không hợp lệ. Vui lòng nhập từ khóa có ý nghĩa.' };
+      return { valid: false, isGibberish: true, msg: 'Từ khóa không hợp lệ. Vui lòng nhập từ khóa có ý nghĩa.' };
 
     // Lớp 4: phải có ít nhất 1 "từ" liên tiếp ≥ 2 chữ cái
     const words = trimmed.match(/\p{L}{2,}/gu) || [];
     if (words.length === 0)
-      return { valid: false, msg: 'Vui lòng nhập ít nhất một từ có nghĩa.' };
+      return { valid: false, isGibberish: true, msg: 'Vui lòng nhập ít nhất một từ có nghĩa.' };
+
+    // Lớp 5: Chuỗi lặp lại hoặc vô nghĩa (chặn spam bàn phím như asdasd, qweqwe...)
+    const isSpam = 
+      /(.)\1{3,}/.test(trimmed) || 
+      /(..)\1{2,}/.test(trimmed) || 
+      /(...)\1{1,}/.test(trimmed) || 
+      /[bcdfghjklmnpqrstvwxz]{5,}/i.test(trimmed) ||
+      /^(qwerty|asdfgh|zxcvbn|qwer|asdf|zxcv)+$/i.test(trimmed);
+      
+    if (isSpam) {
+      return { valid: false, isGibberish: true, msg: 'Từ khóa không có ý nghĩa.' };
+    }
 
     return { valid: true, msg: '' };
   };
@@ -217,12 +229,19 @@ const Header = () => {
     if (!searchQuery) return;
 
     // Validate query trước khi gọi API
-    const { valid, msg } = isValidQuery(searchQuery);
+    const { valid, msg, isGibberish } = isValidQuery(searchQuery);
     if (!valid) {
-      setSearchError(msg);
-      setAiResults([]);
-      setHasSearched(true);
-      setIsSearchFocused(true);
+      if (isGibberish) {
+        setSearchError('');
+        setAiResults([]);
+        setHasSearched(true);
+        setIsSearchFocused(true);
+      } else {
+        setSearchError(msg);
+        setAiResults([]);
+        setHasSearched(true);
+        setIsSearchFocused(true);
+      }
       return;
     }
 
