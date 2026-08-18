@@ -359,32 +359,35 @@ const CategoryManagement = () => {
 
         { }
         <div style={{ padding: '12px 16px', borderBottom: '1px solid #e5e7eb', display: 'flex', gap: 10, alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap' }}>
-          <div style={{ position: 'relative', flex: 1, minWidth: 200, maxWidth: 320 }}>
-            <svg style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)', color: '#9ca3af' }} width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <circle cx="11" cy="11" r="8" /><line x1="21" y1="21" x2="16.65" y2="16.65" />
-            </svg>
-            <input
-              type="text" value={search}
-              onChange={e => setSearch(e.target.value)}
-              placeholder="Tìm tên danh mục, slug..."
-              style={{ width: '100%', padding: '7px 10px 7px 32px', border: '1px solid #d1d5db', borderRadius: 6, fontSize: 13, outline: 'none', boxSizing: 'border-box' }}
-              onFocus={e => e.target.style.borderColor = '#dc2626'}
-              onBlur={e => e.target.style.borderColor = '#d1d5db'}
-            />
+          <div style={{ display: 'flex', gap: 10, alignItems: 'center', flexWrap: 'wrap', flex: 1 }}>
+            <div style={{ position: 'relative', flex: 1, minWidth: 200, maxWidth: 320 }}>
+              <svg style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)', color: '#9ca3af' }} width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <circle cx="11" cy="11" r="8" /><line x1="21" y1="21" x2="16.65" y2="16.65" />
+              </svg>
+              <input
+                type="text" value={search}
+                onChange={e => setSearch(e.target.value)}
+                placeholder="Tìm tên danh mục, slug..."
+                style={{ width: '100%', padding: '7px 10px 7px 32px', border: '1px solid #d1d5db', borderRadius: 6, fontSize: 13, outline: 'none', boxSizing: 'border-box' }}
+                onFocus={e => e.target.style.borderColor = '#dc2626'}
+                onBlur={e => e.target.style.borderColor = '#d1d5db'}
+              />
+            </div>
+            
+            <select
+              value={filterParent}
+              onChange={(e) => setFilterParent(e.target.value)}
+              style={{ padding: '7px 10px', border: '1px solid #d1d5db', borderRadius: 6, fontSize: 13, outline: 'none', background: '#fff', minWidth: 200 }}
+            >
+              <option value="">-- Lọc theo danh mục cha --</option>
+              {flatCategories.map(cat => (
+                <option key={cat.id_danhmuc} value={cat.id_danhmuc}>
+                  {cat.danhmuc_cha ? `  ↳ ${cat.ten_danhmuc}` : cat.ten_danhmuc}
+                </option>
+              ))}
+            </select>
           </div>
-          
-          <select
-            value={filterParent}
-            onChange={(e) => setFilterParent(e.target.value)}
-            style={{ padding: '7px 10px', border: '1px solid #d1d5db', borderRadius: 6, fontSize: 13, outline: 'none', background: '#fff', minWidth: 200 }}
-          >
-            <option value="">-- Lọc theo danh mục cha --</option>
-            {flatCategories.map(cat => (
-              <option key={cat.id_danhmuc} value={cat.id_danhmuc}>
-                {cat.danhmuc_cha ? `  ↳ ${cat.ten_danhmuc}` : cat.ten_danhmuc}
-              </option>
-            ))}
-          </select>
+
           <button
             onClick={fetchCategories}
             style={{ padding: '7px 12px', borderRadius: 6, border: '1px solid #d1d5db', background: '#f9fafb', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 5, fontSize: 13, color: '#374151' }}
