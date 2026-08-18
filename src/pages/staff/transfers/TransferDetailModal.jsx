@@ -232,13 +232,94 @@ const TransferDetailModal = ({ id, myBranchId, onClose, onUpdated }) => {
           <button type="button" onClick={onClose} className="px-5 py-2.5 text-sm font-semibold text-slate-600 hover:bg-slate-100 rounded-lg">Đóng</button>
           
           {ticket.trang_thai === 'Chờ duyệt' && isMyExport && (
-            <button 
-              onClick={handleApprove} 
-              disabled={processing} 
-              className="px-5 py-2.5 text-sm font-bold text-white bg-orange-600 hover:bg-orange-700 rounded-lg"
-            >
-              {processing ? "Đang xử lý..." : "Duyệt Yêu Cầu & Xuất Kho"}
-            </button>
+            <div className="flex items-center gap-3">
+              <button 
+                onClick={async () => {
+                  const { value: reason } = await Swal.fire({
+                    title: 'Từ chối phiếu',
+                    input: 'textarea',
+                    inputLabel: 'Lý do từ chối',
+                    inputPlaceholder: 'Nhập lý do không thể xuất hàng...',
+                    inputAttributes: {
+                      'aria-label': 'Lý do từ chối'
+                    },
+                    showCancelButton: true,
+                    confirmButtonText: 'Xác nhận từ chối',
+                    cancelButtonText: 'Đóng',
+                    confirmButtonColor: '#d33',
+                    inputValidator: (value) => {
+                      if (!value) {
+                        return 'Bạn cần nhập lý do từ chối!'
+                      }
+                    }
+                  });
+                  if (reason) {
+                    setProcessing(true);
+                    try {
+                      const token = localStorage.getItem("staff_access_token");
+                      const res = await axios.put(`${API}/staff/transfers/${ticket.id_phieu}/reject`, { ly_do: reason }, { headers: { Authorization: `Bearer ${token}` } });
+                      if (res.data.status === 'success') {
+                        Swal.fire("Thành công", res.data.message, "success");
+                        onSuccess();
+                      }
+                    } catch (err) {
+                      Swal.fire("Lỗi", err.response?.data?.message || "Không thể từ chối phiếu", "error");
+                    } finally {
+                      setProcessing(false);
+                    }
+                  }
+                }} 
+                disabled={processing} 
+                className="px-5 py-2.5 text-sm font-bold text-slate-700 bg-slate-200 hover:bg-slate-300 rounded-lg"
+              >
+                {processing ? "Đang xử lý..." : "Từ Chối"}
+              </button>
+              <button 
+                onClick={handleApprove} 
+                disabled={processing} 
+                className="px-5 py-2.5 text-sm font-bold text-white bg-orange-600 hover:bg-orange-700 rounded-lg"
+              >
+                {processing ? "Đang xử lý..." : "Duyệt Yêu Cầu & Xuất Kho"}
+              </button>
+            </div>
+          )}
+
+          {ticket.trang_thai === 'Chờ duyệt' && isMyImport && (
+            <div className="flex items-center gap-3">
+              <span className="text-sm font-bold text-orange-600 italic px-2 py-2">⏳ Đang chờ kho kia duyệt xuất hàng...</span>
+              <button 
+                onClick={async () => {
+                  const result = await Swal.fire({
+                    title: 'Xác nhận hủy?',
+                    text: "Bạn có chắc chắn muốn hủy phiếu yêu cầu điều chuyển này không?",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#d33',
+                    cancelButtonColor: '#3085d6',
+                    confirmButtonText: 'Vâng, Hủy phiếu!'
+                  });
+                  if (result.isConfirmed) {
+                    setProcessing(true);
+                    try {
+                      const token = localStorage.getItem("staff_access_token");
+                      const res = await axios.put(`${API}/staff/transfers/${ticket.id_phieu}/cancel`, {}, { headers: { Authorization: `Bearer ${token}` } });
+                      if (res.data.status === 'success') {
+                        Swal.fire("Thành công", res.data.message, "success");
+                        onSuccess();
+                      }
+                    } catch (err) {
+                      Swal.fire("Lỗi", err.response?.data?.message || "Không thể hủy phiếu", "error");
+                    } finally {
+                      setProcessing(false);
+                    }
+                  }
+                }} 
+                disabled={processing} 
+                className="px-5 py-2.5 text-sm font-bold text-white bg-red-600 hover:bg-red-700 rounded-lg shadow-sm"
+              >
+                {processing ? "Đang xử lý..." : "Hủy Yêu Cầu"}
+              </button>
+            </div>
           )}
 
           {ticket.trang_thai === 'Đang vận chuyển' && isMyImport && (
@@ -248,13 +329,8 @@ const TransferDetailModal = ({ id, myBranchId, onClose, onUpdated }) => {
               className="px-5 py-2.5 text-sm font-bold text-white bg-green-600 hover:bg-green-700 rounded-lg shadow-sm flex items-center gap-2"
             >
               <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M5 13l4 4L19 7"></path></svg>
-              Xác Nhận Đã Nhận Đủ Hàng
+              {processing ? "Đang xử lý..." : "Xác Nhận Nhận Hàng"}
             </button>
-          )}
-
-          {/* Nếu là chờ duyệt nhưng mình là kho nhập (người đi xin), mình ko được duyệt */}
-          {ticket.trang_thai === 'Chờ duyệt' && isMyImport && (
-             <span className="text-xs text-orange-600 font-bold italic flex items-center">⏳ Đang chờ kho kia duyệt xuất hàng...</span>
           )}
           
           {/* Nếu là đang vận chuyển nhưng mình là kho xuất (người gửi), mình ko được nhận */}

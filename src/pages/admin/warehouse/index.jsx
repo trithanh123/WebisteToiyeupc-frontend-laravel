@@ -60,7 +60,8 @@ const WarehouseManagement = () => {
         const response = await fetch(`https://webistetoiyeupc-backend-laravel.onrender.com/api/admin/warehouse/${id}`, {
           method: 'DELETE',
           headers: {
-            'Authorization': `Bearer ${token}`
+            'Authorization': `Bearer ${token}`,
+            'Accept': 'application/json'
           }
         });
         const result = await response.json();
