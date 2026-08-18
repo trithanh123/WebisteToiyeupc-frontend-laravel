@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import Swal from 'sweetalert2';
 
 const TransferDetailModal = ({ id, myBranchId, onClose, onUpdated }) => {
   const [ticket, setTicket] = useState(null);
@@ -257,13 +258,24 @@ const TransferDetailModal = ({ id, myBranchId, onClose, onUpdated }) => {
                     setProcessing(true);
                     try {
                       const token = localStorage.getItem("staff_access_token");
-                      const res = await axios.put(`${API}/staff/transfers/${ticket.id_phieu}/reject`, { ly_do: reason }, { headers: { Authorization: `Bearer ${token}` } });
-                      if (res.data.status === 'success') {
-                        Swal.fire("Thành công", res.data.message, "success");
-                        onSuccess();
+                      const res = await fetch(`https://webistetoiyeupc-backend-laravel.onrender.com/api/staff/transfers/${ticket.id_phieu}/reject`, {
+                        method: 'PUT',
+                        headers: { 
+                          'Authorization': `Bearer ${token}`,
+                          'Content-Type': 'application/json',
+                          'Accept': 'application/json'
+                        },
+                        body: JSON.stringify({ ly_do: reason })
+                      });
+                      const data = await res.json();
+                      if (res.ok && data.status === 'success') {
+                        Swal.fire("Thành công", data.message, "success");
+                        onUpdated();
+                      } else {
+                        Swal.fire("Lỗi", data.message || "Không thể từ chối phiếu", "error");
                       }
                     } catch (err) {
-                      Swal.fire("Lỗi", err.response?.data?.message || "Không thể từ chối phiếu", "error");
+                      Swal.fire("Lỗi", "Lỗi kết nối khi từ chối phiếu", "error");
                     } finally {
                       setProcessing(false);
                     }
@@ -302,13 +314,22 @@ const TransferDetailModal = ({ id, myBranchId, onClose, onUpdated }) => {
                     setProcessing(true);
                     try {
                       const token = localStorage.getItem("staff_access_token");
-                      const res = await axios.put(`${API}/staff/transfers/${ticket.id_phieu}/cancel`, {}, { headers: { Authorization: `Bearer ${token}` } });
-                      if (res.data.status === 'success') {
-                        Swal.fire("Thành công", res.data.message, "success");
-                        onSuccess();
+                      const res = await fetch(`https://webistetoiyeupc-backend-laravel.onrender.com/api/staff/transfers/${ticket.id_phieu}/cancel`, {
+                        method: 'PUT',
+                        headers: { 
+                          'Authorization': `Bearer ${token}`,
+                          'Accept': 'application/json'
+                        }
+                      });
+                      const data = await res.json();
+                      if (res.ok && data.status === 'success') {
+                        Swal.fire("Thành công", data.message, "success");
+                        onUpdated();
+                      } else {
+                        Swal.fire("Lỗi", data.message || "Không thể hủy phiếu", "error");
                       }
                     } catch (err) {
-                      Swal.fire("Lỗi", err.response?.data?.message || "Không thể hủy phiếu", "error");
+                      Swal.fire("Lỗi", "Lỗi kết nối khi hủy phiếu", "error");
                     } finally {
                       setProcessing(false);
                     }
