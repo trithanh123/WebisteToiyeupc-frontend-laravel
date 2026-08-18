@@ -151,7 +151,7 @@ const ProductDetailPage = () => {
             <div className="lg:w-7/12 flex flex-col">
                <h1 className="text-[22px] md:text-2xl font-bold text-gray-800 mb-2 leading-[1.3]">{product.tensp}</h1>
                <div className="flex flex-wrap items-center gap-4 text-sm text-gray-500 mb-5">
-                  <span className="font-medium text-gray-600">Thương hiệu: <span className="text-blue-600 font-bold">{product.tensp.split(' ')[0] || 'Unknown'}</span></span>
+                  <span className="font-medium text-gray-600">Danh mục: <span className="text-blue-600 font-bold">{breadcrumb.length > 0 ? breadcrumb[breadcrumb.length - 1].ten_danhmuc : 'Chưa phân loại'}</span></span>
                   <span className="hidden md:inline text-gray-300">|</span>
                   <span>SKU: <span className="font-medium text-gray-700">{product.masp}</span></span>
                   <span className="hidden md:inline text-gray-300">|</span>
