@@ -5,6 +5,7 @@ import logo from "../../../../assets/images/toiyeupc2.png";
 
 import iconHome from "../../../../assets/icons/icons8-dashboard-48.png";
 import iconUser from "../../../../assets/icons/icons8-user-management-53.png";
+import iconCategory from "../../../../assets/icons/icons8-control-panel-48.png";
 import iconProduct from "../../../../assets/icons/icons8-box-128.png";
 import iconVoucher from "../../../../assets/icons/icons8-voucher-48.png";
 import iconStore from "../../../../assets/icons/icons8-online-store-50.png";
@@ -18,7 +19,8 @@ import iconTransfer from "../../../../assets/icons/icons8-transfer-50.png";
 const navItems = [
   { label: "BẢNG ĐIỀU KHIỂN",    path: ROUTERS.ADMIN.HOME, icon: iconHome },
   { label: "Quản lý Người Dùng",       path: ROUTERS.ADMIN.USERS, icon: iconUser },
-  { label: "Quản lý danh mục&sp",      path: ROUTERS.ADMIN.PRODUCTS, icon: iconProduct },
+  { label: "Quản lý Danh mục",         path: ROUTERS.ADMIN.CATEGORIES, icon: iconCategory },
+  { label: "Quản lý Sản phẩm",         path: ROUTERS.ADMIN.PRODUCTS, icon: iconProduct },
   { label: "Quản lý Voucher",          path: ROUTERS.ADMIN.VOUCHER, icon: iconVoucher },
   { label: "Quản lý chuỗi cửa hàng",   path: ROUTERS.ADMIN.STORES, icon: iconStore },
   { label: "Quản lý nhân sự",     path: ROUTERS.ADMIN.STAFF, icon: iconStaff },
