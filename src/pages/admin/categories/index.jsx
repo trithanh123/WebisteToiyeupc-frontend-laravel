@@ -47,10 +47,10 @@ export const getIconSrc = (name) => {
 
 export const CategoryModal = ({ isOpen, onClose, category, onSaveSuccess, categoriesList }) => {
   const [formData, setFormData] = useState({
-    Ten_DanhMuc: '',
+    ten_danhmuc: '',
     slug: '',
-    DanhMuc_cha: '',
-    Hinhanh_icon: '',
+    danhmuc_cha: '',
+    hinhanh_icon: '',
     is_active: true,
   });
   const [loading, setLoading] = useState(false);
@@ -65,21 +65,21 @@ export const CategoryModal = ({ isOpen, onClose, category, onSaveSuccess, catego
   useEffect(() => {
     if (category) {
       setFormData({
-        Ten_DanhMuc: category.ten_danhmuc || '',
+        ten_danhmuc: category.ten_danhmuc || '',
         slug: category.slug || '',
-        DanhMuc_cha: category.danhmuc_cha || '',
-        Hinhanh_icon: category.hinhanh_icon || '',
+        danhmuc_cha: category.danhmuc_cha || '',
+        hinhanh_icon: category.hinhanh_icon || '',
         is_active: category.is_active !== undefined ? category.is_active : true,
       });
     } else {
-      setFormData({ Ten_DanhMuc: '', slug: '', DanhMuc_cha: '', Hinhanh_icon: '', is_active: true });
+      setFormData({ ten_danhmuc: '', slug: '', danhmuc_cha: '', hinhanh_icon: '', is_active: true });
     }
   }, [category, isOpen]);
 
   if (!isOpen) return null;
 
   const handleNameChange = (val) => {
-    setFormData(prev => ({ ...prev, Ten_DanhMuc: val, slug: toSlug(val) }));
+    setFormData(prev => ({ ...prev, ten_danhmuc: val, slug: toSlug(val) }));
   };
 
   const handleSubmit = async (e) => {
@@ -88,10 +88,10 @@ export const CategoryModal = ({ isOpen, onClose, category, onSaveSuccess, catego
     try {
       const token = localStorage.getItem("admin_access_token");
       const payload = {
-        Ten_DanhMuc: formData.ten_danhmuc,
+        ten_danhmuc: formData.ten_danhmuc,
         slug: formData.slug || undefined,
-        DanhMuc_cha: formData.danhmuc_cha ? Number(formData.danhmuc_cha) : null,
-        Hinhanh_icon: formData.hinhanh_icon,
+        danhmuc_cha: formData.danhmuc_cha ? Number(formData.danhmuc_cha) : null,
+        hinhanh_icon: formData.hinhanh_icon,
         is_active: formData.is_active,
       };
       const headers = { Authorization: `Bearer ${token}` };
@@ -166,7 +166,7 @@ export const CategoryModal = ({ isOpen, onClose, category, onSaveSuccess, catego
             <select
               className="cm-input"
               value={formData.danhmuc_cha}
-              onChange={e => setFormData({ ...formData, DanhMuc_cha: e.target.value })}
+              onChange={e => setFormData({ ...formData, danhmuc_cha: e.target.value })}
             >
               <option value="">-- Là danh mục gốc --</option>
               {categoriesList && categoriesList
@@ -184,7 +184,7 @@ export const CategoryModal = ({ isOpen, onClose, category, onSaveSuccess, catego
             <select
               className="cm-input"
               value={formData.hinhanh_icon}
-              onChange={e => setFormData({ ...formData, Hinhanh_icon: e.target.value })}
+              onChange={e => setFormData({ ...formData, hinhanh_icon: e.target.value })}
             >
               <option value="">-- Không chọn --</option>
               {ICON_LIST.map(icon => (
