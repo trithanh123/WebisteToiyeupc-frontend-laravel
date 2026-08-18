@@ -66,7 +66,8 @@ const Header = () => {
       /(..)\1{2,}/.test(trimmed) || 
       /(...)\1{1,}/.test(trimmed) || 
       /[bcdfghjklmnpqrstvwxz]{5,}/i.test(trimmed) ||
-      /^(qwerty|asdfgh|zxcvbn|qwer|asdf|zxcv)+$/i.test(trimmed);
+      /^(qwerty|asdfgh|zxcvbn|qwer|asdf|zxcv)+$/i.test(trimmed) ||
+      /(asd|sdf|dfg|fgh|ghj|hjk|jkl|qwe|zxc|xcv|cvb|vbn|bnm|cxz|vxc|bvc|nbv|mnb|lkj|kjh|jhg|hgf|gfd|fds|dsa|ewq)/i.test(trimmed);
       
     if (isSpam) {
       return { valid: false, isGibberish: true, msg: 'Từ khóa không có ý nghĩa.' };
