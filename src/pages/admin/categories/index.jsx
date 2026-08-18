@@ -233,6 +233,7 @@ const CategoryManagement = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [search, setSearch] = useState('');
+  const [filterParent, setFilterParent] = useState('');
 
   const [itemOffset, setItemOffset] = useState(0);
   const itemsPerPage = 10;
@@ -308,7 +309,9 @@ const CategoryManagement = () => {
 
   const filtered = categories.filter(c => {
     const q = search.toLowerCase();
-    return !q || c.ten_danhmuc?.toLowerCase().includes(q) || c.slug?.toLowerCase().includes(q);
+    const matchSearch = !q || c.ten_danhmuc?.toLowerCase().includes(q) || c.slug?.toLowerCase().includes(q);
+    const matchParent = !filterParent || String(c.danhmuc_cha) === String(filterParent);
+    return matchSearch && matchParent;
   });
 
   const endOffset = itemOffset + itemsPerPage;
@@ -319,7 +322,7 @@ const CategoryManagement = () => {
     const newOffset = (event.selected * itemsPerPage) % filtered.length;
     setItemOffset(newOffset);
   };
-  useEffect(() => { setItemOffset(0); }, [search]);
+  useEffect(() => { setItemOffset(0); }, [search, filterParent]);
 
   return (
     <AdminMasterLayout title="Quản lý Danh mục – Admin">
@@ -369,6 +372,19 @@ const CategoryManagement = () => {
               onBlur={e => e.target.style.borderColor = '#d1d5db'}
             />
           </div>
+          
+          <select
+            value={filterParent}
+            onChange={(e) => setFilterParent(e.target.value)}
+            style={{ padding: '7px 10px', border: '1px solid #d1d5db', borderRadius: 6, fontSize: 13, outline: 'none', background: '#fff', minWidth: 200 }}
+          >
+            <option value="">-- Lọc theo danh mục cha --</option>
+            {flatCategories.map(cat => (
+              <option key={cat.id_danhmuc} value={cat.id_danhmuc}>
+                {cat.danhmuc_cha ? `  ↳ ${cat.ten_danhmuc}` : cat.ten_danhmuc}
+              </option>
+            ))}
+          </select>
           <button
             onClick={fetchCategories}
             style={{ padding: '7px 12px', borderRadius: 6, border: '1px solid #d1d5db', background: '#f9fafb', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 5, fontSize: 13, color: '#374151' }}
