@@ -84,6 +84,8 @@ const OrderManagement = () => {
   const filteredOrders = orders.filter(o => {
     if (activeTab === 'Chờ duyệt') return o.trang_thai_dh === 'Chờ duyệt' || o.trang_thai_dh === 'Chờ xác nhận' || o.trang_thai_dh === 'Đang chuẩn bị';
     if (activeTab === 'Đang giao') return o.trang_thai_dh === 'Đang giao' || o.trang_thai_dh === 'Đang giao hàng';
+    if (activeTab === 'Thành công') return o.trang_thai_dh === 'Hoàn thành' || o.trang_thai_dh === 'Đã giao' || o.trang_thai_dh === 'Thành công';
+    if (activeTab === 'Đã hủy') return o.trang_thai_dh === 'Đã hủy' || o.trang_thai_dh === 'Đã huỷ' || o.trang_thai_dh === 'Giao thất bại';
     return o.trang_thai_dh === activeTab;
   });
 
