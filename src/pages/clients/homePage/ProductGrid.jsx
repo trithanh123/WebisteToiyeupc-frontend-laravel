@@ -12,7 +12,7 @@ const ProductGrid = () => {
   useEffect(() => {
     const fetchTopProducts = async () => {
       try {
-        const res = await axios.get(`${API}/products`);
+        const res = await axios.get(`${API}/products/by-category?danh-muc=pc-toiyeupc`);
 
         const data = Array.isArray(res.data?.data) ? res.data.data : (Array.isArray(res.data) ? res.data : []);
 
